@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package ca.watier.contexts;
+package ca.watier.echechessengine.contexts;
 
 import ca.watier.echechessengine.game.CustomPieceWithStandardRulesHandler;
 import ca.watier.echechessengine.game.GameConstraints;
