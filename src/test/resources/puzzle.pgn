@@ -1,0 +1,17 @@
+[Event "Rated Blitz game"]
+[Site "https://lichess.org/AbyfF5nR"]
+[White "joaquin_jimenez"]
+[Black "asbardhi"]
+[Result "1-0"]
+[UTCDate "2017.12.31"]
+[UTCTime "23:11:51"]
+[WhiteElo "1452"]
+[BlackElo "1549"]
+[WhiteRatingDiff "+13"]
+[BlackRatingDiff "-13"]
+[ECO "C33"]
+[Opening "King's Gambit Accepted, Bishop's Gambit"]
+[TimeControl "300+3"]
+[Termination "Normal"]
+
+1. e4 e5 2. f4 exf4 3. Bc4 a6 4. Qh5 Qf6 5. Nf3 g6 6. Qd5 c6 7. Qd3 b5 8. Bb3 g5 9. O-O g4 10. e5 Qg6 11. Qxg6 hxg6 12. Ng5 Rh5 13. Nxf7 d5 14. Nd6+ Bxd6 15. exd6 Kd7 16. d3 g5 17. g3 fxg3 18. hxg3 Bb7 19. Rf7+ Kxd6 20. Rxb7 Nd7 21. c4 Ngf6 22. cxd5 cxd5 23. Nc3 d4 24. Ne4+ Nxe4 25. dxe4 Nc5 26. Rb6+ Kc7 27. Rg6 Nxe4 28. Rg7+ Kc6 29. Be6 Rah8 30. Kf1 Nxg3+ 31. Ke1 Rh1+ 32. Kd2 R8h2+ 33. Kd3 Kc5 34. Rxg5+ Kd6 35. Bxg4 Nf1 36. Bf4+ Kc6 37. Bxh2 Rxh2 38. Rxf1 Rxb2 39. Kxd4 Rxa2 40. Rf6+ Kb7 41. Rg7+ Ka8 42. Rf8# 1-0

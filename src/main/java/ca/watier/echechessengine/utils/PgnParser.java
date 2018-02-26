@@ -17,11 +17,12 @@
 package ca.watier.echechessengine.utils;
 
 import ca.watier.echechessengine.engines.GenericGameHandler;
-import ca.watier.echechessengine.enums.PgnMoveToken;
 import ca.watier.echechessengine.game.GameConstraints;
 import ca.watier.echesscommon.enums.*;
 import ca.watier.echesscommon.interfaces.WebSocketService;
 import ca.watier.echesscommon.pojos.MoveHistory;
+import ca.watier.echesscommon.pojos.PieceDataSection;
+import ca.watier.echesscommon.pojos.PieceSingleMoveSection;
 import ca.watier.echesscommon.utils.MultiArrayMap;
 import ca.watier.echesscommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -62,14 +63,33 @@ public class PgnParser {
         this.webSocketService = webSocketService;
     }
 
+    @NotNull
+    public static List<Pair<String, String>> getMappedHeadersAndGames(@NotNull String rawText) {
+        List<Pair<String, String>> values = new ArrayList<>();
+        String[] rawValues = getRawHeadersAndGames(rawText);
+
+        for (int i = 0; i < rawValues.length; i = i + 2) {
+            String header = rawValues[i];
+            String game = rawValues[i + 1];
+            values.add(new Pair<>(header, game));
+        }
+
+        return values;
+    }
+
+    @NotNull
+    public static String[] getRawHeadersAndGames(@NotNull String rawText) {
+        return rawText.replace("\r\n", "\n").split("\n\n");
+    }
+
     public List<GenericGameHandler> parse(@NotNull String rawText) {
-        String[] headersAndGames = rawText.replace("\r\n", "\n").split("\n\n");
+        String[] headersAndGames = getRawHeadersAndGames(rawText);
         int nbOfGames = headersAndGames.length;
         int currentIdx = 1;
 
         for (int i = 0; i < nbOfGames; i = i + 2) {
             String rawCurrentGame = headersAndGames[i + 1];
-            String currentGame = rawCurrentGame.substring(2, rawCurrentGame.length()).replace("\n", " ");
+            String currentGame = getGame(rawCurrentGame);
 
             LOGGER.debug("=================================================");
             LOGGER.debug("***{}***", currentIdx);
@@ -106,6 +126,11 @@ public class PgnParser {
         }
 
         return handlerList;
+    }
+
+    @NotNull
+    public static String getGame(String rawCurrentGame) {
+        return rawCurrentGame.substring(2, rawCurrentGame.length()).replace("\n", " ");
     }
 
     private void resetSide() {
@@ -153,7 +178,7 @@ public class PgnParser {
                     executeCastling(pgnMoveToken);
                     break;
                 case PAWN_PROMOTION:
-                    validatePawnPromotion(pawnPromotionWithCapture);
+                    validatePawnPromotion(pawnPromotionWithCapture, action);
                     break;
             }
         }
@@ -216,7 +241,7 @@ public class PgnParser {
 
     private void validateCheckMate() {
         if (!KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(otherSide, false))) {
-            throw new IllegalStateException("The other player king is not check!");
+            throw new IllegalStateException("The other player king is not checkmate!");
         } else {
             LOGGER.debug("{} is CHECKMATE", otherSide);
         }
@@ -227,13 +252,23 @@ public class PgnParser {
         List<String> casePositions = getPositionsFromAction(action);
         List<PgnMoveToken> pieceMovesFromLetter = PgnMoveToken.getPieceMovesFromLetter(action);
 
-        String position = casePositions.get(0);
-        CasePosition to = CasePosition.valueOf(position.toUpperCase());
+        CasePosition to;
+
+        switch (casePositions.size()) {
+            case 1:
+                to = CasePosition.valueOf(casePositions.get(0).toUpperCase());
+                break;
+            case 2:
+                to = CasePosition.valueOf(casePositions.get(1).toUpperCase());
+                break;
+            default:
+                throw new IllegalStateException("More than two coordinates detected!");
+        }
 
         PgnPieceFound pgnPieceFound = isPawnPromotion(action, pieceMovesFromLetter);
         List<Pieces> validPiecesFromAction = pgnPieceFound.getPieces();
         List<Pair<CasePosition, Pieces>> piecesThatCanHitPosition = gameHandler.getAllPiecesThatCanMoveTo(to, currentSide);
-        MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget = getSimilarPiecesThatCanHitSameTarget(piecesThatCanHitPosition, validPiecesFromAction);
+        MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget = getSimilarPiecesThatCanHitSameTarget(piecesThatCanHitPosition, validPiecesFromAction, to, gameHandler);
 
         CasePosition from = (!similarPieceThatHitTarget.isEmpty() ?
                 getPositionWhenMultipleTargetCanHit(action, casePositions, similarPieceThatHitTarget) :
@@ -246,8 +281,8 @@ public class PgnParser {
             PgnPieceFound pieceFromAction = PgnPieceFound.getPieceFromAction(action);
             Pieces pieceBySide = pieceFromAction.getPieceBySide(currentSide);
             gameHandler.upgradePiece(to, pieceBySide, currentSide);
-        } else if (!(MoveType.NORMAL_MOVE.equals(moveType) || MoveType.CAPTURE.equals(moveType) || MoveType.EN_PASSANT.equals(moveType))) {  //Issue with the move / case
-            LOGGER.error("Unable to move at the selected position {} for the current color {} !", position, currentSide);
+        } else if (!(MoveType.NORMAL_MOVE.equals(moveType) || MoveType.CAPTURE.equals(moveType) || MoveType.EN_PASSANT.equals(moveType) || MoveType.PAWN_HOP.equals(moveType))) {  //Issue with the move / case
+            LOGGER.error("Unable to move at the selected position {} for the current color {} ! ({})", to, currentSide, action);
         }
     }
 
@@ -261,7 +296,7 @@ public class PgnParser {
         }
     }
 
-    private void validatePawnPromotion(boolean pawnPromotionWithCapture) {
+    private void validatePawnPromotion(boolean pawnPromotionWithCapture, String action) {
         List<MoveHistory> moveHistory = gameHandler.getMoveHistory();
 
         //In case of a capture and a pawn promotion in the same turn, the history index of the promotion is before the capture
@@ -272,6 +307,8 @@ public class PgnParser {
 
         if (!MoveType.PAWN_PROMOTION.equals(lastMoveHistory.getMoveType())) {
             throw new IllegalStateException("The pawn promotion is not in the history!");
+        } else {
+            LOGGER.debug("PAWN PROMOTION {} to {} ({}) | action -> {}", lastMoveHistory.getFrom(), lastMoveHistory.getTo(), currentSide, action);
         }
     }
 
@@ -300,7 +337,7 @@ public class PgnParser {
         return pieceMovesFromLetter.contains(PgnMoveToken.PAWN_PROMOTION) ? PgnPieceFound.PAWN : PgnPieceFound.getPieceFromAction(action);
     }
 
-    private MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> getSimilarPiecesThatCanHitSameTarget(List<Pair<CasePosition, Pieces>> piecesThatCanHitPosition, List<Pieces> validPiecesFromAction) {
+    private MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> getSimilarPiecesThatCanHitSameTarget(List<Pair<CasePosition, Pieces>> piecesThatCanHitPosition, List<Pieces> validPiecesFromAction, CasePosition to, GenericGameHandler gameHandler) {
         MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget = new MultiArrayMap<>();
 
         //Group all similar pieces that can hit the target
@@ -309,7 +346,7 @@ public class PgnParser {
             CasePosition firstPosition = firstLayer.getFirstValue();
             Pieces firstPiece = firstLayer.getSecondValue();
 
-            if (!validPiecesFromAction.contains(firstPiece)) {
+            if (!validPiecesFromAction.contains(firstPiece) || gameHandler.isKingCheckAfterMove(firstPosition, to, firstPiece.getSide())) {
                 continue;
             }
 
@@ -320,7 +357,7 @@ public class PgnParser {
                 CasePosition secondPosition = secondLayer.getFirstValue();
                 Pieces secondPiece = secondLayer.getSecondValue();
 
-                if (firstPiece.equals(secondPiece)) {
+                if (firstPiece.equals(secondPiece) && !gameHandler.isKingCheckAfterMove(secondPosition, to, secondPiece.getSide())) {
                     similarPieceThatHitTarget.put(secondPiece, new Pair<>(secondPosition, secondPiece));
                     isOtherFound = true;
                 }
@@ -331,30 +368,79 @@ public class PgnParser {
             }
         }
 
+
         return similarPieceThatHitTarget;
     }
 
     private CasePosition getPositionWhenMultipleTargetCanHit(@NotNull String action, List<String> casePositions, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) {
-        CasePosition value = null;
+        CasePosition value;
         int length = casePositions.size();
-        char colOrRow = findFirstColOrRowInAction(action);
-        mainLoop:
-        for (Map.Entry<Pieces, List<Pair<CasePosition, Pieces>>> piecesListEntry : similarPieceThatHitTarget.entrySet()) {
-            for (Pair<CasePosition, Pieces> casePositionPiecesPair : piecesListEntry.getValue()) {
-                if (length == 1) {
-                    CasePosition firstValue = casePositionPiecesPair.getFirstValue();
-                    if ((Character.isLetter(colOrRow) && firstValue.isOnSameColumn(colOrRow)) ||   //col (letter)
-                            (Character.isDigit(colOrRow) && firstValue.isOnSameRow(colOrRow))) {  //row (number)
-                        value = firstValue;
-                        break mainLoop;
+        Byte row = null;
+        Character column = null;
+        boolean isRow;
+        boolean isColumn;
+        PgnPieceFound pieceFromAction;
+
+        if (length == 2) {
+            return CasePosition.valueOf(casePositions.get(0).toUpperCase()); //Contain from (0) and to (1) positions
+        } else if (length > 2) {
+            throw new IllegalStateException("Invalid type of positioning");
+        }
+
+        //Actions
+        if (action.contains(PgnMoveToken.CAPTURE.getChars().get(0)) ||
+                action.contains(PgnMoveToken.PAWN_PROMOTION.getChars().get(0))) {
+
+            //The position from is in the first action
+            PieceDataSection parsedActions = PieceDataSection.getParsedActions(action).stream().findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Unable to find an action!"));
+
+            String before = parsedActions.getBefore();
+
+            pieceFromAction = PgnPieceFound.getPieceFromAction(before);
+
+            if (!PgnPieceFound.PAWN.equals(pieceFromAction)) {
+                before = before.substring(1); //Remove the piece, if not a pawn
+            }
+
+            switch (before.length()) {
+                case 1: //Row or column
+                    char tmp = before.charAt(0);
+
+                    if (Character.isLetter(tmp)) {
+                        column = tmp;
+                    } else if (Character.isDigit(tmp)) {
+                        row = (byte) Character.getNumericValue(tmp);
+                    } else {
+                        throw new IllegalStateException("Invalid type of Character!");
                     }
-                } else if (length == 2) { //Extract the full coordinate
-                    throw new IllegalStateException("The full coordinate is not implemented yet");
-                } else {
-                    throw new IllegalStateException("Invalid type of positioning");
-                }
+
+                    pieceFromAction = PgnPieceFound.getPieceFromAction(action.substring(0, 1));
+
+                    value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column, pieceFromAction);
+                    break;
+                case 2: //Full position
+                    value = getCasePositionWhenFullCoordinate(CasePosition.valueOf(before.toUpperCase()), similarPieceThatHitTarget);
+                    break;
+                default:
+                    throw new IllegalStateException("Invalid number of characters!");
+            }
+        } else { //Normal move
+            PieceSingleMoveSection parsedActions = PieceSingleMoveSection.getParsedActions(action);
+            row = parsedActions.getRow();
+            column = parsedActions.getColumn();
+            isRow = row != null && column == null;
+            isColumn = row == null && column != null;
+
+            if (parsedActions.isFromPositionFullCoordinate()) { //Full
+                value = getCasePositionWhenFullCoordinate(parsedActions.getFromFullCoordinate(), similarPieceThatHitTarget);
+            } else if (isRow || isColumn) { //Row
+                value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column, parsedActions.getPgnPieceFound());
+            } else {
+                throw new IllegalStateException("The position is now known!");
             }
         }
+
         return value;
     }
 
@@ -378,6 +464,35 @@ public class PgnParser {
         }
 
         return value;
+    }
+
+    private CasePosition getCasePositionWhenRowOrCol(MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget, Byte row, Character column, PgnPieceFound pgnPieceFound) {
+        CasePosition value = null;
+        boolean isRow = row != null && column == null;
+        boolean isColumn = row == null && column != null;
+
+        mainLoop:
+        for (Map.Entry<Pieces, List<Pair<CasePosition, Pieces>>> entry : similarPieceThatHitTarget.entrySet()) {
+            Pieces key = entry.getKey();
+
+            if (!pgnPieceFound.getPieces().contains(key)) {
+                continue;
+            }
+
+            for (Pair<CasePosition, Pieces> casePositionPiecesPair : entry.getValue()) {
+                CasePosition firstValue = casePositionPiecesPair.getFirstValue();
+
+                if ((isColumn && firstValue.isOnSameColumn(column)) || (isRow && firstValue.isOnSameRow(Character.forDigit(row, 10)))) {
+                    value = firstValue;
+                    break mainLoop;
+                }
+            }
+        }
+        return value;
+    }
+
+    private CasePosition getCasePositionWhenFullCoordinate(CasePosition fromFullCoordinate, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) {
+        throw new IllegalStateException("Not Implemented");
     }
 
     private char findFirstColOrRowInAction(@NotNull String action) {

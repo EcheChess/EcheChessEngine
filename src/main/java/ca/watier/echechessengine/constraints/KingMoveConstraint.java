@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import static ca.watier.echesscommon.enums.CasePosition.*;
+import static ca.watier.echesscommon.enums.Side.BLACK;
+import static ca.watier.echesscommon.enums.Side.WHITE;
 import static ca.watier.echesscommon.interfaces.BaseUtils.getSafeBoolean;
 
 /**
@@ -77,33 +79,37 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
             return moveType;
         }
 
-        if (Pieces.isSameSide(pieceFrom, pieceTo) && Pieces.isKing(pieceFrom) && Pieces.isRook(pieceTo)) {
+        if (Pieces.isSameSide(pieceFrom, pieceTo) && Pieces.isKing(pieceFrom) && Pieces.isRook(pieceTo)) { //Castling
             List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
-            List<CasePosition> positionsBetweenKingAndRook = MathUtils.getPositionsBetweenTwoPosition(from, to);
 
-            if (positionsBetweenKingAndRook.isEmpty()) {
-                return moveType;
-            }
 
             boolean isQueenSide = Direction.WEST.equals(MathUtils.getDirectionFromPosition(from, to));
-            CasePosition kingPosition = null;
 
-            switch (sideFrom) {
-                case BLACK:
-                    kingPosition = (isQueenSide ? C8 : G8);
-                    break;
-                case WHITE:
-                    kingPosition = (isQueenSide ? C1 : G1);
-                    break;
-                case OBSERVER:
-                default:
-                    break;
+            CasePosition kingPosition;
+            CasePosition positionWhereKingPass;
+            if (BLACK.equals(sideFrom)) {
+                if (isQueenSide) {
+                    kingPosition = C8;
+                    positionWhereKingPass = D8;
+                } else {
+                    kingPosition = G8;
+                    positionWhereKingPass = F8;
+                }
+            } else if (WHITE.equals(sideFrom)) {
+                if (isQueenSide) {
+                    kingPosition = C1;
+                    positionWhereKingPass = D1;
+                } else {
+                    kingPosition = G1;
+                    positionWhereKingPass = F1;
+                }
+            } else {
+                throw new IllegalStateException("The king position cannot be null!");
             }
 
             boolean isPieceAreNotMoved = !getSafeBoolean(gameHandler.isPieceMoved(from)) && !getSafeBoolean(gameHandler.isPieceMoved(to));
             boolean isNoPieceBetweenKingAndRook = piecesBetweenKingAndRook.isEmpty();
-            boolean isNoPieceAttackingBetweenKingAndRook = gameHandler.getPiecesThatCanHitPosition(Side.getOtherPlayerSide(sideFrom),
-                    positionsBetweenKingAndRook.toArray(new CasePosition[positionsBetweenKingAndRook.size()])).isEmpty();
+            boolean isNoPieceAttackingBetweenKingAndRook = gameHandler.getPiecesThatCanHitPosition(Side.getOtherPlayerSide(sideFrom), positionWhereKingPass).isEmpty();
             boolean isKingNotCheckAtCurrentLocation = !gameHandler.isKingCheckAtPosition(from, sideFrom);
             boolean kingNotCheckAtEndPosition = !gameHandler.isKingCheckAtPosition(kingPosition, sideFrom);
 
