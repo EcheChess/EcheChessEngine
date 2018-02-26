@@ -32,8 +32,8 @@ public class PgnTest {
 
     static {
         try {
-            //gamesAsFile = IOUtils.toString(PgnTest.class.getResourceAsStream("/puzzles.pgn"), Charset.forName("UTF-8"));
-            gamesAsFile = IOUtils.toString(PgnTest.class.getResourceAsStream("/puzzle.pgn"), Charset.forName("UTF-8"));
+            gamesAsFile = IOUtils.toString(PgnTest.class.getResourceAsStream("/puzzles.pgn"), Charset.forName("UTF-8"));
+            //gamesAsFile = IOUtils.toString(PgnTest.class.getResourceAsStream("/puzzle.pgn"), Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }

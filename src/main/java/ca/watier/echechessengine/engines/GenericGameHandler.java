@@ -504,6 +504,7 @@ public class GenericGameHandler extends GameBoard {
             value = !piecesThatCanHitOriginalPosition.isEmpty();
 
             //Reset the pawns
+            removePieceAt(to);
             setPiecePositionWithoutMoveState(currentPiece, from);
             setPiecePositionWithoutMoveState(enemyPawn, enPassantEnemyPawnPosition);
         } else {
