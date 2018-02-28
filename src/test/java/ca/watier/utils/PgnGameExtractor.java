@@ -14,13 +14,8 @@ public class PgnGameExtractor {
     private static final int SPACER_CHAR = 0x0A;
 
     public static void main(String[] args) {
-
-        if(args.length != 2) {
-            throw new IllegalStateException("The parameters are invalid");
-        }
-
-        String from = args[0];
-        String to = args[1];
+        String from = System.getenv("pgn_game_file_from");
+        String to = System.getenv("pgn_game_file_to");
 
         PgnGameExtractor.generatePgnFileWithCheckMate(from, to, true, true, true);
     }
@@ -34,7 +29,7 @@ public class PgnGameExtractor {
             boolean isHeader = true;
             int i;
             char current, last = '\0';
-            String header = null, game = null;
+            String header = null, game;
             while ((i = inputStream.read()) != -1) {
                 current = (char) i;
                 currentSectionBuilder.append(current);

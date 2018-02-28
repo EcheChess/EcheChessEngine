@@ -494,24 +494,4 @@ public class PgnParser {
     private CasePosition getCasePositionWhenFullCoordinate(CasePosition fromFullCoordinate, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) {
         throw new IllegalStateException("Not Implemented");
     }
-
-    private char findFirstColOrRowInAction(@NotNull String action) {
-        char value = '\0';
-
-        for (char c : action.toCharArray()) {
-            if (Character.isDigit(c)) {
-                int numericValue = Character.getNumericValue(c);
-
-                if (numericValue >= 1 && numericValue <= 8) {
-                    value = c;
-                    break;
-                }
-            } else if (Character.isLetter(c) && Character.isLowerCase(c) && (c >= 'a' && c <= 'h')) {
-                value = c;
-                break;
-            }
-        }
-
-        return value;
-    }
 }

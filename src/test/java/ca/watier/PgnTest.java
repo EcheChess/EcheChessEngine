@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -32,8 +33,8 @@ public class PgnTest {
 
     static {
         try {
-            gamesAsFile = IOUtils.toString(PgnTest.class.getResourceAsStream("/puzzles.pgn"), Charset.forName("UTF-8"));
-            //gamesAsFile = IOUtils.toString(PgnTest.class.getResourceAsStream("/puzzle.pgn"), Charset.forName("UTF-8"));
+            String from = System.getenv("pgn_game_file_from");
+            gamesAsFile = IOUtils.toString(new FileInputStream(from), Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
