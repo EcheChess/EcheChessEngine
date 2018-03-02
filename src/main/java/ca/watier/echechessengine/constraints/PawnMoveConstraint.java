@@ -55,7 +55,10 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     private static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide, CasePosition enemyPawnPosition, Pieces enemyPawn) {
         boolean isEnPassant = false;
 
-        if (Ranks.SIX.equals(Ranks.getRank(to, currentSide)) && Pieces.isPawn(enemyPawn)) {
+        boolean isFromOnFifthRank = Ranks.FIVE.equals(Ranks.getRank(from, currentSide));
+        boolean isToOnSixthRank = Ranks.SIX.equals(Ranks.getRank(to, currentSide));
+
+        if (isToOnSixthRank && isFromOnFifthRank && Pieces.isPawn(enemyPawn)) {
             boolean pawnUsedSpecialMove = gameHandler.isPawnUsedSpecialMove(enemyPawnPosition);
             Integer pieceTurnEnemyPawn = gameHandler.getPieceTurn(enemyPawnPosition);
 
