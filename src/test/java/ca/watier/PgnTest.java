@@ -16,34 +16,14 @@
 
 package ca.watier;
 
-import ca.watier.echechessengine.game.GameConstraints;
-import ca.watier.echechessengine.utils.PgnParser;
-import ca.watier.echesscommon.impl.WebSocketServiceTestImpl;
-import org.apache.commons.io.IOUtils;
-import org.assertj.core.api.Assertions;
+import ca.watier.utils.PgnGameLauncher;
 import org.junit.Test;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
 
 public class PgnTest {
 
-    private static String gamesAsFile;
-
-    static {
-        try {
-            String from = System.getenv("pgn_game_file_from");
-            gamesAsFile = IOUtils.toString(new FileInputStream(from), Charset.forName("UTF-8"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Test
-    public void pgnTest1() {
-        PgnParser pgnParser = new PgnParser(new GameConstraints(), new WebSocketServiceTestImpl());
-
-        Assertions.assertThat(pgnParser.parse(gamesAsFile)).isNotEmpty();
+    public void pgnLauncherTest() {
+        PgnGameLauncher pgnGameLauncher = new PgnGameLauncher();
+        pgnGameLauncher.start();
     }
 }
