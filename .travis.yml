@@ -7,7 +7,7 @@ branches:
   - master
 
 addons:
-  sonarqube:
+  sonarcloud:
     organization: "doi9t-github"
 script:
   # other script steps might be done before running the actual SonarQube analysis
