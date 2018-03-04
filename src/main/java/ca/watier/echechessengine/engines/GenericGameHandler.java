@@ -18,11 +18,11 @@ package ca.watier.echechessengine.engines;
 
 import ca.watier.echechessengine.constraints.PawnMoveConstraint;
 import ca.watier.echechessengine.game.GameConstraints;
-import ca.watier.echechessengine.responses.GameScoreResponse;
 import ca.watier.echesscommon.enums.*;
 import ca.watier.echesscommon.game.GameBoard;
 import ca.watier.echesscommon.interfaces.WebSocketService;
 import ca.watier.echesscommon.pojos.MoveHistory;
+import ca.watier.echesscommon.responses.GameScoreResponse;
 import ca.watier.echesscommon.sessions.Player;
 import ca.watier.echesscommon.utils.*;
 
@@ -182,7 +182,6 @@ public class GenericGameHandler extends GameBoard {
 
     protected final boolean isPlayerTurn(Side sideFrom) {
         return isGameHaveRule(SpecialGameRules.NO_PLAYER_TURN) || currentAllowedMoveSide.equals(sideFrom);
-
     }
 
     protected final void changeAllowedMoveSide() {
@@ -270,7 +269,7 @@ public class GenericGameHandler extends GameBoard {
                     boolean isColumnNearEachOther = (Math.abs(fromColPos - toColPos) == 1);
 
                     //This is the only case, where the piece is not directly the end target (En passant).
-                    if (Pieces.isPawn(getPiece(from)) &&
+                    if (Pieces.isPawn(currentPiece) &&
                             Pieces.isPawn(enemyPiece) &&
                             isColumnNearEachOther &&
                             fromRow == toRow &&

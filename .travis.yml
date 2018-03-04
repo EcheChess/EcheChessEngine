@@ -1,0 +1,14 @@
+language: java
+jdk:
+  - oraclejdk9
+
+branches:
+  only:
+  - master
+
+addons:
+  sonarqube:
+    organization: "doi9t-github"
+script:
+  # other script steps might be done before running the actual SonarQube analysis
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
