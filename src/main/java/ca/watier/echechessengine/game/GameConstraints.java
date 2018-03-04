@@ -24,6 +24,7 @@ import ca.watier.echesscommon.enums.*;
 import ca.watier.echesscommon.utils.Assert;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -42,8 +43,8 @@ public class GameConstraints {
             Class<? extends MoveConstraint> pieceMoveConstraintClass = getPieceMoveConstraintClass(piece);
 
             try {
-                MOVE_CONSTRAINT_MAP.put(piece, pieceMoveConstraintClass.newInstance());
-            } catch (InstantiationException | IllegalAccessException e) {
+                MOVE_CONSTRAINT_MAP.put(piece, pieceMoveConstraintClass.getDeclaredConstructor().newInstance());
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 LOGGER.error(e.toString(), e);
             }
         }

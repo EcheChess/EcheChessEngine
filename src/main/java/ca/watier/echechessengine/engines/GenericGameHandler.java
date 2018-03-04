@@ -79,19 +79,13 @@ public class GenericGameHandler extends GameBoard {
         moveHistory.setMoveType(moveType);
         moveHistoryList.add(moveHistory);
 
-        switch (moveType) {
-            case PAWN_PROMOTION:
-                //Check if the promotion kill a piece in the process
-                if (piecesToBeforeAction != null) {
-                    MoveHistory moveHistoryCapture = new MoveHistory(from, to, playerSide);
-                    moveHistoryCapture.setMoveType(MoveType.CAPTURE);
-                    moveHistoryList.add(moveHistoryCapture);
-                }
-                break;
-            default:
-                break;
+        if (MoveType.PAWN_PROMOTION.equals(moveType)) {//Check if the promotion kill a piece in the process
+            if (piecesToBeforeAction != null) {
+                MoveHistory moveHistoryCapture = new MoveHistory(from, to, playerSide);
+                moveHistoryCapture.setMoveType(MoveType.CAPTURE);
+                moveHistoryList.add(moveHistoryCapture);
+            }
         }
-
         return moveType;
     }
 
@@ -321,12 +315,9 @@ public class GenericGameHandler extends GameBoard {
 
                 if (currentPiece != null && !Pieces.isKing(currentPiece) && Pieces.isSameSide(currentPiece, kingPiece)) {
                     for (CasePosition moveTo : getAllAvailableMoves(moveFrom, playerSide)) {
-                        if (isPieceMovableTo(moveFrom, moveTo, playerSide)) {
-
-                            if (!isKingCheckAfterMove(moveFrom, moveTo, playerSide)) {
-                                isStalemate = false;
-                                break;
-                            }
+                        if (isPieceMovableTo(moveFrom, moveTo, playerSide) && !isKingCheckAfterMove(moveFrom, moveTo, playerSide)) {
+                            isStalemate = false;
+                            break;
                         }
                     }
                 }
@@ -464,15 +455,15 @@ public class GenericGameHandler extends GameBoard {
 
         //To check if the pawn used the +2 move
         Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap = getIsPawnUsedSpecialMoveMap();
-        Map<CasePosition, Boolean> copyOfIsPawnUsedSpecialMoveMap = new HashMap<>(isPawnUsedSpecialMoveMap);
+        Map<CasePosition, Boolean> copyOfIsPawnUsedSpecialMoveMap = new EnumMap<>(isPawnUsedSpecialMoveMap);
 
         //To check if the piece moved in the current game
         Map<CasePosition, Boolean> isPiecesMovedMap = getIsPiecesMovedMap();
-        Map<CasePosition, Boolean> copyOfIsPiecesMovedMap = new HashMap<>(isPiecesMovedMap);
+        Map<CasePosition, Boolean> copyOfIsPiecesMovedMap = new EnumMap<>(isPiecesMovedMap);
 
         //To get the number of turns since last move
         Map<CasePosition, Integer> turnNumberPieceMap = getTurnNumberPieceMap();
-        Map<CasePosition, Integer> copyOfTurnNumberPieceMap = new HashMap<>(turnNumberPieceMap);
+        Map<CasePosition, Integer> copyOfTurnNumberPieceMap = new EnumMap<>(turnNumberPieceMap);
 
         if (MoveType.EN_PASSANT.equals(moveType)) {
             CasePosition enPassantEnemyPawnPosition = PawnMoveConstraint.getEnPassantEnemyPawnPosition(to, getOtherPlayerSide(playerSide));
