@@ -16,7 +16,6 @@
 
 package ca.watier.pieces;
 
-import ca.watier.echechessengine.constraints.PawnMoveConstraint;
 import ca.watier.echechessengine.contexts.StandardGameHandlerContext;
 import ca.watier.echesscommon.enums.CasePosition;
 import ca.watier.echesscommon.enums.KingStatus;

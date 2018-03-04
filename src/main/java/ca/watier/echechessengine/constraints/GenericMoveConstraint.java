@@ -23,7 +23,6 @@ import ca.watier.echesscommon.utils.Assert;
 import ca.watier.echesscommon.utils.GameUtils;
 import ca.watier.echesscommon.utils.MathUtils;
 
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

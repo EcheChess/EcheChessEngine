@@ -17,7 +17,6 @@
 package ca.watier.game;
 
 import ca.watier.echechessengine.game.CustomPieceWithStandardRulesHandler;
-import ca.watier.echesscommon.enums.CasePosition;
 import ca.watier.echesscommon.enums.KingStatus;
 import ca.watier.echesscommon.enums.Pieces;
 import ca.watier.echesscommon.enums.SpecialGameRules;
@@ -27,8 +26,6 @@ import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Map;
 
 import static ca.watier.echechessengine.game.CustomPieceWithStandardRulesHandler.THE_NUMBER_OF_PARAMETER_IS_INCORRECT;
 import static ca.watier.echesscommon.enums.CasePosition.*;

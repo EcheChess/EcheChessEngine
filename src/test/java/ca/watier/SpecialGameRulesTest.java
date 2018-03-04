@@ -29,9 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static ca.watier.echesscommon.enums.CasePosition.*;
-import static ca.watier.echesscommon.enums.MoveType.MOVE_NOT_ALLOWED;
-import static ca.watier.echesscommon.enums.MoveType.NORMAL_MOVE;
-import static ca.watier.echesscommon.enums.MoveType.PAWN_HOP;
+import static ca.watier.echesscommon.enums.MoveType.*;
 import static ca.watier.echesscommon.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
 import static ca.watier.echesscommon.enums.SpecialGameRules.NO_PLAYER_TURN;
 import static org.assertj.core.api.Assertions.assertThat;
