@@ -101,7 +101,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         boolean isFrontMove = direction.equals(directionFromPosition);
         boolean isNbOfCaseIsOne = nbCaseBetweenPositions == 1;
 
-        boolean isSpecialMove = (isPawnMoveHop(from, gameHandler, pieceFrom, nbCaseBetweenPositions) && !otherPiecesBetweenTarget)
+        boolean isSpecialMove = (isPawnMoveHop(from, pieceFrom, to, gameHandler, nbCaseBetweenPositions) && !otherPiecesBetweenTarget)
                 || MoveType.EN_PASSANT.equals(getMoveType(from, to, gameHandler));
 
         boolean isMovable = (isSpecialMove || isNbOfCaseIsOne) &&
@@ -132,8 +132,12 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         return isMoveValid && isNbOfCaseIsOne;
     }
 
-    private boolean isPawnMoveHop(CasePosition from, GenericGameHandler gameHandler, Pieces pieceFrom, int nbCaseBetweenPositions) {
-        return GameUtils.isDefaultPosition(from, pieceFrom, gameHandler) && nbCaseBetweenPositions == 2;
+    private boolean isPawnMoveHop(CasePosition from, Pieces pieceFrom, CasePosition to, GenericGameHandler gameHandler, int nbCaseBetweenPositions) {
+
+        Direction directionFromPosition = MathUtils.getDirectionFromPosition(from, to);
+        boolean isNorthOfSouth = Direction.NORTH.equals(directionFromPosition) || Direction.SOUTH.equals(directionFromPosition);
+
+        return isNorthOfSouth && GameUtils.isDefaultPosition(from, pieceFrom, gameHandler) && nbCaseBetweenPositions == 2;
     }
 
     @Override
@@ -154,7 +158,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
 
                 int nbCaseBetweenPositions = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to));
 
-                if (isPawnMoveHop(from, gameHandler, pieceFrom, nbCaseBetweenPositions)) {
+                if (isPawnMoveHop(from, pieceFrom, to, gameHandler, nbCaseBetweenPositions)) {
                     return MoveType.PAWN_HOP;
                 } else if (enemyPawn == null || Pieces.isSameSide(pieceFrom, enemyPawn) || !Ranks.FOUR.equals(Ranks.getRank(enemyPawnPosition, otherSide))) {
                     return value;

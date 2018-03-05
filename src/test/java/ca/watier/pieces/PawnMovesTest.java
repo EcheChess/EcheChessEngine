@@ -34,6 +34,7 @@ import static ca.watier.echesscommon.enums.MoveType.*;
 import static ca.watier.echesscommon.enums.Pieces.*;
 import static ca.watier.echesscommon.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
 import static ca.watier.echesscommon.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 5/8/2017.
@@ -137,6 +138,19 @@ public class PawnMovesTest extends EngineGameTest {
         Assert.assertEquals(CAPTURE, context.movePiece(D3, C2, BLACK));
         Assert.assertEquals(CAPTURE, context.movePiece(F5, G6, WHITE));
         Assert.assertEquals(CAPTURE, context.movePiece(F3, G2, BLACK));
+    }
+
+
+    @Test
+    public void pawnHopAndNormalBlackSide() {
+        assertThat(context.getAllAvailableMoves(H2, WHITE)).isNotEmpty().containsOnly(H4, H3);
+        assertThat(context.getAllAvailableMoves(D2, WHITE)).isNotEmpty().containsOnly(D4, D3);
+    }
+
+    @Test
+    public void pawnHopAndNormalWhiteSide() {
+        assertThat(context.getAllAvailableMoves(H7, BLACK)).isNotEmpty().containsOnly(H5, H6);
+        assertThat(context.getAllAvailableMoves(D7, BLACK)).isNotEmpty().containsOnly(D5, D6);
     }
 
     @Test
