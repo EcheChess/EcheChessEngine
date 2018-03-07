@@ -17,9 +17,10 @@
 package ca.watier.echechessengine.engines;
 
 import ca.watier.echechessengine.constraints.PawnMoveConstraint;
+import ca.watier.echechessengine.abstracts.GameBoard;
 import ca.watier.echechessengine.game.GameConstraints;
+import ca.watier.echechessengine.utils.GameUtils;
 import ca.watier.echesscommon.enums.*;
-import ca.watier.echesscommon.game.GameBoard;
 import ca.watier.echesscommon.interfaces.WebSocketService;
 import ca.watier.echesscommon.pojos.MoveHistory;
 import ca.watier.echesscommon.responses.GameScoreResponse;
@@ -127,7 +128,7 @@ public class GenericGameHandler extends GameBoard {
                 if (isEatingPiece) {
                     setPiecePositionWithoutMoveState(piecesTo, to); //reset the attacked piece
                 } else {
-                    removePieceAt(to);
+                    removePieceFromBoard(to);
                 }
 
                 return MoveType.MOVE_NOT_ALLOWED;
@@ -158,7 +159,7 @@ public class GenericGameHandler extends GameBoard {
             CasePosition enemyPawnPosition = MathUtils.getNearestPositionFromDirection(to, otherPlayerSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH);
             Pieces enemyPawnToEat = getPiece(enemyPawnPosition);
             updatePointsForSide(playerSide, enemyPawnToEat.getPoint());
-            removePieceAt(enemyPawnPosition);
+            removePieceFromBoard(enemyPawnPosition);
         }
 
         KingStatus otherKingStatusAfterMove = getKingStatus(otherPlayerSide, true);
@@ -454,15 +455,15 @@ public class GenericGameHandler extends GameBoard {
         MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
 
         //To check if the pawn used the +2 move
-        Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap = getIsPawnUsedSpecialMoveMap();
+        Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap = new EnumMap<>(getIsPawnUsedSpecialMoveMap());
         Map<CasePosition, Boolean> copyOfIsPawnUsedSpecialMoveMap = new EnumMap<>(isPawnUsedSpecialMoveMap);
 
         //To check if the piece moved in the current game
-        Map<CasePosition, Boolean> isPiecesMovedMap = getIsPiecesMovedMap();
+        Map<CasePosition, Boolean> isPiecesMovedMap = new EnumMap<>(getIsPiecesMovedMap());
         Map<CasePosition, Boolean> copyOfIsPiecesMovedMap = new EnumMap<>(isPiecesMovedMap);
 
         //To get the number of turns since last move
-        Map<CasePosition, Integer> turnNumberPieceMap = getTurnNumberPieceMap();
+        Map<CasePosition, Integer> turnNumberPieceMap = new EnumMap<>(getTurnNumberPieceMap());
         Map<CasePosition, Integer> copyOfTurnNumberPieceMap = new EnumMap<>(turnNumberPieceMap);
 
         if (MoveType.EN_PASSANT.equals(moveType)) {
@@ -470,7 +471,7 @@ public class GenericGameHandler extends GameBoard {
 
             Pieces enemyPawn = getPiece(enPassantEnemyPawnPosition);
 
-            removePieceAt(enPassantEnemyPawnPosition); //Remove the enemy pawn
+            removePieceFromBoard(enPassantEnemyPawnPosition); //Remove the enemy pawn
             setPiecePositionWithoutMoveState(currentPiece, to);
 
             //Set the new values in the maps
@@ -494,13 +495,13 @@ public class GenericGameHandler extends GameBoard {
             value = !piecesThatCanHitOriginalPosition.isEmpty();
 
             //Reset the pawns
-            removePieceAt(to);
+            removePieceFromBoard(to);
             setPiecePositionWithoutMoveState(currentPiece, from);
             setPiecePositionWithoutMoveState(enemyPawn, enPassantEnemyPawnPosition);
         } else {
             Pieces pieceEaten = getPiece(to);
 
-            removePieceAt(from);
+            removePieceFromBoard(from);
             setPiecePositionWithoutMoveState(currentPiece, to);
 
             //Set the new values in the maps
@@ -529,7 +530,7 @@ public class GenericGameHandler extends GameBoard {
             if (pieceEaten != null) {
                 setPiecePositionWithoutMoveState(pieceEaten, to);
             } else {
-                removePieceAt(to);
+                removePieceFromBoard(to);
             }
         }
 

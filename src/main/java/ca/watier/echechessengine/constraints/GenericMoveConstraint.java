@@ -18,9 +18,9 @@ package ca.watier.echechessengine.constraints;
 
 import ca.watier.echechessengine.engines.GenericGameHandler;
 import ca.watier.echechessengine.interfaces.MoveConstraint;
+import ca.watier.echechessengine.utils.GameUtils;
 import ca.watier.echesscommon.enums.*;
 import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.GameUtils;
 import ca.watier.echesscommon.utils.MathUtils;
 
 import java.util.Arrays;
