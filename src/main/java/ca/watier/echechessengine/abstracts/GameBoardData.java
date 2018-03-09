@@ -6,8 +6,8 @@ import ca.watier.echesscommon.enums.Pieces;
 import ca.watier.echesscommon.enums.Side;
 import ca.watier.echesscommon.interfaces.BaseUtils;
 import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.MultiArrayMap;
 import ca.watier.echesscommon.utils.Pair;
+import com.google.common.collect.ArrayListMultimap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.Map;
 public abstract class GameBoardData {
 
     //The default position of the board
-    private final Map<CasePosition, Pieces> defaultPositions;
+    private final Map<CasePosition, Pieces> DEFAULT_POSITIONS;
     //The pieces position on the board
     private Map<CasePosition, Pieces> positionPiecesMap;
     //Used to check if the piece have moved
@@ -28,23 +28,22 @@ public abstract class GameBoardData {
     //Used to track the turn that the piece have moved
     private Map<CasePosition, Integer> turnNumberPieceMap;
     //Used to track the pawn promotions
-    private MultiArrayMap<Side, Pair<CasePosition, CasePosition>> pawnPromotionMap;
+    private ArrayListMultimap<Side, Pair<CasePosition, CasePosition>> pawnPromotionMap;
     //Used to track the number of turn of each player
     private int blackTurnNumber;
     private int whiteTurnNumber;
     private int totalMove = 0;
-
     private boolean isGameDraw = false;
     private boolean isGamePaused = false;
 
     public GameBoardData() {
-        defaultPositions = new EnumMap<>(CasePosition.class);
+        pawnPromotionMap = ArrayListMultimap.create();
+        DEFAULT_POSITIONS = new EnumMap<>(CasePosition.class);
         positionPiecesMap = GameUtils.getDefaultGame();
-        defaultPositions.putAll(positionPiecesMap);
+        DEFAULT_POSITIONS.putAll(positionPiecesMap);
         isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
         isPawnUsedSpecialMoveMap = GameUtils.initPawnMap(positionPiecesMap);
         turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);
-        pawnPromotionMap = new MultiArrayMap<>();
     }
 
     protected @NotNull List<Pair<CasePosition, CasePosition>> getPawnPromotionBySide(@NotNull Side playerSide) {
@@ -55,20 +54,12 @@ public abstract class GameBoardData {
         return positionPiecesMap.get(position);
     }
 
-    protected void addPawnPromotionToMap(@NotNull Side side, @NotNull Pair<CasePosition, CasePosition> casePositionCasePositionPair) {
-        pawnPromotionMap.put(side, casePositionCasePositionPair);
-    }
-
-    protected void addPieceToBoard(@NotNull CasePosition to, @NotNull Pieces piece) {
-        positionPiecesMap.put(to, piece);
-    }
-
     public final @NotNull Map<CasePosition, Pieces> getPiecesLocation() {
         return Collections.unmodifiableMap(positionPiecesMap);
     }
 
     public @NotNull Map<CasePosition, Pieces> getDefaultPositions() {
-        return Collections.unmodifiableMap(defaultPositions);
+        return Collections.unmodifiableMap(DEFAULT_POSITIONS);
     }
 
     public int getBlackTurnNumber() {
@@ -83,75 +74,41 @@ public abstract class GameBoardData {
         return totalMove;
     }
 
-    public @NotNull Map<CasePosition, Boolean> getIsPiecesMovedMap() {
+    @NotNull
+    protected Map<CasePosition, Boolean> getIsPiecesMovedMap() {
         return Collections.unmodifiableMap(isPiecesMovedMap);
     }
 
-    public void setIsPiecesMovedMap(@NotNull Map<CasePosition, Boolean> isPiecesMovedMap) {
-        this.isPiecesMovedMap = isPiecesMovedMap;
-    }
-
-    public @NotNull Map<CasePosition, Boolean> getIsPawnUsedSpecialMoveMap() {
+    @NotNull
+    protected Map<CasePosition, Boolean> getIsPawnUsedSpecialMoveMap() {
         return Collections.unmodifiableMap(isPawnUsedSpecialMoveMap);
     }
 
-    public void setIsPawnUsedSpecialMoveMap(@NotNull Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap) {
-        this.isPawnUsedSpecialMoveMap = isPawnUsedSpecialMoveMap;
-    }
-
-    public @NotNull Map<CasePosition, Integer> getTurnNumberPieceMap() {
+    @NotNull
+    protected Map<CasePosition, Integer> getTurnNumberPieceMap() {
         return Collections.unmodifiableMap(turnNumberPieceMap);
     }
 
-    public void setTurnNumberPieceMap(@NotNull Map<CasePosition, Integer> turnNumberPieceMap) {
-        this.turnNumberPieceMap = turnNumberPieceMap;
+    /**
+     * Get the turn number based on a {@link CasePosition}
+     *
+     * @param position
+     * @return
+     */
+    public final Integer getPieceTurn(@NotNull CasePosition position) {
+        return turnNumberPieceMap.get(position);
     }
 
-
-    /**
-     * Remove a piece from the board
-     *
-     * @param from
-     */
-    public final void removePieceFromBoard(@NotNull CasePosition from) {
-        positionPiecesMap.remove(from);
-        isPiecesMovedMap.remove(from);
-        isPawnUsedSpecialMoveMap.remove(from);
-        turnNumberPieceMap.remove(from);
+    protected void addPawnPromotionToMap(@NotNull Side side, @NotNull Pair<CasePosition, CasePosition> casePositionCasePositionPair) {
+        pawnPromotionMap.put(side, casePositionCasePositionPair);
     }
 
     public final void removePiece(@NotNull CasePosition from) {
         positionPiecesMap.remove(from);
     }
 
-    protected void setIsGamePaused(boolean isGamePaused) {
-        this.isGamePaused = isGamePaused;
-    }
-
-    protected void changePieceTurnNumber(@NotNull CasePosition from, @NotNull CasePosition to) {
-        turnNumberPieceMap.remove(from);
-        turnNumberPieceMap.put(to, totalMove);
-    }
-
-    protected void incrementWhiteTurnNumber() {
-        whiteTurnNumber++;
-    }
-
-
-    protected void incrementBlackTurnNumber() {
-        blackTurnNumber++;
-    }
-
-    protected Boolean isPanwUsedSpecialMove(@NotNull CasePosition from) {
-        return isPawnUsedSpecialMoveMap.get(from);
-    }
-
-    protected void addPawnUsedSpecialMove(@NotNull CasePosition to, boolean isValid) {
-        isPawnUsedSpecialMoveMap.put(to, isValid);
-    }
-
-    protected void removePawnUsedSpecialMove(@NotNull CasePosition from) {
-        isPawnUsedSpecialMoveMap.remove(from);
+    protected void setPiecePositionWithoutMoveState(@NotNull Pieces piece, @NotNull CasePosition to) {
+        positionPiecesMap.put(to, piece);
     }
 
     /**
@@ -178,24 +135,6 @@ public abstract class GameBoardData {
         return isPiecesMovedMap.get(position);
     }
 
-    protected void removePawnPromotion(@NotNull Pair<CasePosition, CasePosition> pair, @NotNull Side side) {
-
-        if (Side.OBSERVER.equals(side)) {
-            return;
-        }
-
-        pawnPromotionMap.removeFromList(side, pair);
-    }
-
-    public final void setPositionPiecesMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        Assert.assertNotEmpty(positionPiecesMap);
-
-        this.positionPiecesMap = positionPiecesMap;
-        this.defaultPositions.clear();
-        this.defaultPositions.putAll(positionPiecesMap);
-        this.isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
-        this.turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);
-    }
 
     /**
      * Return true if the pawn used the special move
@@ -207,22 +146,69 @@ public abstract class GameBoardData {
         return BaseUtils.getSafeBoolean(isPawnUsedSpecialMoveMap.get(position));
     }
 
-    /**
-     * Get the turn number based on a {@link CasePosition}
-     *
-     * @param position
-     * @return
-     */
-    public final Integer getPieceTurn(@NotNull CasePosition position) {
-        return turnNumberPieceMap.get(position);
+    protected void addPawnUsedSpecialMove(@NotNull CasePosition to, boolean isValid) {
+        isPawnUsedSpecialMoveMap.put(to, isValid);
+    }
+
+    protected void removePawnUsedSpecialMove(@NotNull CasePosition from) {
+        isPawnUsedSpecialMoveMap.remove(from);
+    }
+
+    protected void incrementWhiteTurnNumber() {
+        whiteTurnNumber++;
+    }
+
+    protected void incrementBlackTurnNumber() {
+        blackTurnNumber++;
+    }
+
+    protected void changePieceTurnNumber(@NotNull CasePosition from, @NotNull CasePosition to) {
+        turnNumberPieceMap.remove(from);
+        turnNumberPieceMap.put(to, totalMove);
     }
 
     protected void incrementTotalMove() {
         totalMove++;
     }
 
-    public boolean isGamePaused() {
-        return isGamePaused;
+    protected void setPiecesGameState(@NotNull Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap,
+                                      @NotNull Map<CasePosition, Integer> turnNumberPieceMap,
+                                      @NotNull Map<CasePosition, Boolean> isPiecesMovedMap) {
+
+        this.isPawnUsedSpecialMoveMap = isPawnUsedSpecialMoveMap;
+        this.turnNumberPieceMap = turnNumberPieceMap;
+        this.isPiecesMovedMap = isPiecesMovedMap;
+    }
+
+    /**
+     * Remove a piece from the board
+     *
+     * @param from
+     */
+    public final void removePieceFromBoard(@NotNull CasePosition from) {
+        positionPiecesMap.remove(from);
+        isPiecesMovedMap.remove(from);
+        isPawnUsedSpecialMoveMap.remove(from);
+        turnNumberPieceMap.remove(from);
+    }
+
+    protected void removePawnPromotion(@NotNull Pair<CasePosition, CasePosition> pair, @NotNull Side side) {
+
+        if (Side.OBSERVER.equals(side)) {
+            return;
+        }
+
+        pawnPromotionMap.remove(side, pair);
+    }
+
+    protected final void setPositionPiecesMap(Map<CasePosition, Pieces> positionPiecesMap) {
+        Assert.assertNotEmpty(positionPiecesMap);
+
+        this.positionPiecesMap = positionPiecesMap;
+        this.DEFAULT_POSITIONS.clear();
+        this.DEFAULT_POSITIONS.putAll(positionPiecesMap);
+        this.isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
+        this.turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);
     }
 
     public void setGamePaused(boolean gamePaused) {

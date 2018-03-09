@@ -16,8 +16,8 @@
 
 package ca.watier.echechessengine.engines;
 
-import ca.watier.echechessengine.constraints.PawnMoveConstraint;
 import ca.watier.echechessengine.abstracts.GameBoard;
+import ca.watier.echechessengine.constraints.PawnMoveConstraint;
 import ca.watier.echechessengine.game.GameConstraints;
 import ca.watier.echechessengine.utils.GameUtils;
 import ca.watier.echesscommon.enums.*;
@@ -449,7 +449,7 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public boolean isKingCheckAfterMove(CasePosition from, CasePosition to, Side playerSide) {
-        boolean value;
+        boolean isKingCheck;
 
         Pieces currentPiece = getPiece(from);
         MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
@@ -482,17 +482,11 @@ public class GenericGameHandler extends GameBoard {
             turnNumberPieceMap.put(to, getNbTotalMove());
 
             //Set the new maps
-            setIsPawnUsedSpecialMoveMap(isPawnUsedSpecialMoveMap);
-            setIsPiecesMovedMap(isPiecesMovedMap);
-            setTurnNumberPieceMap(turnNumberPieceMap);
-
-            //Set the new maps
-            setIsPiecesMovedMap(isPiecesMovedMap);
-            setTurnNumberPieceMap(turnNumberPieceMap);
+            setPiecesGameState(isPawnUsedSpecialMoveMap, turnNumberPieceMap, isPiecesMovedMap);
 
             MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(Side.getOtherPlayerSide(playerSide), GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation()));
 
-            value = !piecesThatCanHitOriginalPosition.isEmpty();
+            isKingCheck = !piecesThatCanHitOriginalPosition.isEmpty();
 
             //Reset the pawns
             removePieceFromBoard(to);
@@ -517,13 +511,11 @@ public class GenericGameHandler extends GameBoard {
             turnNumberPieceMap.put(to, getNbTotalMove());
 
             //Set the new maps
-            setIsPawnUsedSpecialMoveMap(isPawnUsedSpecialMoveMap);
-            setIsPiecesMovedMap(isPiecesMovedMap);
-            setTurnNumberPieceMap(turnNumberPieceMap);
+            setPiecesGameState(isPawnUsedSpecialMoveMap, turnNumberPieceMap, isPiecesMovedMap);
 
             MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(Side.getOtherPlayerSide(playerSide), GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation()));
 
-            value = !piecesThatCanHitOriginalPosition.isEmpty();
+            isKingCheck = !piecesThatCanHitOriginalPosition.isEmpty();
 
             //Reset the piece(s)
             setPiecePositionWithoutMoveState(currentPiece, from);
@@ -535,11 +527,9 @@ public class GenericGameHandler extends GameBoard {
         }
 
         //restore the old maps
-        setIsPawnUsedSpecialMoveMap(copyOfIsPawnUsedSpecialMoveMap);
-        setIsPiecesMovedMap(copyOfIsPiecesMovedMap);
-        setTurnNumberPieceMap(copyOfTurnNumberPieceMap);
+        setPiecesGameState(copyOfIsPawnUsedSpecialMoveMap, copyOfTurnNumberPieceMap, copyOfIsPiecesMovedMap);
 
-        return value;
+        return isKingCheck;
     }
 
     /**

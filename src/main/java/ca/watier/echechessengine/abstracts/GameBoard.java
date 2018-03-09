@@ -39,29 +39,19 @@ public abstract class GameBoard extends GameBoardData {
      * @param rank
      * @param column
      */
-    public CasePosition getPositionByRankAndColumn(@NotNull Ranks rank, char column, @NotNull Side side) {
+    protected CasePosition getPositionByRankAndColumn(@NotNull Ranks rank, char column, @NotNull Side side) {
         return Arrays.stream(CasePosition.values()).filter(casePosition -> rank.equals(Ranks.getRank(casePosition, side))
                 && casePosition.isOnSameColumn(column)).findFirst().orElse(null);
     }
 
 
-    public final void addPawnPromotion(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Side side) {
+    protected final void addPawnPromotion(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Side side) {
 
         if (Side.OBSERVER.equals(side)) {
             return;
         }
 
         addPawnPromotionToMap(side, new Pair<>(from, to));
-    }
-
-    /**
-     * Set the specified case at the position, without changing the move state (useful when evaluating)
-     *
-     * @param piece
-     * @param to
-     */
-    public final void setPiecePositionWithoutMoveState(@NotNull Pieces piece, @NotNull CasePosition to) {
-        addPieceToBoard(to, piece);
     }
 
     /**
@@ -83,12 +73,11 @@ public abstract class GameBoard extends GameBoardData {
      */
     protected final void movePieceTo(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Pieces piece) {
         removePiece(from);
-        addPieceToBoard(to, piece);
+        setPiecePositionWithoutMoveState(piece, to);
         changeMovedStateOfPiece(piece, from, to);
         changePawnSpecialMove(piece, from, to);
         updatePlayerTurnValue(piece.getSide());
         changePieceTurnNumber(from, to);
-
         incrementTotalMove();
     }
 
@@ -99,11 +88,9 @@ public abstract class GameBoard extends GameBoardData {
      * @param from
      * @param to
      */
-    private void changePawnSpecialMove(@NotNull Pieces piece, @NotNull CasePosition from, @NotNull CasePosition to) {
-        Assert.assertNotNull(from, to, piece);
-
+    protected void changePawnSpecialMove(@NotNull Pieces piece, @NotNull CasePosition from, @NotNull CasePosition to) {
         if (Pieces.isPawn(piece)) {
-            boolean isValid = BaseUtils.getSafeBoolean(isPanwUsedSpecialMove(from)) || MathUtils.getDistanceBetweenPositions(from, to) == 2;
+            boolean isValid = BaseUtils.getSafeBoolean(isPawnUsedSpecialMove(from)) || MathUtils.getDistanceBetweenPositions(from, to) == 2;
 
             addPawnUsedSpecialMove(to, isValid);
             removePawnUsedSpecialMove(from);
@@ -115,7 +102,7 @@ public abstract class GameBoard extends GameBoardData {
      *
      * @param side
      */
-    private void updatePlayerTurnValue(@NotNull Side side) {
+    protected void updatePlayerTurnValue(@NotNull Side side) {
         Assert.assertNotNull(side);
 
         switch (side) {
@@ -150,8 +137,8 @@ public abstract class GameBoard extends GameBoardData {
             CasePosition currentPawnFromPosition = pair.getFirstValue();
 
             removePiece(currentPawnFromPosition); //remove the pawn
-            addPieceToBoard(to, pieces); // add the wanted piece
-            setIsGamePaused(false);
+            setPiecePositionWithoutMoveState(pieces, to); // add the wanted piece
+            setGamePaused(false);
         }
 
         return isPresent;

@@ -23,7 +23,6 @@ import ca.watier.echechessengine.utils.GameUtils;
 import ca.watier.echesscommon.enums.*;
 import ca.watier.echesscommon.interfaces.BaseUtils;
 import ca.watier.echesscommon.utils.Assert;
-
 import ca.watier.echesscommon.utils.MathUtils;
 
 /**
