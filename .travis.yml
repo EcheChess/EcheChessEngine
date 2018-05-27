@@ -7,10 +7,7 @@ before_install:
 matrix:
   include:
     - env: JDK='Oracle JDK 10'
-    install: . ./install-jdk.sh -F 10 -L BCL
-
-script:
-  - java -version
+      install: . ./install-jdk.sh -F 10 -L BCL
 
 branches:
   only:
