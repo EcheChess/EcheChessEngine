@@ -17,6 +17,7 @@
 package ca.watier.echechessengine.utils;
 
 import ca.watier.echechessengine.engines.GenericGameHandler;
+import ca.watier.echechessengine.exceptions.*;
 import ca.watier.echechessengine.game.GameConstraints;
 import ca.watier.echesscommon.enums.*;
 import ca.watier.echesscommon.interfaces.WebSocketService;
@@ -42,7 +43,6 @@ public class PgnParser {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PgnParser.class);
     private static final List<PgnMoveToken> PAWN_PROMOTION_WITH_CAPTURE_TOKENS = new ArrayList<>();
     private static final Pattern POSITION_PATTERN = Pattern.compile("[a-h][1-8]");
-    private static final String THE_GAME_IS_SUPPOSED_TO_BE_WON_BY = "The game is supposed to be won by the {} player";
 
     static {
         PAWN_PROMOTION_WITH_CAPTURE_TOKENS.add(PgnMoveToken.PAWN_PROMOTION);
@@ -82,7 +82,7 @@ public class PgnParser {
         return rawText.replace("\r\n", "\n").split("\n\n");
     }
 
-    public List<GenericGameHandler> parse(@NotNull String rawText) {
+    public List<GenericGameHandler> parse(@NotNull String rawText) throws ChessException {
         String[] headersAndGames = getRawHeadersAndGames(rawText);
         int nbOfGames = headersAndGames.length;
         int currentIdx = 1;
@@ -120,7 +120,7 @@ public class PgnParser {
                         continue;
                     }
 
-                    parseAction(action);
+                    parseAction(action, currentGame);
                 }
             }
         }
@@ -138,11 +138,15 @@ public class PgnParser {
         otherSide = BLACK;
     }
 
-    private void parseAction(String action) {
+    private void parseAction(String action, String currentGame) throws ChessException {
         PgnEndGameToken endGameTokenByAction = PgnEndGameToken.getEndGameTokenByAction(action);
         if (PgnEndGameToken.isGameEnded(endGameTokenByAction)) {
-            LOGGER.info("Game ending code ({})", endGameTokenByAction);
-            validateGameEnding(endGameTokenByAction);
+            try {
+                validateGameEnding(endGameTokenByAction);
+            } catch (ChessException chess) { //We cannot be certain that the engine is false (The player can resign of the game)
+                LOGGER.debug("Wrong game ending code found ({}) for the game: {}", endGameTokenByAction, currentGame);
+            }
+
             return;
         }
 
@@ -186,31 +190,30 @@ public class PgnParser {
         switchSide();
     }
 
-    private void validateGameEnding(@NotNull PgnEndGameToken ending) {
+    private void validateGameEnding(@NotNull PgnEndGameToken ending) throws InvalidGameEndingException {
         switch (ending) {
             case WHITE_WIN:
                 if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(BLACK, false)))) {
-                    LOGGER.error(THE_GAME_IS_SUPPOSED_TO_BE_WON_BY, WHITE);
+                    throw new InvalidGameEndingException(WHITE);
                 }
                 break;
             case BLACK_WIN:
                 if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(WHITE, false)))) {
-                    LOGGER.error(THE_GAME_IS_SUPPOSED_TO_BE_WON_BY, BLACK);
+                    throw new InvalidGameEndingException(BLACK);
                 }
                 break;
             case DRAWN:
                 if (!gameHandler.isGameDraw()) {
-                    LOGGER.error("The game is supposed to be DRAWN");
+                    throw new InvalidGameEndingException("The game is supposed to be DRAWN");
                 }
                 break;
             case STILL_IN_PROGRESS:
             case UNKNOWN:
-                LOGGER.error("The game ending is not known ({})", ending);
-                break;
+                throw new InvalidGameEndingException(String.format("The game ending is not known (%s)", ending));
         }
     }
 
-    private void executeCastling(PgnMoveToken pgnMoveToken) {
+    private void executeCastling(PgnMoveToken pgnMoveToken) throws InvalidCastlingException {
         Map<CasePosition, Pieces> piecesLocation = gameHandler.getPiecesLocation(currentSide);
         CasePosition kingPosition = null;
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : piecesLocation.entrySet()) {
@@ -227,28 +230,27 @@ public class PgnParser {
         if (MoveType.CASTLING.equals(gameHandler.movePiece(kingPosition, selectedRookPosition, currentSide))) {
             LOGGER.debug("Castling: King -> {} | Rook {} | ({})", kingPosition, selectedRookPosition, currentSide);
         } else { //Issue with the move / case
-            LOGGER.error("Unable to cast at the selected position {} for the current color {} !", selectedRookPosition, currentSide);
+            throw new InvalidCastlingException(String.format("Unable to cast at the selected position %s for the current color %s !", selectedRookPosition, currentSide));
         }
     }
 
-    private void validateCheck() {
+    private void validateCheck() throws InvalidCheckException {
         if (!KingStatus.CHECK.equals(gameHandler.getKingStatus(otherSide, false))) {
-            throw new IllegalStateException("The other player king is not check!");
+            throw new InvalidCheckException("The other player king is not check!");
         } else {
             LOGGER.debug("{} is CHECK", otherSide);
         }
     }
 
-    private void validateCheckMate() {
+    private void validateCheckMate() throws InvalidCheckMateException {
         if (!KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(otherSide, false))) {
-            throw new IllegalStateException("The other player king is not checkmate!");
+            throw new InvalidCheckMateException("The other player king is not checkmate!");
         } else {
             LOGGER.debug("{} is CHECKMATE", otherSide);
         }
     }
 
-    private void executeMove(@NotNull String action) {
-
+    private void executeMove(@NotNull String action) throws ChessException {
         List<String> casePositions = getPositionsFromAction(action);
         List<PgnMoveToken> pieceMovesFromLetter = PgnMoveToken.getPieceMovesFromLetter(action);
 
@@ -282,21 +284,21 @@ public class PgnParser {
             Pieces pieceBySide = pieceFromAction.getPieceBySide(currentSide);
             gameHandler.upgradePiece(to, pieceBySide, currentSide);
         } else if (!(MoveType.NORMAL_MOVE.equals(moveType) || MoveType.CAPTURE.equals(moveType) || MoveType.EN_PASSANT.equals(moveType) || MoveType.PAWN_HOP.equals(moveType))) {  //Issue with the move / case
-            LOGGER.error("Unable to move at the selected position {} for the current color {} ! ({})", to, currentSide, action);
+            throw new InvalidMoveException(String.format("Unable to move at the selected position %s for the current color %s ! (%s)", to, currentSide, action));
         }
     }
 
-    private void validateCapture() {
+    private void validateCapture() throws InvalidCaptureException {
         List<MoveHistory> moveHistory = gameHandler.getMoveHistory();
         MoveHistory lastMoveHistory = moveHistory.get(moveHistory.size() - 1);
         MoveType moveType = lastMoveHistory.getMoveType();
 
         if (!(MoveType.CAPTURE.equals(moveType) || MoveType.EN_PASSANT.equals(moveType))) {
-            throw new IllegalStateException("The capture is not in the history!");
+            throw new InvalidCaptureException("The capture is not in the history!");
         }
     }
 
-    private void validatePawnPromotion(boolean pawnPromotionWithCapture, String action) {
+    private void validatePawnPromotion(boolean pawnPromotionWithCapture, String action) throws InvalidPawnPromotionException {
         List<MoveHistory> moveHistory = gameHandler.getMoveHistory();
 
         //In case of a capture and a pawn promotion in the same turn, the history index of the promotion is before the capture
@@ -306,7 +308,7 @@ public class PgnParser {
                         moveHistory.get(moveHistory.size() - 1);
 
         if (!MoveType.PAWN_PROMOTION.equals(lastMoveHistory.getMoveType())) {
-            throw new IllegalStateException("The pawn promotion is not in the history!");
+            throw new InvalidPawnPromotionException("The pawn promotion is not in the history!");
         } else {
             LOGGER.debug("PAWN PROMOTION {} to {} ({}) | action -> {}", lastMoveHistory.getFrom(), lastMoveHistory.getTo(), currentSide, action);
         }
@@ -372,7 +374,7 @@ public class PgnParser {
         return similarPieceThatHitTarget;
     }
 
-    private CasePosition getPositionWhenMultipleTargetCanHit(@NotNull String action, List<String> casePositions, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) {
+    private CasePosition getPositionWhenMultipleTargetCanHit(@NotNull String action, List<String> casePositions, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) throws ChessException {
         CasePosition value;
         int length = casePositions.size();
         Byte row = null;
@@ -437,7 +439,7 @@ public class PgnParser {
             } else if (isRow || isColumn) { //Row
                 value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column, parsedActions.getPgnPieceFound());
             } else {
-                throw new IllegalStateException("The position is now known!");
+                throw new InvalidMoveException("The position is now known!");
             }
         }
 

@@ -85,7 +85,7 @@
 
     <properties>
         <github.global.server>github</github.global.server>
-        <java.version>9</java.version>
+        <java.version>10</java.version>
     </properties>
 
     <dependencies>
@@ -116,12 +116,6 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>15.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
