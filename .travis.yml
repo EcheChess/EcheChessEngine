@@ -1,6 +1,12 @@
 language: java
+
+sudo: false
+addons:
+  apt:
+    packages:
+      - oracle-java10-installer
 jdk:
-  - oraclejdk9
+  - oraclejdk10
 
 branches:
   only:
