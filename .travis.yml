@@ -1,8 +1,8 @@
 language: java
 
 before_install:
-  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh # Get latest install-jdk.sh script
-  - unset _JAVA_OPTIONS # https://github.com/travis-ci/travis-ci/issues/8408
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh  # Get latest install-jdk.sh script
+  - unset _JAVA_OPTIONS  # https://github.com/travis-ci/travis-ci/issues/8408
 
 matrix:
   include:
