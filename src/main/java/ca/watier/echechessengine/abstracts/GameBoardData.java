@@ -38,9 +38,8 @@ public abstract class GameBoardData {
 
     public GameBoardData() {
         pawnPromotionMap = ArrayListMultimap.create();
-        DEFAULT_POSITIONS = new EnumMap<>(CasePosition.class);
+        DEFAULT_POSITIONS = GameUtils.getDefaultGame();
         positionPiecesMap = GameUtils.getDefaultGame();
-        DEFAULT_POSITIONS.putAll(positionPiecesMap);
         isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
         isPawnUsedSpecialMoveMap = GameUtils.initPawnMap(positionPiecesMap);
         turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);

@@ -43,6 +43,7 @@ public class PgnGameLauncher extends AbstractPgnGame {
                     true,
                     true,
                     true,
+                    false,
                     false
             );
         } catch (IOException e) {

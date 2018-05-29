@@ -16,44 +16,61 @@ public abstract class AbstractPgnGame {
     protected static final int SPACER_CHAR = 0x0A;
 
 
-    protected final void startReading(final InputStream inputStream, final boolean removeGameComments, final boolean removeUnknownDateToken, final boolean removeChessSymbols, final boolean onlyCheckmateGame) {
-        new Thread(() -> {
-            try {
-                StringBuilder currentSectionBuilder = new StringBuilder();
+    protected final void startReading(
+            final InputStream inputStream,
+            final boolean removeGameComments,
+            final boolean removeUnknownDateToken,
+            final boolean removeChessSymbols,
+            final boolean onlyCheckmateGame,
+            final boolean async) {
 
-                boolean isHeader = true;
-                int i;
-                char current, last = '\0';
-                String header = null, game;
-                boolean isNotAbandonnedGame;
-                while ((i = inputStream.read()) != -1) {
-                    current = (char) i;
-                    currentSectionBuilder.append(current);
+        if(async) {
+            read(inputStream, removeGameComments, removeUnknownDateToken, removeChessSymbols, onlyCheckmateGame);
+        } else {
+            new Thread(() -> read(inputStream, removeGameComments, removeUnknownDateToken, removeChessSymbols, onlyCheckmateGame)).start();
+        }
+    }
 
-                    if (current == SPACER_CHAR && last == SPACER_CHAR) {
+    private void read(InputStream inputStream, boolean removeGameComments, boolean removeUnknownDateToken, boolean removeChessSymbols, boolean onlyCheckmateGame) {
+        try {
+            StringBuilder currentSectionBuilder = new StringBuilder();
 
-                        if (!isHeader) { //Write the header and the game to the file
-                            game = replaceInvalidCharacters(removeGameComments, removeUnknownDateToken, removeChessSymbols, currentSectionBuilder.toString());
+            boolean isHeader = true;
+            int i;
+            char current, last = '\0';
+            String header = null, game;
+            boolean isNotAbandonnedGame;
+            while ((i = inputStream.read()) != -1) {
+                if(isEnded()) {
+                    break;
+                }
 
-                            isNotAbandonnedGame = PgnEndGameToken.UNKNOWN.equals(PgnEndGameToken.getEndGameTokenByAction(game));
+                current = (char) i;
+                currentSectionBuilder.append(current);
 
-                            if (isNotAbandonnedGame && (!onlyCheckmateGame || game.contains("#"))) { //Checkmate
-                                parseGame(header, game);
-                            }
-                        } else {
-                            header = currentSectionBuilder.toString().trim();
+                if (current == SPACER_CHAR && last == SPACER_CHAR) {
+
+                    if (!isHeader) { //Write the header and the game to the file
+                        game = replaceInvalidCharacters(removeGameComments, removeUnknownDateToken, removeChessSymbols, currentSectionBuilder.toString());
+
+                        isNotAbandonnedGame = PgnEndGameToken.UNKNOWN.equals(PgnEndGameToken.getEndGameTokenByAction(game));
+
+                        if (isNotAbandonnedGame && (!onlyCheckmateGame || game.contains("#"))) { //Checkmate
+                            parseGame(header, game);
                         }
-
-                        currentSectionBuilder.setLength(0);
-                        isHeader = !isHeader;
+                    } else {
+                        header = currentSectionBuilder.toString().trim();
                     }
 
-                    last = current;
+                    currentSectionBuilder.setLength(0);
+                    isHeader = !isHeader;
                 }
-            } catch (IOException io) {
-                LOGGER.error(io.getMessage(), io);
+
+                last = current;
             }
-        }).start();
+        } catch (IOException io) {
+            LOGGER.error(io.getMessage(), io);
+        }
     }
 
     private String replaceInvalidCharacters(boolean removeGameComments, boolean removeUnknownDateToken, boolean removeChessSymbols, String game) {
@@ -78,4 +95,8 @@ public abstract class AbstractPgnGame {
     protected abstract void parseGame(String header, String game);
 
     public abstract void start();
+
+    protected boolean isEnded() {
+        return false;
+    }
 }

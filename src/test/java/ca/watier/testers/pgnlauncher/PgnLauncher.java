@@ -15,10 +15,11 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class PgnLauncher extends Application {
     private final PgnGameLauncher PGN_GAME_LAUNCHER = new PgnGameLauncher();
-    private Timer timer = new Timer();
+    private final Timer TIMER = new Timer();
 
     @FXML
     private Label totalGameLbl;
@@ -29,7 +30,6 @@ public class PgnLauncher extends Application {
     @FXML
     private Button startBtn;
 
-
     @FXML
     void whenStartButtonPressed(ActionEvent event) {
         startBtn.setDisable(true);
@@ -38,17 +38,13 @@ public class PgnLauncher extends Application {
         try {
             PGN_GAME_LAUNCHER.setMaximumPoolSize(Integer.parseInt(nbOfThreadsInputText));
             PGN_GAME_LAUNCHER.start();
-            timer.schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            Platform.runLater(() -> {
-                                totalGameLbl.setText(Integer.toString(PGN_GAME_LAUNCHER.getNbOfGames()));
-                            });
-                        }
-                    },
-                    0, 2500
-            );
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    Platform.runLater(() -> totalGameLbl.setText(Integer.toString(PGN_GAME_LAUNCHER.getNbOfGames())));
+                }
+            };
+            TIMER.schedule(task, 0, 2500);
 
         } catch (NumberFormatException nfe) {
             nfe.printStackTrace();
@@ -61,7 +57,7 @@ public class PgnLauncher extends Application {
     }
 
     private void stopTheThreads() {
-        timer.cancel();
+        TIMER.cancel();
         PGN_GAME_LAUNCHER.stop();
     }
 

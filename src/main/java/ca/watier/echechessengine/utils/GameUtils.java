@@ -34,78 +34,50 @@ import java.util.Map;
  */
 public class GameUtils implements BaseUtils {
 
-    private static final Map<CasePosition, Pieces> DEFAULT_GAME_TEMPLATE = new EnumMap<>(CasePosition.class);
-    private static final Map<CasePosition, Boolean> DEFAULT_GAME_MOVED_TEMPLATE = new EnumMap<>(CasePosition.class);
-
-    static {
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.A1, Pieces.W_ROOK);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.B1, Pieces.W_KNIGHT);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.C1, Pieces.W_BISHOP);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.D1, Pieces.W_QUEEN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.E1, Pieces.W_KING);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.F1, Pieces.W_BISHOP);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.G1, Pieces.W_KNIGHT);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.H1, Pieces.W_ROOK);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.A2, Pieces.W_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.B2, Pieces.W_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.C2, Pieces.W_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.D2, Pieces.W_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.E2, Pieces.W_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.F2, Pieces.W_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.G2, Pieces.W_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.H2, Pieces.W_PAWN);
-
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.A8, Pieces.B_ROOK);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.B8, Pieces.B_KNIGHT);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.C8, Pieces.B_BISHOP);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.D8, Pieces.B_QUEEN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.E8, Pieces.B_KING);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.F8, Pieces.B_BISHOP);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.G8, Pieces.B_KNIGHT);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.H8, Pieces.B_ROOK);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.A7, Pieces.B_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.B7, Pieces.B_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.C7, Pieces.B_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.D7, Pieces.B_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.E7, Pieces.B_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.F7, Pieces.B_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.G7, Pieces.B_PAWN);
-        DEFAULT_GAME_TEMPLATE.put(CasePosition.H7, Pieces.B_PAWN);
-
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.A1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.B1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.C1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.D1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.E1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.F1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.G1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.H1, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.A2, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.B2, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.C2, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.D2, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.E2, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.F2, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.G2, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.H2, false);
-
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.A8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.B8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.C8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.D8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.E8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.F8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.G8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.H8, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.A7, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.B7, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.C7, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.D7, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.E7, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.F7, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.G7, false);
-        DEFAULT_GAME_MOVED_TEMPLATE.put(CasePosition.H7, false);
-    }
+    private static final CasePosition A_1 = CasePosition.A1;
+    private static final CasePosition B_1 = CasePosition.B1;
+    private static final CasePosition C_1 = CasePosition.C1;
+    private static final CasePosition D_1 = CasePosition.D1;
+    private static final CasePosition E_1 = CasePosition.E1;
+    private static final CasePosition F_1 = CasePosition.F1;
+    private static final CasePosition G_1 = CasePosition.G1;
+    private static final CasePosition H_1 = CasePosition.H1;
+    private static final CasePosition A_2 = CasePosition.A2;
+    private static final CasePosition B_2 = CasePosition.B2;
+    private static final CasePosition C_2 = CasePosition.C2;
+    private static final CasePosition D_2 = CasePosition.D2;
+    private static final CasePosition E_2 = CasePosition.E2;
+    private static final CasePosition F_2 = CasePosition.F2;
+    private static final CasePosition G_2 = CasePosition.G2;
+    private static final CasePosition H_2 = CasePosition.H2;
+    private static final CasePosition A_8 = CasePosition.A8;
+    private static final CasePosition B_8 = CasePosition.B8;
+    private static final CasePosition C_8 = CasePosition.C8;
+    private static final CasePosition D_8 = CasePosition.D8;
+    private static final CasePosition F_8 = CasePosition.F8;
+    private static final CasePosition E_8 = CasePosition.E8;
+    private static final CasePosition G_8 = CasePosition.G8;
+    private static final CasePosition H_8 = CasePosition.H8;
+    private static final CasePosition A_7 = CasePosition.A7;
+    private static final CasePosition B_7 = CasePosition.B7;
+    private static final CasePosition C_7 = CasePosition.C7;
+    private static final CasePosition D_7 = CasePosition.D7;
+    private static final CasePosition E_7 = CasePosition.E7;
+    private static final CasePosition F_7 = CasePosition.F7;
+    private static final CasePosition G_7 = CasePosition.G7;
+    private static final CasePosition H_7 = CasePosition.H7;
+    private static final Pieces W_ROOK = Pieces.W_ROOK;
+    private static final Pieces W_KNIGHT = Pieces.W_KNIGHT;
+    private static final Pieces W_BISHOP = Pieces.W_BISHOP;
+    private static final Pieces W_QUEEN = Pieces.W_QUEEN;
+    private static final Pieces W_KING = Pieces.W_KING;
+    private static final Pieces W_PAWN = Pieces.W_PAWN;
+    private static final Pieces B_ROOK = Pieces.B_ROOK;
+    private static final Pieces B_KNIGHT = Pieces.B_KNIGHT;
+    private static final Pieces B_BISHOP = Pieces.B_BISHOP;
+    private static final Pieces B_QUEEN = Pieces.B_QUEEN;
+    private static final Pieces B_KING = Pieces.B_KING;
+    private static final Pieces B_PAWN = Pieces.B_PAWN;
 
     private GameUtils() {
     }
@@ -116,9 +88,41 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Pieces> getDefaultGame() {
-        Map<CasePosition, Pieces> game = new EnumMap<>(CasePosition.class);
-        game.putAll(DEFAULT_GAME_TEMPLATE);
-        return game;
+        final Map<CasePosition, Pieces> GAME = new EnumMap<>(CasePosition.class);
+        GAME.put(A_1, W_ROOK);
+        GAME.put(B_1, W_KNIGHT);
+        GAME.put(C_1, W_BISHOP);
+        GAME.put(D_1, W_QUEEN);
+        GAME.put(E_1, W_KING);
+        GAME.put(F_1, W_BISHOP);
+        GAME.put(G_1, W_KNIGHT);
+        GAME.put(H_1, W_ROOK);
+        GAME.put(A_2, W_PAWN);
+        GAME.put(B_2, W_PAWN);
+        GAME.put(C_2, W_PAWN);
+        GAME.put(D_2, W_PAWN);
+        GAME.put(E_2, W_PAWN);
+        GAME.put(F_2, W_PAWN);
+        GAME.put(G_2, W_PAWN);
+        GAME.put(H_2, W_PAWN);
+
+        GAME.put(A_8, B_ROOK);
+        GAME.put(B_8, B_KNIGHT);
+        GAME.put(C_8, B_BISHOP);
+        GAME.put(D_8, B_QUEEN);
+        GAME.put(E_8, B_KING);
+        GAME.put(F_8, B_BISHOP);
+        GAME.put(G_8, B_KNIGHT);
+        GAME.put(H_8, B_ROOK);
+        GAME.put(A_7, B_PAWN);
+        GAME.put(B_7, B_PAWN);
+        GAME.put(C_7, B_PAWN);
+        GAME.put(D_7, B_PAWN);
+        GAME.put(E_7, B_PAWN);
+        GAME.put(F_7, B_PAWN);
+        GAME.put(G_7, B_PAWN);
+        GAME.put(H_7, B_PAWN);
+        return GAME;
     }
 
 

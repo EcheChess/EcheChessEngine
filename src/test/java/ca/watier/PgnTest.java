@@ -21,7 +21,7 @@ import ca.watier.echechessengine.game.GameConstraints;
 import ca.watier.echechessengine.utils.PgnParser;
 import ca.watier.echesscommon.impl.WebSocketServiceTestImpl;
 import ca.watier.utils.EngineGameTest;
-import ca.watier.utils.PgnGameLauncher;
+import ca.watier.utils.PgnGameLauncherWithNumberOfGames;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
 
 
 public class PgnTest extends EngineGameTest {
-
 
     private static String gamesAsFile;
 
@@ -54,6 +53,12 @@ public class PgnTest extends EngineGameTest {
         } catch (ChessException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    @Ignore("PgnTest.pgnManualTest - Not really unit tests, only used to test the stability of the engine by running a certain number of games")
+    public void pgnWithNumberOfGame() {
+        new PgnGameLauncherWithNumberOfGames(2500).start();
     }
 
     @Test
