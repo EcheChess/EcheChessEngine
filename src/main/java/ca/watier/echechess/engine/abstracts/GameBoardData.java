@@ -209,6 +209,10 @@ public abstract class GameBoardData {
         this.turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);
     }
 
+    public boolean isGamePaused() {
+        return isGamePaused;
+    }
+
     public void setGamePaused(boolean gamePaused) {
         isGamePaused = gamePaused;
     }
