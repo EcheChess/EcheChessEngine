@@ -1,7 +1,7 @@
 package ca.watier.utils;
 
-import ca.watier.echechessengine.exceptions.ChessException;
-import ca.watier.echechessengine.utils.PgnParser;
+import ca.watier.echechess.engine.exceptions.ChessException;
+import ca.watier.echechess.engine.utils.PgnParser;
 
 import java.io.FileInputStream;
 import java.io.IOException;

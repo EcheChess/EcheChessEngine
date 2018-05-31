@@ -1,6 +1,6 @@
 package ca.watier.utils;
 
-import ca.watier.echechessengine.game.GameConstraints;
+import ca.watier.echechess.engine.game.GameConstraints;
 import ca.watier.echesscommon.enums.PgnEndGameToken;
 import ca.watier.echesscommon.impl.WebSocketServiceTestImpl;
 import org.slf4j.LoggerFactory;
