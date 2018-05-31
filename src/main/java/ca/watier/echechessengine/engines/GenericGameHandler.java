@@ -26,6 +26,7 @@ import ca.watier.echesscommon.pojos.MoveHistory;
 import ca.watier.echesscommon.responses.GameScoreResponse;
 import ca.watier.echesscommon.sessions.Player;
 import ca.watier.echesscommon.utils.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -90,7 +91,7 @@ public class GenericGameHandler extends GameBoard {
         return moveType;
     }
 
-    private MoveType movePiece(CasePosition from, CasePosition to, Side playerSide, MoveHistory moveHistory) {
+    private MoveType movePiece(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Side playerSide, @NotNull MoveHistory moveHistory) {
         Assert.assertNotNull(from, to, playerSide);
 
         Side otherPlayerSide = Side.getOtherPlayerSide(playerSide);
@@ -150,7 +151,10 @@ public class GenericGameHandler extends GameBoard {
             CasePosition rookPosition = castlingPositionHelper.getRookPosition();
 
             movePieceTo(from, kingPosition, piecesFrom);
-            movePieceTo(to, rookPosition, piecesTo);
+
+            if (isEatingPiece) {
+                movePieceTo(to, rookPosition, piecesTo);
+            }
             changeAllowedMoveSide();
         } else if (MoveType.EN_PASSANT.equals(moveType)) {
             movePieceTo(from, to, piecesFrom);
