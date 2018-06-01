@@ -16,11 +16,11 @@
 
 package ca.watier.pieces;
 
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
-import ca.watier.echesscommon.enums.Side;
-import ca.watier.echesscommon.utils.Pair;
 import ca.watier.utils.EngineGameTest;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

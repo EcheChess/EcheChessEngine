@@ -16,14 +16,15 @@
 
 package ca.watier.echechess.engine.game;
 
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.interfaces.WebSocketService;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
-import ca.watier.echesscommon.interfaces.WebSocketService;
-import ca.watier.echesscommon.utils.Assert;
 
 import java.util.EnumMap;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 5/22/2017.
@@ -40,7 +41,7 @@ public class CustomPieceWithStandardRulesHandler extends GenericGameHandler {
     }
 
     public void setPieces(String specialGamePieces) {
-        Assert.assertNotEmpty(specialGamePieces);
+        assertThat(specialGamePieces).isNotEmpty();
 
         Map<CasePosition, Pieces> positionPieces = new EnumMap<>(CasePosition.class);
 

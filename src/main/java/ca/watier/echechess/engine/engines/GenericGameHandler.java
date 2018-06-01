@@ -16,26 +16,28 @@
 
 package ca.watier.echechess.engine.engines;
 
+import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.interfaces.WebSocketService;
+import ca.watier.echechess.common.pojos.MoveHistory;
+import ca.watier.echechess.common.responses.GameScoreResponse;
+import ca.watier.echechess.common.sessions.Player;
+import ca.watier.echechess.common.utils.*;
 import ca.watier.echechess.engine.abstracts.GameBoard;
+import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
 import ca.watier.echechess.engine.game.GameConstraints;
 import ca.watier.echechess.engine.utils.GameUtils;
-import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
-import ca.watier.echesscommon.enums.*;
-import ca.watier.echesscommon.interfaces.WebSocketService;
-import ca.watier.echesscommon.pojos.MoveHistory;
-import ca.watier.echesscommon.responses.GameScoreResponse;
-import ca.watier.echesscommon.sessions.Player;
-import ca.watier.echesscommon.utils.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static ca.watier.echesscommon.enums.ChessEventMessage.*;
-import static ca.watier.echesscommon.enums.ChessEventMessage.PLAYER_TURN;
-import static ca.watier.echesscommon.enums.KingStatus.OK;
-import static ca.watier.echesscommon.enums.KingStatus.STALEMATE;
-import static ca.watier.echesscommon.enums.Side.*;
-import static ca.watier.echesscommon.utils.Constants.*;
+import static ca.watier.echechess.common.enums.ChessEventMessage.*;
+import static ca.watier.echechess.common.enums.ChessEventMessage.PLAYER_TURN;
+import static ca.watier.echechess.common.enums.KingStatus.OK;
+import static ca.watier.echechess.common.enums.KingStatus.STALEMATE;
+import static ca.watier.echechess.common.enums.Side.*;
+import static ca.watier.echechess.common.utils.Constants.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * Created by yannick on 5/5/2017.
@@ -92,9 +94,7 @@ public class GenericGameHandler extends GameBoard {
     }
 
     private MoveType movePiece(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Side playerSide, @NotNull MoveHistory moveHistory) {
-        Assert.assertNotNull(from, to, playerSide);
-
-        Side otherPlayerSide = Side.getOtherPlayerSide(playerSide);
+        Side otherPlayerSide = getOtherPlayerSide(playerSide);
         Pieces piecesFrom = getPiece(from);
         Pieces piecesTo = getPiece(to);
 
@@ -111,7 +111,7 @@ public class GenericGameHandler extends GameBoard {
         }
 
         MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
-        KingStatus currentKingStatus = KingStatus.OK;
+        KingStatus currentKingStatus = OK;
         boolean isEatingPiece = piecesTo != null;
 
 
@@ -160,7 +160,7 @@ public class GenericGameHandler extends GameBoard {
             movePieceTo(from, to, piecesFrom);
             changeAllowedMoveSide();
 
-            CasePosition enemyPawnPosition = MathUtils.getNearestPositionFromDirection(to, otherPlayerSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH);
+            CasePosition enemyPawnPosition = MathUtils.getNearestPositionFromDirection(to, otherPlayerSide.equals(BLACK) ? Direction.SOUTH : Direction.NORTH);
             Pieces enemyPawnToEat = getPiece(enemyPawnPosition);
             updatePointsForSide(playerSide, enemyPawnToEat.getPoint());
             removePieceFromBoard(enemyPawnPosition);
@@ -198,7 +198,7 @@ public class GenericGameHandler extends GameBoard {
 
     private void sendMovedMessages(CasePosition from, CasePosition to, Side playerSide) {
         WEB_SOCKET_SERVICE.fireGameEvent(uuid, MOVE, String.format(PLAYER_MOVE, playerSide, from, to));
-        WEB_SOCKET_SERVICE.fireSideEvent(uuid, Side.getOtherPlayerSide(playerSide), PLAYER_TURN, Constants.PLAYER_TURN);
+        WEB_SOCKET_SERVICE.fireSideEvent(uuid, getOtherPlayerSide(playerSide), PLAYER_TURN, Constants.PLAYER_TURN);
         WEB_SOCKET_SERVICE.fireGameEvent(uuid, SCORE_UPDATE, getGameScore());
     }
 
@@ -233,8 +233,10 @@ public class GenericGameHandler extends GameBoard {
             return kingStatus;
         }
 
-        Assert.assertNotNull(kingPosition, playerSide);
-        MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(Side.getOtherPlayerSide(playerSide), kingPosition);
+        assertThat(kingPosition).isNotNull();
+        assertThat(playerSide).isNotNull();
+
+        MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), kingPosition);
 
         boolean isCheck = !piecesThatCanHitOriginalPosition.isEmpty();
         if (isCheck) {
@@ -333,9 +335,8 @@ public class GenericGameHandler extends GameBoard {
         return kingStatus;
     }
 
-    protected void updatePointsForSide(Side side, byte point) {
-        Assert.assertNotNull(side);
-        Assert.assertNumberSuperiorOrEqualsTo(point, (byte) 0);
+    protected void updatePointsForSide(@NotNull Side side, byte point) {
+        assertThat(point).isGreaterThanOrEqualTo((byte) 0);
 
         switch (side) {
             case BLACK:
@@ -349,9 +350,8 @@ public class GenericGameHandler extends GameBoard {
         }
     }
 
-    private void sendCheckOrCheckmateMessages(KingStatus currentkingStatus, KingStatus otherKingStatusAfterMove, Side playerSide) {
-        Assert.assertNotNull(currentkingStatus, otherKingStatusAfterMove);
-        Side otherPlayerSide = Side.getOtherPlayerSide(playerSide);
+    private void sendCheckOrCheckmateMessages(@NotNull KingStatus currentkingStatus, @NotNull KingStatus otherKingStatusAfterMove, Side playerSide) {
+        Side otherPlayerSide = getOtherPlayerSide(playerSide);
 
         if (KingStatus.CHECKMATE.equals(currentkingStatus)) {
             WEB_SOCKET_SERVICE.fireGameEvent(uuid, KING_CHECKMATE, String.format(PLAYER_KING_CHECKMATE, playerSide));
@@ -383,7 +383,7 @@ public class GenericGameHandler extends GameBoard {
      * @return
      */
     public MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> getPiecesThatCanHitPosition(Side sideToKeep, CasePosition... positions) {
-        Assert.assertNotEmpty(positions);
+        assertThat(positions).isNotEmpty();
 
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> values = new MultiArrayMap<>();
 
@@ -406,8 +406,7 @@ public class GenericGameHandler extends GameBoard {
         return values;
     }
 
-    public List<CasePosition> getPositionKingCanMove(Side playerSide) {
-        Assert.assertNotNull(playerSide);
+    public List<CasePosition> getPositionKingCanMove(@NotNull Side playerSide) {
         CasePosition kingPosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation());
 
         List<CasePosition> values = new ArrayList<>();
@@ -419,7 +418,7 @@ public class GenericGameHandler extends GameBoard {
         }
 
         //Add the position, if the castling is authorized on the rook
-        Pieces rook = Side.WHITE.equals(playerSide) ? Pieces.W_ROOK : Pieces.B_ROOK;
+        Pieces rook = WHITE.equals(playerSide) ? Pieces.W_ROOK : Pieces.B_ROOK;
         for (CasePosition rookPosition : GameUtils.getPiecesPosition(rook, getPiecesLocation())) {
             if (MoveType.CASTLING.equals(GAME_CONSTRAINTS.getMoveType(kingPosition, rookPosition, this))) {
                 values.add(rookPosition);
@@ -435,9 +434,7 @@ public class GenericGameHandler extends GameBoard {
      * @param side
      * @return
      */
-    public final Map<CasePosition, Pieces> getPiecesLocation(Side side) {
-        Assert.assertNotNull(side);
-
+    public final Map<CasePosition, Pieces> getPiecesLocation(@NotNull Side side) {
         Map<CasePosition, Pieces> values = new EnumMap<>(CasePosition.class);
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
@@ -488,7 +485,7 @@ public class GenericGameHandler extends GameBoard {
             //Set the new maps
             setPiecesGameState(isPawnUsedSpecialMoveMap, turnNumberPieceMap, isPiecesMovedMap);
 
-            MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(Side.getOtherPlayerSide(playerSide), GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation()));
+            MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation()));
 
             isKingCheck = !piecesThatCanHitOriginalPosition.isEmpty();
 
@@ -517,7 +514,7 @@ public class GenericGameHandler extends GameBoard {
             //Set the new maps
             setPiecesGameState(isPawnUsedSpecialMoveMap, turnNumberPieceMap, isPiecesMovedMap);
 
-            MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(Side.getOtherPlayerSide(playerSide), GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation()));
+            MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation()));
 
             isKingCheck = !piecesThatCanHitOriginalPosition.isEmpty();
 
@@ -563,16 +560,12 @@ public class GenericGameHandler extends GameBoard {
         return positions;
     }
 
-    public boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide) {
-        Assert.assertNotNull(currentPosition, playerSide);
-
+    public boolean isKingCheckAtPosition(@NotNull CasePosition currentPosition, @NotNull Side playerSide) {
         if (isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
             return false;
         }
 
-        Assert.assertNotNull(currentPosition, playerSide);
-
-        return !getPiecesThatCanHitPosition(Side.getOtherPlayerSide(playerSide), currentPosition).isEmpty();
+        return !getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), currentPosition).isEmpty();
     }
 
     public List<MoveHistory> getMoveHistory() {
@@ -608,8 +601,7 @@ public class GenericGameHandler extends GameBoard {
         return values;
     }
 
-    public final boolean setPlayerToSide(Player player, Side side) {
-        Assert.assertNotNull(player, side);
+    public final boolean setPlayerToSide(@NotNull Player player, @NotNull Side side) {
         boolean value;
 
         switch (side) {
@@ -732,12 +724,14 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public void addSpecialRule(SpecialGameRules... rules) {
-        Assert.assertNotEmpty(rules);
+        assertThat(rules).isNotEmpty();
+
         SPECIAL_GAME_RULES.addAll(Arrays.asList(rules));
     }
 
     public void removeSpecialRule(SpecialGameRules... rules) {
-        Assert.assertNotEmpty(rules);
+        assertThat(rules).isNotEmpty();
+
         SPECIAL_GAME_RULES.removeAll(Arrays.asList(rules));
     }
 

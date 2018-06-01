@@ -16,16 +16,17 @@
 
 package ca.watier.echechess.engine.constraints;
 
+import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
-import ca.watier.echesscommon.enums.*;
-import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.MathUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 4/23/2017.
@@ -50,7 +51,8 @@ public class GenericMoveConstraint implements MoveConstraint {
 
         List<Direction> directionList = Arrays.asList(directions);
 
-        Assert.assertNotNull(from, to);
+        assertThat(from).isNotNull();
+        assertThat(to).isNotNull();
 
         Map<CasePosition, Pieces> positionPiecesMap = gameHandler.getPiecesLocation();
         Pieces pieceTo = positionPiecesMap.get(to);

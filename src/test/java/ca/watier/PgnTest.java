@@ -19,7 +19,7 @@ package ca.watier;
 import ca.watier.echechess.engine.exceptions.ChessException;
 import ca.watier.echechess.engine.game.GameConstraints;
 import ca.watier.echechess.engine.utils.PgnParser;
-import ca.watier.echesscommon.impl.WebSocketServiceTestImpl;
+import ca.watier.echechess.common.impl.WebSocketServiceTestImpl;
 import ca.watier.utils.EngineGameTest;
 import ca.watier.utils.PgnGameLauncherWithNumberOfGames;
 import org.apache.commons.io.IOUtils;

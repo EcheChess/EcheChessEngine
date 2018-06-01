@@ -16,13 +16,13 @@
 
 package ca.watier.game;
 
+import ca.watier.echechess.common.enums.SpecialGameRules;
 import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
-import ca.watier.echesscommon.enums.SpecialGameRules;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static ca.watier.echesscommon.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.CasePosition.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 

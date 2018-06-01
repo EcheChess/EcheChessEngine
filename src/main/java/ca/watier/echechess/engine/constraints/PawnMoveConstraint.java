@@ -16,14 +16,17 @@
 
 package ca.watier.echechess.engine.constraints;
 
+import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
-import ca.watier.echesscommon.enums.*;
-import ca.watier.echesscommon.interfaces.BaseUtils;
-import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.MathUtils;
+import org.jetbrains.annotations.NotNull;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * Created by yannick on 4/23/2017.
@@ -75,9 +78,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     @Override
-    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
-        Assert.assertNotNull(from, to);
-
+    public boolean isMoveValid(@NotNull CasePosition from, @NotNull CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
         Direction direction = Direction.NORTH;
         Direction directionAttack1 = Direction.NORTH_WEST;
         Direction directionAttack2 = Direction.NORTH_EAST;
@@ -141,9 +142,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     @Override
-    public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        Assert.assertNotNull(from, to, gameHandler);
-
+    public MoveType getMoveType(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull GenericGameHandler gameHandler) {
         MoveType value = MoveType.NORMAL_MOVE;
         Pieces pieceFrom = gameHandler.getPiece(from);
 

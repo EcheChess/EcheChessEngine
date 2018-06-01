@@ -16,16 +16,18 @@
 
 package ca.watier.echechess.engine.contexts;
 
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.interfaces.WebSocketService;
+import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
 import ca.watier.echechess.engine.game.GameConstraints;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
-import ca.watier.echesscommon.interfaces.WebSocketService;
-import ca.watier.echesscommon.sessions.Player;
-import ca.watier.echesscommon.utils.Assert;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 5/20/2017.
@@ -46,9 +48,9 @@ public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHand
         playerWhite.addJoinedGame(uuid);
     }
 
-    public StandardGameHandlerContext(GameConstraints gameConstraints, WebSocketService webSocketService, Map<CasePosition, Pieces> positionPieces) {
+    public StandardGameHandlerContext(@NotNull GameConstraints gameConstraints, @NotNull WebSocketService webSocketService, @NotNull Map<CasePosition, Pieces> positionPieces) {
         super(gameConstraints, webSocketService);
-        Assert.assertNotEmpty(positionPieces);
+        assertThat(positionPieces).isNotEmpty();
 
         setPieces(positionPieces);
         addBothPlayerToGameAndSetUUID();
@@ -56,18 +58,13 @@ public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHand
 
     public StandardGameHandlerContext(GameConstraints gameConstraints, WebSocketService webSocketService, String positionPieces) {
         super(gameConstraints, webSocketService);
-        Assert.assertNotEmpty(positionPieces);
+        assertThat(positionPieces).isNotEmpty();
 
         setPieces(positionPieces);
         addBothPlayerToGameAndSetUUID();
     }
 
-    public void movePieceTo(CasePosition from, CasePosition to) {
-        Assert.assertNotNull(from, to);
-
-        Pieces pieces = getPiece(from);
-        Assert.assertNotNull(pieces);
-
-        movePieceTo(from, to, pieces);
+    public void movePieceTo(@NotNull CasePosition from, @NotNull CasePosition to) {
+        movePieceTo(from, to, getPiece(from));
     }
 }

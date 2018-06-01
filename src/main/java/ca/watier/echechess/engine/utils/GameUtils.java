@@ -16,18 +16,19 @@
 
 package ca.watier.echechess.engine.utils;
 
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Direction;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Direction;
-import ca.watier.echesscommon.enums.Pieces;
-import ca.watier.echesscommon.interfaces.BaseUtils;
-import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.MathUtils;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 4/23/2017.
@@ -133,7 +134,7 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Boolean> initNewMovedPieceMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        Assert.assertNotEmpty(positionPiecesMap);
+        assertThat(positionPiecesMap).isNotEmpty();
 
         Map<CasePosition, Boolean> values = new EnumMap<>(CasePosition.class);
         for (CasePosition position : positionPiecesMap.keySet()) {
@@ -151,7 +152,7 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Boolean> initPawnMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        Assert.assertNotEmpty(positionPiecesMap);
+        assertThat(positionPiecesMap).isNotEmpty();
 
         Map<CasePosition, Boolean> values = new EnumMap<>(CasePosition.class);
 
@@ -172,7 +173,7 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Integer> initTurnMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        Assert.assertNotEmpty(positionPiecesMap);
+        assertThat(positionPiecesMap).isNotEmpty();
 
         Map<CasePosition, Integer> values = new EnumMap<>(CasePosition.class);
 
@@ -192,7 +193,10 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static boolean isDefaultPosition(CasePosition position, Pieces pieces, GameBoardData gameBoard) {
-        Assert.assertNotNull(position, pieces);
+        assertThat(position).isNotNull();
+        assertThat(pieces).isNotNull();
+        assertThat(gameBoard).isNotNull();
+
         return pieces.equals(gameBoard.getDefaultPositions().get(position));
     }
 
@@ -205,7 +209,9 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static boolean isOtherPiecesBetweenTarget(CasePosition from, CasePosition to, Map<CasePosition, Pieces> pieces) {
-        Assert.assertNotNull(from, to, pieces);
+        assertThat(from).isNotNull();
+        assertThat(to).isNotNull();
+        assertThat(pieces).isNotNull();
 
         return !getPiecesBetweenPosition(from, to, pieces).isEmpty();
     }
@@ -219,7 +225,9 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static List<CasePosition> getPiecesBetweenPosition(CasePosition from, CasePosition to, Map<CasePosition, Pieces> pieces) {
-        Assert.assertNotNull(from, to, pieces);
+        assertThat(from).isNotNull();
+        assertThat(to).isNotNull();
+        assertThat(pieces).isNotNull();
 
         List<CasePosition> positions = new ArrayList<>();
 
@@ -252,7 +260,7 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static CasePosition getSinglePiecePosition(Pieces pieces, Map<CasePosition, Pieces> positionPiecesMap) {
-        Assert.assertNotNull(pieces);
+        assertThat(pieces).isNotNull();
         CasePosition position = null;
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {
@@ -274,8 +282,8 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static List<CasePosition> getPiecesPosition(Pieces pieces, Map<CasePosition, Pieces> positionPiecesMap) {
-        Assert.assertNotNull(pieces);
-        Assert.assertNotEmpty(positionPiecesMap);
+        assertThat(pieces).isNotNull();
+        assertThat(positionPiecesMap).isNotEmpty();
         List<CasePosition> positions = new ArrayList<>();
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {

@@ -16,13 +16,12 @@
 
 package ca.watier.echechess.engine.constraints;
 
-import ca.watier.echesscommon.enums.DirectionPattern;
+import ca.watier.echechess.common.enums.DirectionPattern;
 
 /**
  * Created by yannick on 4/23/2017.
  */
 public class RookMoveConstraint extends GenericMoveConstraint {
-
     public RookMoveConstraint() {
         super(DirectionPattern.NORMAL);
     }

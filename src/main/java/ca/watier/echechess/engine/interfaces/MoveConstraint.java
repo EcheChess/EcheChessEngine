@@ -16,9 +16,9 @@
 
 package ca.watier.echechess.engine.interfaces;
 
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.MoveMode;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.MoveMode;
 
 /**
  * Created by yannick on 4/23/2017.

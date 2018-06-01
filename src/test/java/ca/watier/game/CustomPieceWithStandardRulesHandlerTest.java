@@ -16,20 +16,20 @@
 
 package ca.watier.game;
 
+import ca.watier.echechess.common.enums.KingStatus;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.enums.SpecialGameRules;
+import ca.watier.echechess.common.impl.WebSocketServiceTestImpl;
+import ca.watier.echechess.common.utils.Constants;
 import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
-import ca.watier.echesscommon.enums.KingStatus;
-import ca.watier.echesscommon.enums.Pieces;
-import ca.watier.echesscommon.enums.SpecialGameRules;
-import ca.watier.echesscommon.impl.WebSocketServiceTestImpl;
-import ca.watier.echesscommon.utils.Constants;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler.THE_NUMBER_OF_PARAMETER_IS_INCORRECT;
-import static ca.watier.echesscommon.enums.CasePosition.*;
-import static ca.watier.echesscommon.enums.MoveType.MOVE_NOT_ALLOWED;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

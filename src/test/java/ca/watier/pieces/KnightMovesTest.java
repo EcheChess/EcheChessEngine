@@ -17,8 +17,8 @@
 package ca.watier.pieces;
 
 import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,12 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ca.watier.echesscommon.enums.CasePosition.*;
-import static ca.watier.echesscommon.enums.MoveType.MOVE_NOT_ALLOWED;
-import static ca.watier.echesscommon.enums.MoveType.NORMAL_MOVE;
-import static ca.watier.echesscommon.enums.Pieces.*;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
+import static ca.watier.echechess.common.enums.MoveType.NORMAL_MOVE;
+import static ca.watier.echechess.common.enums.Pieces.*;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 
 /**
  * Created by yannick on 5/8/2017.

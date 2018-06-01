@@ -21,11 +21,11 @@ import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static ca.watier.echesscommon.enums.CasePosition.*;
-import static ca.watier.echesscommon.enums.MoveType.CAPTURE;
-import static ca.watier.echesscommon.enums.MoveType.MOVE_NOT_ALLOWED;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.MoveType.CAPTURE;
+import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 
 /**
  * Created by yannick on 5/8/2017.

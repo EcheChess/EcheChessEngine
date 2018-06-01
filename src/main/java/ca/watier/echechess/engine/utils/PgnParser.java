@@ -16,16 +16,16 @@
 
 package ca.watier.echechess.engine.utils;
 
+import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.interfaces.WebSocketService;
+import ca.watier.echechess.common.pojos.MoveHistory;
+import ca.watier.echechess.common.pojos.PieceDataSection;
+import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
+import ca.watier.echechess.common.utils.MultiArrayMap;
+import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
 import ca.watier.echechess.engine.game.GameConstraints;
-import ca.watier.echesscommon.enums.*;
-import ca.watier.echesscommon.interfaces.WebSocketService;
-import ca.watier.echesscommon.pojos.MoveHistory;
-import ca.watier.echesscommon.pojos.PieceDataSection;
-import ca.watier.echesscommon.pojos.PieceSingleMoveSection;
-import ca.watier.echesscommon.utils.MultiArrayMap;
-import ca.watier.echesscommon.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static ca.watier.echesscommon.enums.Side.BLACK;
-import static ca.watier.echesscommon.enums.Side.WHITE;
+import static ca.watier.echechess.common.enums.Side.BLACK;
+import static ca.watier.echechess.common.enums.Side.WHITE;
 
 
 public class PgnParser {

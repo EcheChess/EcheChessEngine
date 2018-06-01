@@ -16,10 +16,10 @@
 
 package ca.watier.pieces;
 
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
 import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,12 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ca.watier.echesscommon.enums.CasePosition.*;
-import static ca.watier.echesscommon.enums.MoveType.*;
-import static ca.watier.echesscommon.enums.Pieces.B_PAWN;
-import static ca.watier.echesscommon.enums.Pieces.W_KING;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.MoveType.*;
+import static ca.watier.echechess.common.enums.Pieces.B_PAWN;
+import static ca.watier.echechess.common.enums.Pieces.W_KING;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

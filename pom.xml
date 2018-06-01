@@ -6,7 +6,7 @@
 
     <groupId>ca.watier.echechess.engine</groupId>
     <artifactId>echechess-engine</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <distributionManagement>
         <repository>
@@ -135,6 +135,11 @@
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ca.watier.echechess.common</groupId>
+            <artifactId>echechess-common</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>

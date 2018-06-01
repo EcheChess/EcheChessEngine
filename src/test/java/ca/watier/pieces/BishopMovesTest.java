@@ -20,9 +20,9 @@ import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Test;
 
-import static ca.watier.echesscommon.enums.CasePosition.*;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
-import static ca.watier.echesscommon.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
+import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

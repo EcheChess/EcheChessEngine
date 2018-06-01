@@ -1,12 +1,12 @@
 package ca.watier.game;
 
+import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
-import ca.watier.echesscommon.sessions.Player;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static ca.watier.echesscommon.enums.Side.OBSERVER;
+import static ca.watier.echechess.common.enums.Side.OBSERVER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GenericGameHandlerTest extends EngineGameTest {

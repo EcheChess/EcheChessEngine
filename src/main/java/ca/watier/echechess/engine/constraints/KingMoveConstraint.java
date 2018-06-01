@@ -16,22 +16,22 @@
 
 package ca.watier.echechess.engine.constraints;
 
+import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
-import ca.watier.echechess.engine.utils.GameUtils;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
-import ca.watier.echesscommon.enums.*;
-import ca.watier.echesscommon.interfaces.BaseUtils;
-import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.MathUtils;
+import ca.watier.echechess.engine.utils.GameUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 
-import static ca.watier.echesscommon.enums.CasePosition.*;
-import static ca.watier.echesscommon.enums.Side.BLACK;
-import static ca.watier.echesscommon.enums.Side.WHITE;
-import static ca.watier.echesscommon.interfaces.BaseUtils.getSafeBoolean;
+import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.Side.BLACK;
+import static ca.watier.echechess.common.enums.Side.WHITE;
+import static ca.watier.echechess.common.interfaces.BaseUtils.getSafeBoolean;
 
 /**
  * Created by yannick on 4/23/2017.
@@ -39,8 +39,7 @@ import static ca.watier.echesscommon.interfaces.BaseUtils.getSafeBoolean;
 public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint {
 
     @Override
-    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
-        Assert.assertNotNull(from, to, gameHandler);
+    public boolean isMoveValid(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull GenericGameHandler gameHandler, @NotNull MoveMode moveMode) {
         Pieces hittingPiece = gameHandler.getPiece(to);
         Pieces pieceFrom = gameHandler.getPiece(from);
         Side sideFrom = pieceFrom.getSide();
@@ -66,8 +65,7 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
            The king does not end up in check. (True of any legal move.)
     */
     @Override
-    public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        Assert.assertNotNull(from, to, gameHandler);
+    public MoveType getMoveType(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull GenericGameHandler gameHandler) {
 
         MoveType moveType = MoveType.NORMAL_MOVE;
         Pieces pieceFrom = gameHandler.getPiece(from);

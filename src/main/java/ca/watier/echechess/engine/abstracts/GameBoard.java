@@ -16,14 +16,13 @@
 
 package ca.watier.echechess.engine.abstracts;
 
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
-import ca.watier.echesscommon.enums.Ranks;
-import ca.watier.echesscommon.enums.Side;
-import ca.watier.echesscommon.interfaces.BaseUtils;
-import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.MathUtils;
-import ca.watier.echesscommon.utils.Pair;
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.enums.Ranks;
+import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.utils.MathUtils;
+import ca.watier.echechess.common.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -103,8 +102,6 @@ public abstract class GameBoard extends GameBoardData {
      * @param side
      */
     protected void updatePlayerTurnValue(@NotNull Side side) {
-        Assert.assertNotNull(side);
-
         switch (side) {
             case WHITE:
                 incrementWhiteTurnNumber();
@@ -119,8 +116,6 @@ public abstract class GameBoard extends GameBoardData {
     }
 
     public final boolean upgradePiece(@NotNull CasePosition to, @NotNull Pieces pieces, @NotNull Side playerSide) {
-        Assert.assertNotNull(pieces, playerSide);
-
         Pair<CasePosition, CasePosition> pair = null;
         for (Pair<CasePosition, CasePosition> casePositionCasePositionPair : getPawnPromotionBySide(playerSide)) {
             CasePosition toValue = casePositionCasePositionPair.getSecondValue();

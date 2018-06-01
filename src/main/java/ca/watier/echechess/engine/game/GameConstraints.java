@@ -16,17 +16,18 @@
 
 package ca.watier.echechess.engine.game;
 
+import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.engine.constraints.*;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
-import ca.watier.echesscommon.enums.*;
-import ca.watier.echesscommon.utils.Assert;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 4/26/2017.
@@ -51,7 +52,7 @@ public class GameConstraints {
     }
 
     private static Class<? extends MoveConstraint> getPieceMoveConstraintClass(Pieces pieces) {
-        Assert.assertNotNull(pieces);
+        assertThat(pieces).isNotNull();
 
         Class<? extends MoveConstraint> moveConstraint = null;
 
@@ -96,7 +97,10 @@ public class GameConstraints {
      * @return
      */
     public boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide, GenericGameHandler gameHandler, MoveMode moveMode) {
-        Assert.assertNotNull(from, to, playerSide);
+        assertThat(from).isNotNull();
+        assertThat(to).isNotNull();
+        assertThat(playerSide).isNotNull();
+
         Pieces fromPiece = gameHandler.getPiece(from);
 
 
@@ -106,14 +110,17 @@ public class GameConstraints {
 
         MoveConstraint moveConstraint = MOVE_CONSTRAINT_MAP.get(fromPiece);
 
-        Assert.assertNotNull(moveConstraint);
+        assertThat(moveConstraint).isNotNull();
 
         return moveConstraint.isMoveValid(from, to, gameHandler, moveMode);
     }
 
 
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        Assert.assertNotNull(from, to, gameHandler);
+        assertThat(from).isNotNull();
+        assertThat(to).isNotNull();
+        assertThat(gameHandler).isNotNull();
+
         MoveType value = MoveType.NORMAL_MOVE;
 
         Pieces fromPiece = gameHandler.getPiece(from);

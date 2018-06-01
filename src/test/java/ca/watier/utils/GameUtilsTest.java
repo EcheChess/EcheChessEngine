@@ -17,15 +17,15 @@
 package ca.watier.utils;
 
 import ca.watier.echechess.engine.utils.GameUtils;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;
 
-import static ca.watier.echesscommon.enums.Pieces.*;
+import static ca.watier.echechess.common.enums.Pieces.*;
 
 /**
  * Created by yannick on 4/28/2017.

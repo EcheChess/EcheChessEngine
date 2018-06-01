@@ -1,18 +1,19 @@
 package ca.watier.echechess.engine.abstracts;
 
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.utils.GameUtils;
-import ca.watier.echesscommon.enums.CasePosition;
-import ca.watier.echesscommon.enums.Pieces;
-import ca.watier.echesscommon.enums.Side;
-import ca.watier.echesscommon.interfaces.BaseUtils;
-import ca.watier.echesscommon.utils.Assert;
-import ca.watier.echesscommon.utils.Pair;
 import com.google.common.collect.ArrayListMultimap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class GameBoardData {
 
@@ -200,7 +201,7 @@ public abstract class GameBoardData {
     }
 
     protected final void setPositionPiecesMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        Assert.assertNotEmpty(positionPiecesMap);
+        assertThat(positionPiecesMap).isNotEmpty();
 
         this.positionPiecesMap = positionPiecesMap;
         this.DEFAULT_POSITIONS.clear();
