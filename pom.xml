@@ -93,7 +93,7 @@
         <dependency>
             <groupId>ca.watier.echechess.common</groupId>
             <artifactId>echechess-common</artifactId>
-            <version>1.0</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
