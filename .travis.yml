@@ -1,7 +1,6 @@
 language: java
 
 before_install:
-  - git clone https://github.com/EcheChess/EcheChessProperties.git
   - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh  # Get latest install-jdk.sh script
   - unset _JAVA_OPTIONS  # https://github.com/travis-ci/travis-ci/issues/8408
 
