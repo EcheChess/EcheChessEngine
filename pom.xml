@@ -27,7 +27,7 @@
     <repositories>
         <repository>
             <id>Doi9t</id>
-            <url>https://gitlab.com/doi9t/mvn-repo/raw/master/</url>
+            <url>https://gitlab.com/doi9t/mvn-repo/raw/repo/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
