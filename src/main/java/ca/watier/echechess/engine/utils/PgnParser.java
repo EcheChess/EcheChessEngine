@@ -63,73 +63,60 @@ public class PgnParser {
         this.webSocketService = webSocketService;
     }
 
-    @NotNull
-    public static List<Pair<String, String>> getMappedHeadersAndGames(@NotNull String rawText) {
-        List<Pair<String, String>> values = new ArrayList<>();
-        String[] rawValues = getRawHeadersAndGames(rawText);
-
-        for (int i = 0; i < rawValues.length; i = i + 2) {
-            String header = rawValues[i];
-            String game = rawValues[i + 1];
-            values.add(new Pair<>(header, game));
-        }
-
-        return values;
-    }
-
-    @NotNull
-    public static String[] getRawHeadersAndGames(@NotNull String rawText) {
-        return rawText.replace("\r\n", "\n").split("\n\n");
-    }
-
-    public List<GenericGameHandler> parse(@NotNull String rawText) throws ChessException {
+    public List<GenericGameHandler> parseMultipleGameWithHeader(@NotNull String rawText) throws ChessException {
         String[] headersAndGames = getRawHeadersAndGames(rawText);
         int nbOfGames = headersAndGames.length;
-        int currentIdx = 1;
 
         for (int i = 0; i < nbOfGames; i = i + 2) {
-            String rawCurrentGame = headersAndGames[i + 1];
-            String currentGame = getGame(rawCurrentGame);
-
-            LOGGER.debug("=================================================");
-            LOGGER.debug("***{}***", currentIdx);
-            LOGGER.debug(currentGame);
-            LOGGER.debug("=================================================");
-
-            currentIdx++;
-
-            String[] tokens = currentGame.split("\\s+\\d+\\.");
-
-            if (tokens.length == 0) {
-                continue;
-            }
-
-            resetSide();
-            gameHandler = new GenericGameHandler(gameConstraints, webSocketService);
-            handlerList.add(gameHandler);
-
-            for (String currentToken : tokens) {
-                currentToken = currentToken.trim();
-
-                String[] actions = currentToken.split(" ");
-
-                for (String action : actions) {
-                    action = action.trim();
-
-                    if (action.isEmpty()) {
-                        continue;
-                    }
-
-                    parseAction(action, currentGame);
-                }
-            }
+            parseGame(headersAndGames[i + 1]);
         }
 
         return handlerList;
     }
 
-    @NotNull
-    public static String getGame(String rawCurrentGame) {
+    public static @NotNull String[] getRawHeadersAndGames(@NotNull String rawText) {
+        return replaceInvalidCharacters(rawText).split("\n\n");
+    }
+
+    private void parseGame(String rawCurrentGame) throws ChessException {
+        String currentGame = getGame(rawCurrentGame);
+
+        LOGGER.debug("=================================================");
+        LOGGER.debug(currentGame);
+        LOGGER.debug("=================================================");
+
+        String[] tokens = currentGame.split("\\s+\\d+\\.");
+
+        if (tokens.length == 0) {
+            return;
+        }
+
+        resetSide();
+        gameHandler = new GenericGameHandler(gameConstraints, webSocketService);
+        handlerList.add(gameHandler);
+
+        for (String currentToken : tokens) {
+            currentToken = currentToken.trim();
+
+            String[] actions = currentToken.split(" ");
+
+            for (String action : actions) {
+                action = action.trim();
+
+                if (action.isEmpty()) {
+                    continue;
+                }
+
+                parseAction(action, currentGame);
+            }
+        }
+    }
+
+    private static @NotNull String replaceInvalidCharacters(@NotNull String rawText) {
+        return rawText.replace("\r\n", "\n");
+    }
+
+    private static @NotNull String getGame(@NotNull String rawCurrentGame) {
         return rawCurrentGame.substring(2, rawCurrentGame.length()).replace("\n", " ");
     }
 
@@ -495,5 +482,10 @@ public class PgnParser {
 
     private CasePosition getCasePositionWhenFullCoordinate(CasePosition fromFullCoordinate, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) {
         throw new IllegalStateException("Not Implemented");
+    }
+
+    public GenericGameHandler parseSingleGameWithoutHeader(@NotNull String rawText) throws ChessException {
+        parseGame(replaceInvalidCharacters(rawText));
+        return handlerList.get(0);
     }
 }
