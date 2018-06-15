@@ -27,8 +27,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Created by yannick on 4/26/2017.
  */
@@ -52,7 +50,9 @@ public class GameConstraints {
     }
 
     private static Class<? extends MoveConstraint> getPieceMoveConstraintClass(Pieces pieces) {
-        assertThat(pieces).isNotNull();
+        if (pieces == null) {
+            return null;
+        }
 
         Class<? extends MoveConstraint> moveConstraint = null;
 
@@ -97,9 +97,9 @@ public class GameConstraints {
      * @return
      */
     public boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide, GenericGameHandler gameHandler, MoveMode moveMode) {
-        assertThat(from).isNotNull();
-        assertThat(to).isNotNull();
-        assertThat(playerSide).isNotNull();
+        if (from == null || to == null || playerSide == null) {
+            return false;
+        }
 
         Pieces fromPiece = gameHandler.getPiece(from);
 
@@ -109,17 +109,14 @@ public class GameConstraints {
         }
 
         MoveConstraint moveConstraint = MOVE_CONSTRAINT_MAP.get(fromPiece);
-
-        assertThat(moveConstraint).isNotNull();
-
         return moveConstraint.isMoveValid(from, to, gameHandler, moveMode);
     }
 
 
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        assertThat(from).isNotNull();
-        assertThat(to).isNotNull();
-        assertThat(gameHandler).isNotNull();
+        if (from == null || to == null || gameHandler == null) {
+            return MoveType.MOVE_NOT_ALLOWED;
+        }
 
         MoveType value = MoveType.NORMAL_MOVE;
 

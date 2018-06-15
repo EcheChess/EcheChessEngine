@@ -26,7 +26,7 @@ import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
 import ca.watier.echechess.engine.game.GameConstraints;
 import ca.watier.echechess.engine.utils.GameUtils;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 
@@ -36,7 +36,6 @@ import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.KingStatus.STALEMATE;
 import static ca.watier.echechess.common.enums.Side.*;
 import static ca.watier.echechess.common.utils.Constants.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -76,6 +75,10 @@ public class GenericGameHandler extends GameBoard {
      * @return
      */
     public MoveType movePiece(CasePosition from, CasePosition to, Side playerSide) {
+        if (from == null || to == null || playerSide == null) {
+            return MoveType.MOVE_NOT_ALLOWED;
+        }
+
         MoveHistory moveHistory = new MoveHistory(from, to, playerSide);
         Pieces piecesToBeforeAction = getPiece(to);
 
@@ -93,7 +96,11 @@ public class GenericGameHandler extends GameBoard {
         return moveType;
     }
 
-    private MoveType movePiece(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Side playerSide, @NotNull MoveHistory moveHistory) {
+    private MoveType movePiece(CasePosition from, CasePosition to, Side playerSide, MoveHistory moveHistory) {
+        if (from == null || to == null || playerSide == null || moveHistory == null) {
+            return MoveType.MOVE_NOT_ALLOWED;
+        }
+
         Side otherPlayerSide = getOtherPlayerSide(playerSide);
         Pieces piecesFrom = getPiece(from);
         Pieces piecesTo = getPiece(to);
@@ -180,6 +187,10 @@ public class GenericGameHandler extends GameBoard {
     }
 
     protected final boolean isPlayerTurn(Side sideFrom) {
+        if (sideFrom == null) {
+            return false;
+        }
+
         return isGameHaveRule(SpecialGameRules.NO_PLAYER_TURN) || currentAllowedMoveSide.equals(sideFrom);
     }
 
@@ -192,11 +203,19 @@ public class GenericGameHandler extends GameBoard {
     }
 
     private void sendPawnPromotionMessage(CasePosition to, Side playerSide) {
+        if (to == null || playerSide == null) {
+            return;
+        }
+
         WEB_SOCKET_SERVICE.fireSideEvent(uuid, playerSide, PAWN_PROMOTION, to.name());
         WEB_SOCKET_SERVICE.fireGameEvent(uuid, PAWN_PROMOTION, String.format(GAME_PAUSED_PAWN_PROMOTION, playerSide));
     }
 
     private void sendMovedMessages(CasePosition from, CasePosition to, Side playerSide) {
+        if (from == null || to == null || playerSide == null) {
+            return;
+        }
+
         WEB_SOCKET_SERVICE.fireGameEvent(uuid, MOVE, String.format(PLAYER_MOVE, playerSide, from, to));
         WEB_SOCKET_SERVICE.fireSideEvent(uuid, getOtherPlayerSide(playerSide), PLAYER_TURN, Constants.PLAYER_TURN);
         WEB_SOCKET_SERVICE.fireGameEvent(uuid, SCORE_UPDATE, getGameScore());
@@ -211,6 +230,10 @@ public class GenericGameHandler extends GameBoard {
      * @return
      */
     public final boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide) {
+        if (from == null || to == null || playerSide == null) {
+            return false;
+        }
+
         return GAME_CONSTRAINTS.isPieceMovableTo(from, to, playerSide, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
     }
 
@@ -224,6 +247,10 @@ public class GenericGameHandler extends GameBoard {
      * @return
      */
     public KingStatus getKingStatus(Side playerSide, boolean enableCheckForStalemate) {
+        if (playerSide == null) {
+            return null;
+        }
+
         KingStatus kingStatus = OK;
 
         Pieces kingPiece = Pieces.getKingBySide(playerSide);
@@ -232,9 +259,6 @@ public class GenericGameHandler extends GameBoard {
         if (isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
             return kingStatus;
         }
-
-        assertThat(kingPosition).isNotNull();
-        assertThat(playerSide).isNotNull();
 
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), kingPosition);
 
@@ -335,8 +359,10 @@ public class GenericGameHandler extends GameBoard {
         return kingStatus;
     }
 
-    protected void updatePointsForSide(@NotNull Side side, byte point) {
-        assertThat(point).isGreaterThanOrEqualTo((byte) 0);
+    protected void updatePointsForSide(Side side, byte point) {
+        if (side == null) {
+            return;
+        }
 
         switch (side) {
             case BLACK:
@@ -350,7 +376,11 @@ public class GenericGameHandler extends GameBoard {
         }
     }
 
-    private void sendCheckOrCheckmateMessages(@NotNull KingStatus currentkingStatus, @NotNull KingStatus otherKingStatusAfterMove, Side playerSide) {
+    private void sendCheckOrCheckmateMessages(KingStatus currentkingStatus, KingStatus otherKingStatusAfterMove, Side playerSide) {
+        if (currentkingStatus == null || otherKingStatusAfterMove == null || playerSide == null) {
+            return;
+        }
+
         Side otherPlayerSide = getOtherPlayerSide(playerSide);
 
         if (KingStatus.CHECKMATE.equals(currentkingStatus)) {
@@ -383,9 +413,11 @@ public class GenericGameHandler extends GameBoard {
      * @return
      */
     public MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> getPiecesThatCanHitPosition(Side sideToKeep, CasePosition... positions) {
-        assertThat(positions).isNotEmpty();
-
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> values = new MultiArrayMap<>();
+
+        if (ArrayUtils.isEmpty(positions)) {
+            return values;
+        }
 
         for (CasePosition position : positions) {
             for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
@@ -406,7 +438,11 @@ public class GenericGameHandler extends GameBoard {
         return values;
     }
 
-    public List<CasePosition> getPositionKingCanMove(@NotNull Side playerSide) {
+    public List<CasePosition> getPositionKingCanMove(Side playerSide) {
+        if (playerSide == null) {
+            return null;
+        }
+
         CasePosition kingPosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation());
 
         List<CasePosition> values = new ArrayList<>();
@@ -434,8 +470,12 @@ public class GenericGameHandler extends GameBoard {
      * @param side
      * @return
      */
-    public final Map<CasePosition, Pieces> getPiecesLocation(@NotNull Side side) {
+    public final Map<CasePosition, Pieces> getPiecesLocation(Side side) {
         Map<CasePosition, Pieces> values = new EnumMap<>(CasePosition.class);
+
+        if (side == null) {
+            return values;
+        }
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
             CasePosition key = casePositionPiecesEntry.getKey();
@@ -450,6 +490,10 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public boolean isKingCheckAfterMove(CasePosition from, CasePosition to, Side playerSide) {
+        if (from == null || to == null || playerSide == null) {
+            return false;
+        }
+
         boolean isKingCheck;
 
         Pieces currentPiece = getPiece(from);
@@ -542,6 +586,11 @@ public class GenericGameHandler extends GameBoard {
      */
     public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide) {
         List<CasePosition> positions = new ArrayList<>();
+
+        if (from == null || playerSide == null) {
+            return positions;
+        }
+
         Pieces pieces = getPiece(from);
 
         if (pieces == null || !pieces.getSide().equals(playerSide)) {
@@ -560,8 +609,8 @@ public class GenericGameHandler extends GameBoard {
         return positions;
     }
 
-    public boolean isKingCheckAtPosition(@NotNull CasePosition currentPosition, @NotNull Side playerSide) {
-        if (isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
+    public boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide) {
+        if (currentPosition == null || playerSide == null || isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
             return false;
         }
 
@@ -582,6 +631,10 @@ public class GenericGameHandler extends GameBoard {
     public List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep) {
         List<Pair<CasePosition, Pieces>> values = new ArrayList<>();
 
+        if (to == null || sideToKeep == null) {
+            return values;
+        }
+
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
             CasePosition from = casePositionPiecesEntry.getKey();
             Pieces piecesFrom = casePositionPiecesEntry.getValue();
@@ -601,7 +654,11 @@ public class GenericGameHandler extends GameBoard {
         return values;
     }
 
-    public final boolean setPlayerToSide(@NotNull Player player, @NotNull Side side) {
+    public final boolean setPlayerToSide(Player player, Side side) {
+        if (player == null || side == null) {
+            return false;
+        }
+
         boolean value;
 
         switch (side) {
@@ -724,13 +781,17 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public void addSpecialRule(SpecialGameRules... rules) {
-        assertThat(rules).isNotEmpty();
+        if (ArrayUtils.isEmpty(rules)) {
+            return;
+        }
 
         SPECIAL_GAME_RULES.addAll(Arrays.asList(rules));
     }
 
     public void removeSpecialRule(SpecialGameRules... rules) {
-        assertThat(rules).isNotEmpty();
+        if (ArrayUtils.isEmpty(rules)) {
+            return;
+        }
 
         SPECIAL_GAME_RULES.removeAll(Arrays.asList(rules));
     }

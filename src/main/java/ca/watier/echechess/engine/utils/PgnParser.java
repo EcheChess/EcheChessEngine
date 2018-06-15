@@ -26,7 +26,6 @@ import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
 import ca.watier.echechess.engine.game.GameConstraints;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -58,12 +57,12 @@ public class PgnParser {
     private Side otherSide = BLACK;
 
 
-    public PgnParser(@NotNull GameConstraints gameConstraints, @NotNull WebSocketService webSocketService) {
+    public PgnParser(GameConstraints gameConstraints, WebSocketService webSocketService) {
         this.gameConstraints = gameConstraints;
         this.webSocketService = webSocketService;
     }
 
-    public List<GenericGameHandler> parseMultipleGameWithHeader(@NotNull String rawText) throws ChessException {
+    public List<GenericGameHandler> parseMultipleGameWithHeader(String rawText) throws ChessException {
         String[] headersAndGames = getRawHeadersAndGames(rawText);
         int nbOfGames = headersAndGames.length;
 
@@ -74,7 +73,7 @@ public class PgnParser {
         return handlerList;
     }
 
-    public static @NotNull String[] getRawHeadersAndGames(@NotNull String rawText) {
+    public static String[] getRawHeadersAndGames(String rawText) {
         return replaceInvalidCharacters(rawText).split("\n\n");
     }
 
@@ -112,11 +111,11 @@ public class PgnParser {
         }
     }
 
-    private static @NotNull String replaceInvalidCharacters(@NotNull String rawText) {
+    private static String replaceInvalidCharacters(String rawText) {
         return rawText.replace("\r\n", "\n");
     }
 
-    private static @NotNull String getGame(@NotNull String rawCurrentGame) {
+    private static String getGame(String rawCurrentGame) {
         return rawCurrentGame.substring(2, rawCurrentGame.length()).replace("\n", " ");
     }
 
@@ -177,7 +176,7 @@ public class PgnParser {
         switchSide();
     }
 
-    private void validateGameEnding(@NotNull PgnEndGameToken ending) throws InvalidGameEndingException {
+    private void validateGameEnding(PgnEndGameToken ending) throws InvalidGameEndingException {
         switch (ending) {
             case WHITE_WIN:
                 if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(BLACK, false)))) {
@@ -237,7 +236,7 @@ public class PgnParser {
         }
     }
 
-    private void executeMove(@NotNull String action) throws ChessException {
+    private void executeMove(String action) throws ChessException {
         List<String> casePositions = getPositionsFromAction(action);
         List<PgnMoveToken> pieceMovesFromLetter = PgnMoveToken.getPieceMovesFromLetter(action);
 
@@ -311,7 +310,7 @@ public class PgnParser {
         }
     }
 
-    private @NotNull List<String> getPositionsFromAction(@NotNull String action) {
+    private List<String> getPositionsFromAction(String action) {
         Matcher m = POSITION_PATTERN.matcher(action);
         List<String> casePositions = new ArrayList<>();
 
@@ -322,7 +321,7 @@ public class PgnParser {
         return casePositions;
     }
 
-    private PgnPieceFound isPawnPromotion(@NotNull String action, List<PgnMoveToken> pieceMovesFromLetter) {
+    private PgnPieceFound isPawnPromotion(String action, List<PgnMoveToken> pieceMovesFromLetter) {
         return pieceMovesFromLetter.contains(PgnMoveToken.PAWN_PROMOTION) ? PgnPieceFound.PAWN : PgnPieceFound.getPieceFromAction(action);
     }
 
@@ -361,7 +360,7 @@ public class PgnParser {
         return similarPieceThatHitTarget;
     }
 
-    private CasePosition getPositionWhenMultipleTargetCanHit(@NotNull String action, List<String> casePositions, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) throws ChessException {
+    private CasePosition getPositionWhenMultipleTargetCanHit(String action, List<String> casePositions, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) throws ChessException {
         CasePosition value;
         int length = casePositions.size();
         Byte row = null;
@@ -484,7 +483,7 @@ public class PgnParser {
         throw new IllegalStateException("Not Implemented");
     }
 
-    public GenericGameHandler parseSingleGameWithoutHeader(@NotNull String rawText) throws ChessException {
+    public GenericGameHandler parseSingleGameWithoutHeader(String rawText) throws ChessException {
         parseGame(replaceInvalidCharacters(rawText));
         return handlerList.get(0);
     }

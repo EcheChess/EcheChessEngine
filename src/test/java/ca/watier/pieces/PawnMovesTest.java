@@ -16,11 +16,11 @@
 
 package ca.watier.pieces;
 
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.responses.GameScoreResponse;
+import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Before;

@@ -20,7 +20,6 @@ import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,11 @@ public class KnightMoveConstraint implements MoveConstraint {
     }
 
     @Override
-    public boolean isMoveValid(@NotNull CasePosition from, @NotNull CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
+    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
+        if (from == null || to == null || gameHandler == null) {
+            return false;
+        }
+
         Map<CasePosition, Pieces> positionPiecesMap = gameHandler.getPiecesLocation();
         Pieces hittingPiece = positionPiecesMap.get(to);
         Pieces pieceFrom = positionPiecesMap.get(from);

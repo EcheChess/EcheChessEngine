@@ -28,8 +28,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Created by yannick on 4/23/2017.
  */
@@ -134,9 +132,12 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Boolean> initNewMovedPieceMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        assertThat(positionPiecesMap).isNotEmpty();
-
         Map<CasePosition, Boolean> values = new EnumMap<>(CasePosition.class);
+
+        if (positionPiecesMap == null || positionPiecesMap.isEmpty()) {
+            return values;
+        }
+
         for (CasePosition position : positionPiecesMap.keySet()) {
             values.put(position, false);
         }
@@ -152,9 +153,11 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Boolean> initPawnMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        assertThat(positionPiecesMap).isNotEmpty();
-
         Map<CasePosition, Boolean> values = new EnumMap<>(CasePosition.class);
+
+        if (positionPiecesMap == null || positionPiecesMap.isEmpty()) {
+            return values;
+        }
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {
             if (Pieces.isPawn(casePositionPiecesEntry.getValue())) {
@@ -173,9 +176,11 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Integer> initTurnMap(Map<CasePosition, Pieces> positionPiecesMap) {
-        assertThat(positionPiecesMap).isNotEmpty();
-
         Map<CasePosition, Integer> values = new EnumMap<>(CasePosition.class);
+
+        if (positionPiecesMap == null || positionPiecesMap.isEmpty()) {
+            return values;
+        }
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {
             values.put(casePositionPiecesEntry.getKey(), 0);
@@ -193,9 +198,10 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static boolean isDefaultPosition(CasePosition position, Pieces pieces, GameBoardData gameBoard) {
-        assertThat(position).isNotNull();
-        assertThat(pieces).isNotNull();
-        assertThat(gameBoard).isNotNull();
+        if (position == null || pieces == null || gameBoard == null) {
+            return false;
+        }
+
 
         return pieces.equals(gameBoard.getDefaultPositions().get(position));
     }
@@ -209,9 +215,9 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static boolean isOtherPiecesBetweenTarget(CasePosition from, CasePosition to, Map<CasePosition, Pieces> pieces) {
-        assertThat(from).isNotNull();
-        assertThat(to).isNotNull();
-        assertThat(pieces).isNotNull();
+        if (from == null || to == null || pieces == null) {
+            return false;
+        }
 
         return !getPiecesBetweenPosition(from, to, pieces).isEmpty();
     }
@@ -225,11 +231,12 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static List<CasePosition> getPiecesBetweenPosition(CasePosition from, CasePosition to, Map<CasePosition, Pieces> pieces) {
-        assertThat(from).isNotNull();
-        assertThat(to).isNotNull();
-        assertThat(pieces).isNotNull();
 
         List<CasePosition> positions = new ArrayList<>();
+
+        if (from == null || to == null || pieces == null) {
+            return positions;
+        }
 
         int distanceFromDestination = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to));
         Direction directionToDestination = MathUtils.getDirectionFromPosition(from, to);
@@ -260,7 +267,10 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static CasePosition getSinglePiecePosition(Pieces pieces, Map<CasePosition, Pieces> positionPiecesMap) {
-        assertThat(pieces).isNotNull();
+        if (pieces == null || positionPiecesMap == null) {
+            return null;
+        }
+
         CasePosition position = null;
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {
@@ -282,8 +292,10 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static List<CasePosition> getPiecesPosition(Pieces pieces, Map<CasePosition, Pieces> positionPiecesMap) {
-        assertThat(pieces).isNotNull();
-        assertThat(positionPiecesMap).isNotEmpty();
+        if (pieces == null || positionPiecesMap == null) {
+            return null;
+        }
+
         List<CasePosition> positions = new ArrayList<>();
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {

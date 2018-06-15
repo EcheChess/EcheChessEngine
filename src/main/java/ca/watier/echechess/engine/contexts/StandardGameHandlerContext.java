@@ -22,12 +22,9 @@ import ca.watier.echechess.common.interfaces.WebSocketService;
 import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
 import ca.watier.echechess.engine.game.GameConstraints;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 5/20/2017.
@@ -48,9 +45,8 @@ public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHand
         playerWhite.addJoinedGame(uuid);
     }
 
-    public StandardGameHandlerContext(@NotNull GameConstraints gameConstraints, @NotNull WebSocketService webSocketService, @NotNull Map<CasePosition, Pieces> positionPieces) {
+    public StandardGameHandlerContext(GameConstraints gameConstraints, WebSocketService webSocketService, Map<CasePosition, Pieces> positionPieces) {
         super(gameConstraints, webSocketService);
-        assertThat(positionPieces).isNotEmpty();
 
         setPieces(positionPieces);
         addBothPlayerToGameAndSetUUID();
@@ -58,13 +54,12 @@ public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHand
 
     public StandardGameHandlerContext(GameConstraints gameConstraints, WebSocketService webSocketService, String positionPieces) {
         super(gameConstraints, webSocketService);
-        assertThat(positionPieces).isNotEmpty();
 
         setPieces(positionPieces);
         addBothPlayerToGameAndSetUUID();
     }
 
-    public void movePieceTo(@NotNull CasePosition from, @NotNull CasePosition to) {
+    public void movePieceTo(CasePosition from, CasePosition to) {
         movePieceTo(from, to, getPiece(from));
     }
 }

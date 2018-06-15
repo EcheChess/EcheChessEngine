@@ -16,9 +16,9 @@
 
 package ca.watier.utils;
 
-import ca.watier.echechess.engine.utils.GameUtils;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.engine.utils.GameUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;

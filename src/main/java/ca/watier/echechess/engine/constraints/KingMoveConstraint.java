@@ -23,7 +23,6 @@ import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ import static ca.watier.echechess.common.interfaces.BaseUtils.getSafeBoolean;
 public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint {
 
     @Override
-    public boolean isMoveValid(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull GenericGameHandler gameHandler, @NotNull MoveMode moveMode) {
+    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
         Pieces hittingPiece = gameHandler.getPiece(to);
         Pieces pieceFrom = gameHandler.getPiece(from);
         Side sideFrom = pieceFrom.getSide();
@@ -65,7 +64,11 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
            The king does not end up in check. (True of any legal move.)
     */
     @Override
-    public MoveType getMoveType(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull GenericGameHandler gameHandler) {
+    public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
+
+        if (from == null || to == null || gameHandler == null) {
+            return MoveType.MOVE_NOT_ALLOWED;
+        }
 
         MoveType moveType = MoveType.NORMAL_MOVE;
         Pieces pieceFrom = gameHandler.getPiece(from);

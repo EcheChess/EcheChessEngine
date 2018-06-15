@@ -23,9 +23,6 @@ import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
-import org.jetbrains.annotations.NotNull;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -34,11 +31,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint {
 
     public static boolean isPawnMoveHop(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
+        if (from == null || to == null || gameHandler == null) {
+            return false;
+        }
+
         return GameUtils.isDefaultPosition(from, gameHandler.getPiece(from), gameHandler) &&
                 BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to)) == 2;
     }
 
     public static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide) {
+        if (from == null || to == null || gameHandler == null || currentSide == null) {
+            return false;
+        }
+
         boolean isEnPassant = false;
         CasePosition enemyPawnPosition = getEnPassantEnemyPawnPosition(to, Side.getOtherPlayerSide(currentSide));
 
@@ -52,12 +57,19 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     public static CasePosition getEnPassantEnemyPawnPosition(CasePosition to, Side otherSide) {
+        if (to == null || otherSide == null) {
+            return null;
+        }
+
         return MathUtils.getNearestPositionFromDirection(to, otherSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH);
     }
 
     private static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide, CasePosition enemyPawnPosition, Pieces enemyPawn) {
-        boolean isEnPassant = false;
+        if (from == null || to == null || gameHandler == null || currentSide == null || enemyPawnPosition == null || enemyPawn == null) {
+            return false;
+        }
 
+        boolean isEnPassant = false;
         boolean isFromOnFifthRank = Ranks.FIVE.equals(Ranks.getRank(from, currentSide));
         boolean isToOnSixthRank = Ranks.SIX.equals(Ranks.getRank(to, currentSide));
 
@@ -78,7 +90,11 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     @Override
-    public boolean isMoveValid(@NotNull CasePosition from, @NotNull CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
+    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
+        if (from == null || to == null || gameHandler == null || moveMode == null) {
+            return false;
+        }
+
         Direction direction = Direction.NORTH;
         Direction directionAttack1 = Direction.NORTH_WEST;
         Direction directionAttack2 = Direction.NORTH_EAST;
@@ -134,6 +150,9 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     private boolean isPawnMoveHop(CasePosition from, Pieces pieceFrom, CasePosition to, GenericGameHandler gameHandler, int nbCaseBetweenPositions) {
+        if (from == null || pieceFrom == null || to == null || gameHandler == null) {
+            return false;
+        }
 
         Direction directionFromPosition = MathUtils.getDirectionFromPosition(from, to);
         boolean isNorthOfSouth = Direction.NORTH.equals(directionFromPosition) || Direction.SOUTH.equals(directionFromPosition);
@@ -142,7 +161,11 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     @Override
-    public MoveType getMoveType(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull GenericGameHandler gameHandler) {
+    public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
+        if (from == null || to == null || gameHandler == null) {
+            return MoveType.MOVE_NOT_ALLOWED;
+        }
+
         MoveType value = MoveType.NORMAL_MOVE;
         Pieces pieceFrom = gameHandler.getPiece(from);
 

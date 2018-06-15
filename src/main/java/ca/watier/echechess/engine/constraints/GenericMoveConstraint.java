@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Created by yannick on 4/23/2017.
  */
@@ -36,23 +34,21 @@ public class GenericMoveConstraint implements MoveConstraint {
     private DirectionPattern pattern;
 
     public GenericMoveConstraint(DirectionPattern pattern) {
+        if (pattern == null) {
+            return;
+        }
+
         this.pattern = pattern;
     }
 
     @Override
     public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
-        if (pattern == null) {
+        if (from == null || to == null || pattern == null) {
             return false;
         }
 
         Direction[] directions = pattern.getDirections();
-
-        assert directions != null;
-
         List<Direction> directionList = Arrays.asList(directions);
-
-        assertThat(from).isNotNull();
-        assertThat(to).isNotNull();
 
         Map<CasePosition, Pieces> positionPiecesMap = gameHandler.getPiecesLocation();
         Pieces pieceTo = positionPiecesMap.get(to);

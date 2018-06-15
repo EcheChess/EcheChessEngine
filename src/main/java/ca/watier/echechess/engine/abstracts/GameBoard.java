@@ -23,7 +23,6 @@ import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.Pair;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -38,15 +37,18 @@ public abstract class GameBoard extends GameBoardData {
      * @param rank
      * @param column
      */
-    protected CasePosition getPositionByRankAndColumn(@NotNull Ranks rank, char column, @NotNull Side side) {
+    protected CasePosition getPositionByRankAndColumn(Ranks rank, char column, Side side) {
+        if (rank == null || side == null) {
+            return null;
+        }
+
         return Arrays.stream(CasePosition.values()).filter(casePosition -> rank.equals(Ranks.getRank(casePosition, side))
                 && casePosition.isOnSameColumn(column)).findFirst().orElse(null);
     }
 
 
-    protected final void addPawnPromotion(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Side side) {
-
-        if (Side.OBSERVER.equals(side)) {
+    protected final void addPawnPromotion(CasePosition from, CasePosition to, Side side) {
+        if (side == null || from == null || to == null || Side.OBSERVER.equals(side)) {
             return;
         }
 
@@ -59,7 +61,7 @@ public abstract class GameBoard extends GameBoardData {
      * @param position
      * @return
      */
-    public final Pieces getPiece(@NotNull CasePosition position) {
+    public final Pieces getPiece(CasePosition position) {
         return getPieceFromPosition(position);
     }
 
@@ -70,7 +72,11 @@ public abstract class GameBoard extends GameBoardData {
      * @param to
      * @param piece
      */
-    protected final void movePieceTo(@NotNull CasePosition from, @NotNull CasePosition to, @NotNull Pieces piece) {
+    protected final void movePieceTo(CasePosition from, CasePosition to, Pieces piece) {
+        if (from == null || to == null || piece == null) {
+            return;
+        }
+
         removePiece(from);
         setPiecePositionWithoutMoveState(piece, to);
         changeMovedStateOfPiece(piece, from, to);
@@ -87,7 +93,7 @@ public abstract class GameBoard extends GameBoardData {
      * @param from
      * @param to
      */
-    protected void changePawnSpecialMove(@NotNull Pieces piece, @NotNull CasePosition from, @NotNull CasePosition to) {
+    protected void changePawnSpecialMove(Pieces piece, CasePosition from, CasePosition to) {
         if (Pieces.isPawn(piece)) {
             boolean isValid = BaseUtils.getSafeBoolean(isPawnUsedSpecialMove(from)) || MathUtils.getDistanceBetweenPositions(from, to) == 2;
 
@@ -101,7 +107,7 @@ public abstract class GameBoard extends GameBoardData {
      *
      * @param side
      */
-    protected void updatePlayerTurnValue(@NotNull Side side) {
+    protected void updatePlayerTurnValue(Side side) {
         switch (side) {
             case WHITE:
                 incrementWhiteTurnNumber();
@@ -115,7 +121,11 @@ public abstract class GameBoard extends GameBoardData {
         }
     }
 
-    public final boolean upgradePiece(@NotNull CasePosition to, @NotNull Pieces pieces, @NotNull Side playerSide) {
+    public final boolean upgradePiece(CasePosition to, Pieces pieces, Side playerSide) {
+        if (to == null || pieces == null || playerSide == null) {
+            return false;
+        }
+
         Pair<CasePosition, CasePosition> pair = null;
         for (Pair<CasePosition, CasePosition> casePositionCasePositionPair : getPawnPromotionBySide(playerSide)) {
             CasePosition toValue = casePositionCasePositionPair.getSecondValue();
