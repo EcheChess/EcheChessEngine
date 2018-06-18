@@ -222,22 +222,6 @@ public class GenericGameHandler extends GameBoard {
     }
 
     /**
-     * Check if the piece can be moved to the selected position
-     *
-     * @param from
-     * @param to
-     * @param playerSide
-     * @return
-     */
-    public final boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide) {
-        if (from == null || to == null || playerSide == null) {
-            return false;
-        }
-
-        return GAME_CONSTRAINTS.isPieceMovableTo(from, to, playerSide, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
-    }
-
-    /**
      * 1) Check if the king can move / kill to escape.
      * 2) If not, try to liberate a case around the king, by killing / blocking the piece with an ally piece (if only one that can hit this target).
      * 3) If not, the king is checkmate.
@@ -262,8 +246,7 @@ public class GenericGameHandler extends GameBoard {
 
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), kingPosition);
 
-        boolean isCheck = !piecesThatCanHitOriginalPosition.isEmpty();
-        if (isCheck) {
+        if (!piecesThatCanHitOriginalPosition.isEmpty()) { //One or more piece can hit the king
             kingStatus = KingStatus.CHECKMATE;
 
             //Try to move the king
@@ -272,91 +255,92 @@ public class GenericGameHandler extends GameBoard {
             }
 
             //If not able to move, try to kill the enemy piece with an other piece
-            if (piecesThatCanHitOriginalPosition.size() == 1) {
-                Pair<CasePosition, Pieces> enemyPiecesPair = piecesThatCanHitOriginalPosition.get(kingPosition).get(0);
-                CasePosition to = enemyPiecesPair.getFirstValue();
-
-                for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation(playerSide).entrySet()) {
-
-                    CasePosition from = casePositionPiecesEntry.getKey();
-
-                    if (Pieces.isKing(casePositionPiecesEntry.getValue())) {
-                        continue;
-                    }
-
-                    Pieces currentPiece = getPiece(from);
-                    Pieces enemyPiece = getPiece(to);
-
-                    int fromColPos = from.getColPos();
-                    int fromRow = from.getRow();
-                    int toRow = to.getRow();
-                    int toColPos = to.getColPos();
-                    boolean isColumnNearEachOther = (Math.abs(fromColPos - toColPos) == 1);
-
-                    //This is the only case, where the piece is not directly the end target (En passant).
-                    if (Pieces.isPawn(currentPiece) &&
-                            Pieces.isPawn(enemyPiece) &&
-                            isColumnNearEachOther &&
-                            fromRow == toRow &&
-                            !enemyPiece.getSide().equals(currentPiece.getSide()) &&
-                            Ranks.FIVE.equals(Ranks.getRank(to, playerSide))) {
-
-                        CasePosition positionByRankAndColumn = getPositionByRankAndColumn(Ranks.SIX, to.getCol(), playerSide);
-
-                        if (!PawnMoveConstraint.isEnPassant(to, positionByRankAndColumn, this, playerSide)) {
-                            continue;
-                        }
-
-                        return KingStatus.CHECK;
-                    } else if (isPieceMovableTo(from, to, playerSide) && !isKingCheckAfterMove(from, to, playerSide)) {
-                        return KingStatus.CHECK; //One or more piece is able to kill the enemy
-                    }
-                }
+            if (piecesThatCanHitOriginalPosition.size() == 1 && isStillCheckAfterKillingEnemies(playerSide, kingPosition, piecesThatCanHitOriginalPosition)) {
+                return KingStatus.CHECK;
             }
 
             //Try to block the path of the enemy with one of the pieces
-            List<Pair<CasePosition, Pieces>> pairs = piecesThatCanHitOriginalPosition.get(kingPosition);
-            if (pairs.size() == 1) { //We can only block one piece, if more, checkmate
-                Pair<CasePosition, Pieces> casePositionPiecesPair = pairs.get(0);
-                Pieces enemyPiece = casePositionPiecesPair.getSecondValue();
-                CasePosition enemyPosition = casePositionPiecesPair.getFirstValue();
-
-                if (Pieces.isKnight(enemyPiece)) { //We cannot block a knight
-                    return KingStatus.CHECKMATE;
-                }
-
-                for (CasePosition to : MathUtils.getPositionsBetweenTwoPosition(enemyPosition, kingPosition)) { //For each position between the king and the enemy, we try to block it
-                    for (CasePosition from : getPiecesLocation(playerSide).keySet()) { //Try to find if one of our piece can block the target
-                        if (Pieces.isKing(getPiece(from))) {
-                            continue;
-                        }
-
-                        if (isPieceMovableTo(from, to, playerSide) && !isKingCheckAfterMove(from, to, playerSide)) {
-                            return KingStatus.CHECK;
-                        }
-                    }
-                }
+            if (oneOrMorePieceCanBlock(piecesThatCanHitOriginalPosition, kingPosition, playerSide)) {
+                return KingStatus.CHECK;
             }
+
+
         } else if (getPositionKingCanMove(playerSide).isEmpty() && enableCheckForStalemate) { //Check if not a stalemate
-            boolean isStalemate = true;
-
-            //Check if we can move the pieces around the king (same color)
-            for (CasePosition moveFrom : MathUtils.getAllPositionsAroundPosition(kingPosition)) {
-                Pieces currentPiece = getPiece(moveFrom);
-
-                if (currentPiece != null && !Pieces.isKing(currentPiece) && Pieces.isSameSide(currentPiece, kingPiece)) {
-                    for (CasePosition moveTo : getAllAvailableMoves(moveFrom, playerSide)) {
-                        if (isPieceMovableTo(moveFrom, moveTo, playerSide) && !isKingCheckAfterMove(moveFrom, moveTo, playerSide)) {
-                            isStalemate = false;
-                            break;
-                        }
-                    }
-                }
-            }
-            kingStatus = isStalemate ? STALEMATE : kingStatus;
+            kingStatus = isStalemate(playerSide, kingPiece, kingPosition) ? STALEMATE : kingStatus;
         }
 
         return kingStatus;
+    }
+
+    private boolean oneOrMorePieceCanBlock(MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition, CasePosition kingPosition, Side playerSide) {
+        List<Pair<CasePosition, Pieces>> pairs = piecesThatCanHitOriginalPosition.get(kingPosition);
+        if (pairs.size() == 1) { //We can only block one piece, if more, checkmate
+            Pair<CasePosition, Pieces> casePositionPiecesPair = pairs.get(0);
+            Pieces enemyPiece = casePositionPiecesPair.getSecondValue();
+            CasePosition enemyPosition = casePositionPiecesPair.getFirstValue();
+
+            if (Pieces.isKnight(enemyPiece)) { //We cannot block a knight
+                return false;
+            }
+
+            for (CasePosition to : MathUtils.getPositionsBetweenTwoPosition(enemyPosition, kingPosition)) { //For each position between the king and the enemy, we try to block it
+                for (CasePosition from : getPiecesLocation(playerSide).keySet()) { //Try to find if one of our piece can block the target
+                    if (Pieces.isKing(getPiece(from))) {
+                        continue;
+                    }
+
+                    if (isPieceMovableTo(from, to, playerSide) && !isKingCheckAfterMove(from, to, playerSide)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isStillCheckAfterKillingEnemies(Side playerSide, CasePosition kingPosition, MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition) {
+        Pair<CasePosition, Pieces> enemyPiecesPair = piecesThatCanHitOriginalPosition.get(kingPosition).get(0);
+        CasePosition to = enemyPiecesPair.getFirstValue();
+
+        for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation(playerSide).entrySet()) {
+
+            CasePosition from = casePositionPiecesEntry.getKey();
+
+            if (Pieces.isKing(casePositionPiecesEntry.getValue())) {
+                continue;
+            }
+
+            Pieces currentPiece = getPiece(from);
+            Pieces enemyPiece = getPiece(to);
+
+            int fromColPos = from.getColPos();
+            int fromRow = from.getRow();
+            int toRow = to.getRow();
+            int toColPos = to.getColPos();
+            boolean isColumnNearEachOther = (Math.abs(fromColPos - toColPos) == 1);
+
+            //This is the only case, where the piece is not directly the end target (En passant).
+            if (Pieces.isPawn(currentPiece) &&
+                    Pieces.isPawn(enemyPiece) &&
+                    isColumnNearEachOther &&
+                    fromRow == toRow &&
+                    !enemyPiece.getSide().equals(currentPiece.getSide()) &&
+                    Ranks.FIVE.equals(Ranks.getRank(to, playerSide))) {
+
+                CasePosition positionByRankAndColumn = getPositionByRankAndColumn(Ranks.SIX, to.getCol(), playerSide);
+
+                if (!PawnMoveConstraint.isEnPassant(to, positionByRankAndColumn, this, playerSide)) {
+                    continue;
+                }
+
+                return true;
+            } else if (isPieceMovableTo(from, to, playerSide) && !isKingCheckAfterMove(from, to, playerSide)) {
+                return true; //One or more piece is able to kill the enemy
+            }
+        }
+
+        return false;
     }
 
     protected void updatePointsForSide(Side side, byte point) {
@@ -405,39 +389,6 @@ public class GenericGameHandler extends GameBoard {
         return new GameScoreResponse(whitePlayerPoint, blackPlayerPoint);
     }
 
-    /**
-     * Gets the pieces that can hit the target, the {@link CasePosition} inside the {@link Pair} is the starting position of the attacking {@link Pieces}
-     *
-     * @param positions
-     * @param sideToKeep
-     * @return
-     */
-    public MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> getPiecesThatCanHitPosition(Side sideToKeep, CasePosition... positions) {
-        MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> values = new MultiArrayMap<>();
-
-        if (ArrayUtils.isEmpty(positions)) {
-            return values;
-        }
-
-        for (CasePosition position : positions) {
-            for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
-                CasePosition key = casePositionPiecesEntry.getKey();
-                Pieces value = casePositionPiecesEntry.getValue();
-
-                Side pieceSide = value.getSide();
-                if (!pieceSide.equals(sideToKeep)) {
-                    continue;
-                }
-
-                if (GAME_CONSTRAINTS.isPieceMovableTo(key, position, pieceSide, this, MoveMode.IS_KING_CHECK_MODE)) {
-                    values.put(position, new Pair<>(key, value));
-                }
-            }
-        }
-
-        return values;
-    }
-
     public List<CasePosition> getPositionKingCanMove(Side playerSide) {
         if (playerSide == null) {
             return null;
@@ -483,6 +434,102 @@ public class GenericGameHandler extends GameBoard {
 
             if (side.equals(value.getSide())) {
                 values.put(key, value);
+            }
+        }
+
+        return values;
+    }
+
+    private boolean isStalemate(Side playerSide, Pieces kingPiece, CasePosition kingPosition) {
+        boolean isStalemate = true;
+
+        //Check if we can move the pieces around the king (same color)
+        for (CasePosition moveFrom : MathUtils.getAllPositionsAroundPosition(kingPosition)) {
+            Pieces currentPiece = getPiece(moveFrom);
+
+            if (currentPiece != null && !Pieces.isKing(currentPiece) && Pieces.isSameSide(currentPiece, kingPiece)) {
+                for (CasePosition moveTo : getAllAvailableMoves(moveFrom, playerSide)) {
+                    if (isPieceMovableTo(moveFrom, moveTo, playerSide) && !isKingCheckAfterMove(moveFrom, moveTo, playerSide)) {
+                        isStalemate = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return isStalemate;
+    }
+
+    public boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide) {
+        if (currentPosition == null || playerSide == null || isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
+            return false;
+        }
+
+        return !getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), currentPosition).isEmpty();
+    }
+
+    /**
+     * Return a List containing all the moves for the selected piece
+     *
+     * @param from
+     * @param playerSide
+     * @return
+     */
+    public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide) {
+        List<CasePosition> positions = new ArrayList<>();
+
+        if (from == null || playerSide == null) {
+            return positions;
+        }
+
+        Pieces pieces = getPiece(from);
+
+        if (pieces == null || !pieces.getSide().equals(playerSide)) {
+            return positions;
+        }
+
+        for (CasePosition position : CasePosition.values()) {
+
+            boolean isSpecialMove = MoveType.isSpecialMove(GAME_CONSTRAINTS.getMoveType(from, position, this));
+
+            if (isSpecialMove || !from.equals(position) && isPieceMovableTo(from, position, playerSide)) {
+                positions.add(position);
+            }
+        }
+
+        return positions;
+    }
+
+    public List<MoveHistory> getMoveHistory() {
+        return moveHistoryList;
+    }
+
+    /**
+     * Return a list of @{@link Pieces} that can moves to the selected position
+     *
+     * @param to
+     * @param sideToKeep
+     * @return
+     */
+    public List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep) {
+        List<Pair<CasePosition, Pieces>> values = new ArrayList<>();
+
+        if (to == null || sideToKeep == null) {
+            return values;
+        }
+
+        for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
+            CasePosition from = casePositionPiecesEntry.getKey();
+            Pieces piecesFrom = casePositionPiecesEntry.getValue();
+
+            if (!sideToKeep.equals(piecesFrom.getSide())) {
+                continue;
+            }
+
+            MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
+            boolean isEnPassant = MoveType.EN_PASSANT.equals(moveType);
+
+            if (!isKingCheckAfterMove(from, to, sideToKeep) && isPieceMovableTo(from, to, sideToKeep) || isEnPassant) {
+                values.add(new Pair<>(from, piecesFrom));
             }
         }
 
@@ -578,76 +625,48 @@ public class GenericGameHandler extends GameBoard {
     }
 
     /**
-     * Return a List containing all the moves for the selected piece
+     * Check if the piece can be moved to the selected position
      *
      * @param from
+     * @param to
      * @param playerSide
      * @return
      */
-    public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide) {
-        List<CasePosition> positions = new ArrayList<>();
-
-        if (from == null || playerSide == null) {
-            return positions;
-        }
-
-        Pieces pieces = getPiece(from);
-
-        if (pieces == null || !pieces.getSide().equals(playerSide)) {
-            return positions;
-        }
-
-        for (CasePosition position : CasePosition.values()) {
-
-            boolean isSpecialMove = MoveType.isSpecialMove(GAME_CONSTRAINTS.getMoveType(from, position, this));
-
-            if (isSpecialMove || !from.equals(position) && isPieceMovableTo(from, position, playerSide)) {
-                positions.add(position);
-            }
-        }
-
-        return positions;
-    }
-
-    public boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide) {
-        if (currentPosition == null || playerSide == null || isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
+    public final boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide) {
+        if (from == null || to == null || playerSide == null) {
             return false;
         }
 
-        return !getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), currentPosition).isEmpty();
-    }
-
-    public List<MoveHistory> getMoveHistory() {
-        return moveHistoryList;
+        return GAME_CONSTRAINTS.isPieceMovableTo(from, to, playerSide, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
     }
 
     /**
-     * Return a list of @{@link Pieces} that can moves to the selected position
+     * Gets the pieces that can hit the target, the {@link CasePosition} inside the {@link Pair} is the starting position of the attacking {@link Pieces}
      *
-     * @param to
+     * @param positions
      * @param sideToKeep
      * @return
      */
-    public List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep) {
-        List<Pair<CasePosition, Pieces>> values = new ArrayList<>();
+    public MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> getPiecesThatCanHitPosition(Side sideToKeep, CasePosition... positions) {
+        MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> values = new MultiArrayMap<>();
 
-        if (to == null || sideToKeep == null) {
+        if (ArrayUtils.isEmpty(positions)) {
             return values;
         }
 
-        for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
-            CasePosition from = casePositionPiecesEntry.getKey();
-            Pieces piecesFrom = casePositionPiecesEntry.getValue();
+        for (CasePosition position : positions) {
+            for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation().entrySet()) {
+                CasePosition key = casePositionPiecesEntry.getKey();
+                Pieces value = casePositionPiecesEntry.getValue();
 
-            if (!sideToKeep.equals(piecesFrom.getSide())) {
-                continue;
-            }
+                Side pieceSide = value.getSide();
+                if (!pieceSide.equals(sideToKeep)) {
+                    continue;
+                }
 
-            MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
-            boolean isEnPassant = MoveType.EN_PASSANT.equals(moveType);
-
-            if (!isKingCheckAfterMove(from, to, sideToKeep) && isPieceMovableTo(from, to, sideToKeep) || isEnPassant) {
-                values.add(new Pair<>(from, piecesFrom));
+                if (GAME_CONSTRAINTS.isPieceMovableTo(key, position, pieceSide, this, MoveMode.IS_KING_CHECK_MODE)) {
+                    values.put(position, new Pair<>(key, value));
+                }
             }
         }
 

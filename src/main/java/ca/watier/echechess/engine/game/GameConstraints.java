@@ -21,11 +21,11 @@ import ca.watier.echechess.engine.constraints.*;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
-import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.Map;
+
+import static ca.watier.echechess.common.enums.Pieces.*;
 
 /**
  * Created by yannick on 4/26/2017.
@@ -33,57 +33,27 @@ import java.util.Map;
 
 public class GameConstraints {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GameConstraints.class);
     private static final Map<Pieces, MoveConstraint> MOVE_CONSTRAINT_MAP = new EnumMap<>(Pieces.class);
+    private static final MoveConstraint KING = new KingMoveConstraint();
+    private static final MoveConstraint QUEEN = new QueenMoveConstraint();
+    private static final MoveConstraint ROOK = new RookMoveConstraint();
+    private static final MoveConstraint BISHOP = new BishopMoveConstraint();
+    private static final MoveConstraint KNIGHT = new KnightMoveConstraint();
+    private static final MoveConstraint PAWN = new PawnMoveConstraint();
 
     static {
-        for (Pieces piece : Pieces.values()) {
-
-            Class<? extends MoveConstraint> pieceMoveConstraintClass = getPieceMoveConstraintClass(piece);
-
-            try {
-                MOVE_CONSTRAINT_MAP.put(piece, pieceMoveConstraintClass.getDeclaredConstructor().newInstance());
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                LOGGER.error(e.toString(), e);
-            }
-        }
-    }
-
-    private static Class<? extends MoveConstraint> getPieceMoveConstraintClass(Pieces pieces) {
-        if (pieces == null) {
-            return null;
-        }
-
-        Class<? extends MoveConstraint> moveConstraint = null;
-
-        switch (pieces) {
-            case W_KING:
-            case B_KING:
-                moveConstraint = KingMoveConstraint.class;
-                break;
-            case W_QUEEN:
-            case B_QUEEN:
-                moveConstraint = QueenMoveConstraint.class;
-                break;
-            case W_ROOK:
-            case B_ROOK:
-                moveConstraint = RookMoveConstraint.class;
-                break;
-            case W_BISHOP:
-            case B_BISHOP:
-                moveConstraint = BishopMoveConstraint.class;
-                break;
-            case W_KNIGHT:
-            case B_KNIGHT:
-                moveConstraint = KnightMoveConstraint.class;
-                break;
-            case W_PAWN:
-            case B_PAWN:
-                moveConstraint = PawnMoveConstraint.class;
-                break;
-        }
-
-        return moveConstraint;
+        MOVE_CONSTRAINT_MAP.put(W_KING, KING);
+        MOVE_CONSTRAINT_MAP.put(B_KING, KING);
+        MOVE_CONSTRAINT_MAP.put(W_QUEEN, QUEEN);
+        MOVE_CONSTRAINT_MAP.put(B_QUEEN, QUEEN);
+        MOVE_CONSTRAINT_MAP.put(W_ROOK, ROOK);
+        MOVE_CONSTRAINT_MAP.put(B_ROOK, ROOK);
+        MOVE_CONSTRAINT_MAP.put(W_BISHOP, BISHOP);
+        MOVE_CONSTRAINT_MAP.put(B_BISHOP, BISHOP);
+        MOVE_CONSTRAINT_MAP.put(W_KNIGHT, KNIGHT);
+        MOVE_CONSTRAINT_MAP.put(B_KNIGHT, KNIGHT);
+        MOVE_CONSTRAINT_MAP.put(W_PAWN, PAWN);
+        MOVE_CONSTRAINT_MAP.put(B_PAWN, PAWN);
     }
 
     /**
