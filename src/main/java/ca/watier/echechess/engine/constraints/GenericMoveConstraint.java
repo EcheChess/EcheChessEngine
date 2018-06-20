@@ -47,8 +47,7 @@ public class GenericMoveConstraint implements MoveConstraint {
             return false;
         }
 
-        Direction[] directions = pattern.getDirections();
-        List<Direction> directionList = Arrays.asList(directions);
+        List<Direction> directionList = Arrays.asList(pattern.getDirections());
 
         Map<CasePosition, Pieces> positionPiecesMap = gameHandler.getPiecesLocation();
         Pieces pieceTo = positionPiecesMap.get(to);
@@ -61,33 +60,56 @@ public class GenericMoveConstraint implements MoveConstraint {
             return false;
         }
 
-        boolean isMoveValid = MathUtils.isPositionInLine(from, MathUtils.getNearestPositionFromDirection(from, directionFromPosition), to);
+        return isMoveValid(from, to, moveMode, positionPiecesMap, pieceTo, sideFrom, directionFromPosition);
+    }
 
-        if (MoveMode.NORMAL_OR_ATTACK_MOVE.equals(moveMode)) {
-            isMoveValid &= !GameUtils.isOtherPiecesBetweenTarget(from, to, positionPiecesMap);
+    private boolean isMoveValid(CasePosition from, CasePosition to, MoveMode moveMode, Map<CasePosition, Pieces> positionPiecesMap,
+                                Pieces pieceTo, Side sideFrom, Direction directionFromPosition) {
 
-            if (pieceTo != null) {
-                isMoveValid &= !sideFrom.equals(pieceTo.getSide()) && !Pieces.isKing(pieceTo);
-            }
-        } else if (MoveMode.IS_KING_CHECK_MODE.equals(moveMode)) {
+        if (!MathUtils.isPositionInLine(from, MathUtils.getNearestPositionFromDirection(from, directionFromPosition), to)) {
+            return false;
+        }
 
-            /*
-                1) If a king between position and not covered, return true
-                2) If other piece between position, return false
-             */
+        boolean isMoveValid;
 
-            boolean isKingDirectOnTheAttackingPiece = false;
-
-            List<CasePosition> piecesBetweenPosition = GameUtils.getPiecesBetweenPosition(from, to, positionPiecesMap);
-            CasePosition kingPosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(Side.getOtherPlayerSide(sideFrom)), positionPiecesMap);
-
-            if (piecesBetweenPosition.contains(kingPosition)) { //If the king is on the path, check if he's covered by another piece
-                isKingDirectOnTheAttackingPiece = GameUtils.getPiecesBetweenPosition(from, kingPosition, positionPiecesMap).isEmpty();
-            }
-
-            isMoveValid &= piecesBetweenPosition.isEmpty() || isKingDirectOnTheAttackingPiece;
+        switch (moveMode) {
+            case NORMAL_OR_ATTACK_MOVE:
+                isMoveValid = whenNormalOrAttackMode(from, to, positionPiecesMap, pieceTo, sideFrom);
+                break;
+            case IS_KING_CHECK_MODE:
+                isMoveValid = whenIsKingCheckMode(from, to, positionPiecesMap, sideFrom);
+                break;
+            default:
+                isMoveValid = false;
+                break;
         }
 
         return isMoveValid;
+    }
+
+    private boolean whenNormalOrAttackMode(CasePosition from, CasePosition to, Map<CasePosition, Pieces> positionPiecesMap, Pieces pieceTo, Side sideFrom) {
+        return !GameUtils.isOtherPiecesBetweenTarget(from, to, positionPiecesMap) &&
+                isValidTarget(pieceTo, sideFrom);
+    }
+
+    private boolean whenIsKingCheckMode(CasePosition from, CasePosition to, Map<CasePosition, Pieces> positionPiecesMap, Side sideFrom) {
+        /*
+            1) If a king between position and not covered, return true
+            2) If other piece between position, return false
+        */
+        boolean isKingDirectOnTheAttackingPiece = false;
+
+        List<CasePosition> piecesBetweenPosition = GameUtils.getPiecesBetweenPosition(from, to, positionPiecesMap);
+        CasePosition kingPosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(Side.getOtherPlayerSide(sideFrom)), positionPiecesMap);
+
+        if (piecesBetweenPosition.contains(kingPosition)) { //If the king is on the path, check if he's covered by another piece
+            isKingDirectOnTheAttackingPiece = GameUtils.getPiecesBetweenPosition(from, kingPosition, positionPiecesMap).isEmpty();
+        }
+
+        return piecesBetweenPosition.isEmpty() || isKingDirectOnTheAttackingPiece;
+    }
+
+    private boolean isValidTarget(Pieces pieceTo, Side sideFrom) {
+        return pieceTo == null || !sideFrom.equals(pieceTo.getSide()) && !Pieces.isKing(pieceTo);
     }
 }
