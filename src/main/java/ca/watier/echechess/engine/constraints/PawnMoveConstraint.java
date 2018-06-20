@@ -30,30 +30,18 @@ import ca.watier.echechess.engine.utils.GameUtils;
  */
 public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint {
 
-    public static boolean isPawnMoveHop(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        if (from == null || to == null || gameHandler == null) {
-            return false;
-        }
-
-        return GameUtils.isDefaultPosition(from, gameHandler.getPiece(from), gameHandler) &&
-                BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to)) == 2;
-    }
-
     public static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide) {
         if (from == null || to == null || gameHandler == null || currentSide == null) {
             return false;
         }
 
-        boolean isEnPassant = false;
         CasePosition enemyPawnPosition = getEnPassantEnemyPawnPosition(to, Side.getOtherPlayerSide(currentSide));
 
-        if (enemyPawnPosition != null) {
-            Pieces enemyPawn = gameHandler.getPiece(enemyPawnPosition);
-
-            isEnPassant = isEnPassant(from, to, gameHandler, currentSide, enemyPawnPosition, enemyPawn);
+        if (enemyPawnPosition == null) {
+            return false;
         }
 
-        return isEnPassant;
+        return isEnPassant(from, to, gameHandler, currentSide, enemyPawnPosition, gameHandler.getPiece(enemyPawnPosition));
     }
 
     public static CasePosition getEnPassantEnemyPawnPosition(CasePosition to, Side otherSide) {
