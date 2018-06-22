@@ -24,6 +24,7 @@ import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.common.utils.*;
 import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
+import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
 import ca.watier.echechess.engine.game.GameConstraints;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -82,7 +83,13 @@ public class GenericGameHandler extends GameBoard {
         MoveHistory moveHistory = new MoveHistory(from, to, playerSide);
         Pieces piecesToBeforeAction = getPiece(to);
 
-        MoveType moveType = movePiece(from, to, playerSide, moveHistory);
+        MoveType moveType;
+        try {
+            moveType = movePiece(from, to, playerSide, moveHistory);
+        } catch (MoveNotAllowedException e) {
+            moveType = MoveType.MOVE_NOT_ALLOWED;
+            e.printStackTrace();
+        }
         moveHistory.setMoveType(moveType);
         moveHistoryList.add(moveHistory);
 
@@ -96,9 +103,9 @@ public class GenericGameHandler extends GameBoard {
         return moveType;
     }
 
-    private MoveType movePiece(CasePosition from, CasePosition to, Side playerSide, MoveHistory moveHistory) {
+    private MoveType movePiece(CasePosition from, CasePosition to, Side playerSide, MoveHistory moveHistory) throws MoveNotAllowedException {
         if (from == null || to == null || playerSide == null || moveHistory == null) {
-            return MoveType.MOVE_NOT_ALLOWED;
+            throw new MoveNotAllowedException();
         }
 
         Side otherPlayerSide = getOtherPlayerSide(playerSide);
@@ -106,7 +113,7 @@ public class GenericGameHandler extends GameBoard {
         Pieces piecesTo = getPiece(to);
 
         if (piecesFrom == null || !isPlayerTurn(playerSide) || !piecesFrom.getSide().equals(playerSide)) {
-            return MoveType.MOVE_NOT_ALLOWED;
+            throw new MoveNotAllowedException();
         } else if (Pieces.isPawn(piecesFrom) && Ranks.EIGHT.equals(Ranks.getRank(to, playerSide))) {
             addPawnPromotion(from, to, playerSide);
             setGamePaused(true);
@@ -114,7 +121,7 @@ public class GenericGameHandler extends GameBoard {
 
             sendPawnPromotionMessage(to, playerSide);
             sendMovedMessages(from, to, playerSide);
-            return MoveType.PAWN_PROMOTION;
+            throw new MoveNotAllowedException();
         }
 
         MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
@@ -124,7 +131,7 @@ public class GenericGameHandler extends GameBoard {
 
         if (MoveType.NORMAL_MOVE.equals(moveType) || MoveType.PAWN_HOP.equals(moveType)) {
             if (!isPieceMovableTo(from, to, playerSide)) {
-                return MoveType.MOVE_NOT_ALLOWED;
+                throw new MoveNotAllowedException();
             }
 
             movePieceTo(from, to, piecesFrom);
@@ -139,7 +146,7 @@ public class GenericGameHandler extends GameBoard {
                     removePieceFromBoard(to);
                 }
 
-                return MoveType.MOVE_NOT_ALLOWED;
+                throw new MoveNotAllowedException();
             } else {
                 changeAllowedMoveSide();
 
@@ -149,28 +156,9 @@ public class GenericGameHandler extends GameBoard {
                 }
             }
         } else if (MoveType.CASTLING.equals(moveType)) {
-            /*
-                If queen side, move rook to D1 / D8 and king to C1 / C8
-                Otherwise, move rook to F1 / F8 and king to G1 / G8
-             */
-            CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, playerSide).invoke();
-            CasePosition kingPosition = castlingPositionHelper.getKingPosition();
-            CasePosition rookPosition = castlingPositionHelper.getRookPosition();
-
-            movePieceTo(from, kingPosition, piecesFrom);
-
-            if (isEatingPiece) {
-                movePieceTo(to, rookPosition, piecesTo);
-            }
-            changeAllowedMoveSide();
+            handleCastlingWhenMove(from, to, playerSide, piecesFrom, piecesTo, isEatingPiece);
         } else if (MoveType.EN_PASSANT.equals(moveType)) {
-            movePieceTo(from, to, piecesFrom);
-            changeAllowedMoveSide();
-
-            CasePosition enemyPawnPosition = MathUtils.getNearestPositionFromDirection(to, otherPlayerSide.equals(BLACK) ? Direction.SOUTH : Direction.NORTH);
-            Pieces enemyPawnToEat = getPiece(enemyPawnPosition);
-            updatePointsForSide(playerSide, enemyPawnToEat.getPoint());
-            removePieceFromBoard(enemyPawnPosition);
+            handleEnPassantWhenMove(from, to, playerSide, otherPlayerSide, piecesFrom);
         }
 
         KingStatus otherKingStatusAfterMove = getKingStatus(otherPlayerSide, true);
@@ -184,6 +172,40 @@ public class GenericGameHandler extends GameBoard {
         sendCheckOrCheckmateMessages(currentKingStatus, otherKingStatusAfterMove, playerSide);
 
         return moveType;
+    }
+
+    private void handleEnPassantWhenMove(CasePosition from, CasePosition to, Side playerSide, Side otherPlayerSide, Pieces piecesFrom) {
+        movePieceTo(from, to, piecesFrom);
+        changeAllowedMoveSide();
+
+        CasePosition enemyPawnPosition = MathUtils.getNearestPositionFromDirection(to, otherPlayerSide.equals(BLACK) ? Direction.SOUTH : Direction.NORTH);
+        Pieces enemyPawnToEat = getPiece(enemyPawnPosition);
+        updatePointsForSide(playerSide, enemyPawnToEat.getPoint());
+        removePieceFromBoard(enemyPawnPosition);
+    }
+
+    /**
+     * If queen side, move rook to D1 / D8 and king to C1 / C8
+     * Otherwise, move rook to F1 / F8 and king to G1 / G8
+     *
+     * @param from
+     * @param to
+     * @param playerSide
+     * @param piecesFrom
+     * @param piecesTo
+     * @param isEatingPiece
+     */
+    private void handleCastlingWhenMove(CasePosition from, CasePosition to, Side playerSide, Pieces piecesFrom, Pieces piecesTo, boolean isEatingPiece) {
+        CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, playerSide).invoke();
+        CasePosition kingPosition = castlingPositionHelper.getKingPosition();
+        CasePosition rookPosition = castlingPositionHelper.getRookPosition();
+
+        movePieceTo(from, kingPosition, piecesFrom);
+
+        if (isEatingPiece) {
+            movePieceTo(to, rookPosition, piecesTo);
+        }
+        changeAllowedMoveSide();
     }
 
     protected final boolean isPlayerTurn(Side sideFrom) {

@@ -80,9 +80,8 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
             return moveType;
         }
 
-        if (Pieces.isSameSide(pieceFrom, pieceTo) && Pieces.isKing(pieceFrom) && Pieces.isRook(pieceTo)) { //Castling
+        if (isCastlingPieces(pieceFrom, pieceTo)) {
             List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
-
 
             boolean isQueenSide = Direction.WEST.equals(MathUtils.getDirectionFromPosition(from, to));
 
@@ -122,5 +121,9 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         }
 
         return moveType;
+    }
+
+    private boolean isCastlingPieces(Pieces pieceFrom, Pieces pieceTo) {
+        return Pieces.isSameSide(pieceFrom, pieceTo) && Pieces.isKing(pieceFrom) && Pieces.isRook(pieceTo);
     }
 }
