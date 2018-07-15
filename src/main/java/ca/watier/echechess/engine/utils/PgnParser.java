@@ -40,13 +40,8 @@ import static ca.watier.echechess.common.enums.Side.WHITE;
 
 public class PgnParser {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PgnParser.class);
-    private static final List<PgnMoveToken> PAWN_PROMOTION_WITH_CAPTURE_TOKENS = new ArrayList<>();
+    private static final List<PgnMoveToken> PAWN_PROMOTION_WITH_CAPTURE_TOKENS = List.of(PgnMoveToken.PAWN_PROMOTION, PgnMoveToken.CAPTURE);
     private static final Pattern POSITION_PATTERN = Pattern.compile("[a-h][1-8]");
-
-    static {
-        PAWN_PROMOTION_WITH_CAPTURE_TOKENS.add(PgnMoveToken.PAWN_PROMOTION);
-        PAWN_PROMOTION_WITH_CAPTURE_TOKENS.add(PgnMoveToken.CAPTURE);
-    }
 
     private final List<GenericGameHandler> handlerList = new ArrayList<>();
     private final GameConstraints gameConstraints;
@@ -97,9 +92,7 @@ public class PgnParser {
         for (String currentToken : tokens) {
             currentToken = currentToken.trim();
 
-            String[] actions = currentToken.split(" ");
-
-            for (String action : actions) {
+            for (String action : currentToken.split(" ")) {
                 action = action.trim();
 
                 if (action.isEmpty()) {

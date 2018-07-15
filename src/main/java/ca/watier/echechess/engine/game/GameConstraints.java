@@ -73,7 +73,6 @@ public class GameConstraints {
 
         Pieces fromPiece = gameHandler.getPiece(from);
 
-
         if (Side.OBSERVER.equals(playerSide) || !fromPiece.getSide().equals(playerSide)) {
             return false;
         }

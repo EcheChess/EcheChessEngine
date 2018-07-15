@@ -202,7 +202,6 @@ public class GameUtils implements BaseUtils {
             return false;
         }
 
-
         return pieces.equals(gameBoard.getDefaultPositions().get(position));
     }
 
