@@ -9,10 +9,11 @@ import ca.watier.echechess.engine.utils.GameUtils;
 import com.google.common.collect.ArrayListMultimap;
 
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class GameBoardData {
+public abstract class GameBoardData implements Cloneable {
 
     //The default position of the board
     private final Map<CasePosition, Pieces> DEFAULT_POSITIONS;
@@ -269,5 +270,25 @@ public abstract class GameBoardData {
 
     public boolean isGameDraw() {
         return isGameDraw;
+    }
+
+    protected void restore(GameBoardData gameBoardData) {
+        this.positionPiecesMap = gameBoardData.positionPiecesMap;
+        this.isPiecesMovedMap = gameBoardData.isPiecesMovedMap;
+        this.isPawnUsedSpecialMoveMap = gameBoardData.isPawnUsedSpecialMoveMap;
+        this.turnNumberPieceMap = gameBoardData.turnNumberPieceMap;
+        this.pawnPromotionMap = gameBoardData.pawnPromotionMap;
+    }
+
+    @Override
+    protected GameBoardData clone() throws CloneNotSupportedException {
+        GameBoardData cloned = (GameBoardData) super.clone();
+        cloned.positionPiecesMap = new EnumMap<>(positionPiecesMap);
+        cloned.isPiecesMovedMap = new EnumMap<>(isPiecesMovedMap);
+        cloned.isPawnUsedSpecialMoveMap = new EnumMap<>(isPawnUsedSpecialMoveMap);
+        cloned.turnNumberPieceMap = new EnumMap<>(turnNumberPieceMap);
+        cloned.pawnPromotionMap = ArrayListMultimap.create(pawnPromotionMap);
+
+        return cloned;
     }
 }

@@ -23,13 +23,24 @@ import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.Pair;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 /**
  * Created by yannick on 6/29/2017.
  */
 public abstract class GameBoard extends GameBoardData {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GameBoard.class);
+
+    private Stack<GameBoardData> historyStack;
+
+    public GameBoard() {
+        super();
+        historyStack = new Stack<>();
+    }
 
     /**
      * Find the position for a column and a rank
@@ -147,5 +158,17 @@ public abstract class GameBoard extends GameBoardData {
         }
 
         return isPresent;
+    }
+
+    public void cloneCurrentState() {
+        try {
+            historyStack.push(this.clone());
+        } catch (CloneNotSupportedException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    public void restoreLastState() {
+        restore(historyStack.pop());
     }
 }

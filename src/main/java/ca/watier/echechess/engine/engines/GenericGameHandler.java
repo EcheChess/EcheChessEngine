@@ -88,7 +88,6 @@ public class GenericGameHandler extends GameBoard {
             moveType = movePiece(from, to, playerSide, moveHistory);
         } catch (MoveNotAllowedException e) {
             moveType = MoveType.MOVE_NOT_ALLOWED;
-            e.printStackTrace();
         }
         moveHistory.setMoveType(moveType);
         moveHistoryList.add(moveHistory);
@@ -121,7 +120,7 @@ public class GenericGameHandler extends GameBoard {
 
             sendPawnPromotionMessage(to, playerSide);
             sendMovedMessages(from, to, playerSide);
-            throw new MoveNotAllowedException();
+            return MoveType.PAWN_PROMOTION;
         }
 
         MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
@@ -575,26 +574,16 @@ public class GenericGameHandler extends GameBoard {
         Pieces currentPiece = getPiece(from);
         MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
 
-        //To check if the pawn used the +2 move
-        Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap = new EnumMap<>(getIsPawnUsedSpecialMoveMap());
-        Map<CasePosition, Boolean> copyOfIsPawnUsedSpecialMoveMap = new EnumMap<>(isPawnUsedSpecialMoveMap);
 
-        //To check if the piece moved in the current game
-        Map<CasePosition, Boolean> isPiecesMovedMap = new EnumMap<>(getIsPiecesMovedMap());
-        Map<CasePosition, Boolean> copyOfIsPiecesMovedMap = new EnumMap<>(isPiecesMovedMap);
-
-        //To get the number of turns since last move
-        Map<CasePosition, Integer> turnNumberPieceMap = new EnumMap<>(getTurnNumberPieceMap());
-        Map<CasePosition, Integer> copyOfTurnNumberPieceMap = new EnumMap<>(turnNumberPieceMap);
+        cloneCurrentState();
 
         if (MoveType.EN_PASSANT.equals(moveType)) {
-            isKingCheck = isKingCheckWithEnPassantMove(from, to, playerSide, currentPiece, isPawnUsedSpecialMoveMap, isPiecesMovedMap, turnNumberPieceMap);
+            isKingCheck = isKingCheckWithEnPassantMove(from, to, playerSide, currentPiece);
         } else {
-            isKingCheck = isKingCheckWithOtherMove(from, to, playerSide, currentPiece, moveType, isPawnUsedSpecialMoveMap, isPiecesMovedMap, turnNumberPieceMap);
+            isKingCheck = isKingCheckWithOtherMove(from, to, playerSide, currentPiece, moveType);
         }
 
-        //restore the old maps
-        setPiecesGameState(copyOfIsPawnUsedSpecialMoveMap, copyOfTurnNumberPieceMap, copyOfIsPiecesMovedMap);
+        restoreLastState();
 
         return isKingCheck;
     }
@@ -615,7 +604,7 @@ public class GenericGameHandler extends GameBoard {
         return GAME_CONSTRAINTS.isPieceMovableTo(from, to, playerSide, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
     }
 
-    private boolean isKingCheckWithEnPassantMove(CasePosition from, CasePosition to, Side playerSide, Pieces currentPiece, Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap, Map<CasePosition, Boolean> isPiecesMovedMap, Map<CasePosition, Integer> turnNumberPieceMap) {
+    private boolean isKingCheckWithEnPassantMove(CasePosition from, CasePosition to, Side playerSide, Pieces currentPiece) {
         boolean isKingCheck;
         CasePosition enPassantEnemyPawnPosition = PawnMoveConstraint.getEnPassantEnemyPawnPosition(to, getOtherPlayerSide(playerSide));
 
@@ -623,16 +612,6 @@ public class GenericGameHandler extends GameBoard {
 
         removePieceFromBoard(enPassantEnemyPawnPosition); //Remove the enemy pawn
         setPiecePositionWithoutMoveState(currentPiece, to);
-
-        //Set the new values in the maps
-        isPiecesMovedMap.remove(from);
-        isPiecesMovedMap.put(to, true);
-
-        turnNumberPieceMap.remove(from);
-        turnNumberPieceMap.put(to, getNbTotalMove());
-
-        //Set the new maps
-        setPiecesGameState(isPawnUsedSpecialMoveMap, turnNumberPieceMap, isPiecesMovedMap);
 
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), getPiecesLocation()));
 
@@ -645,12 +624,21 @@ public class GenericGameHandler extends GameBoard {
         return isKingCheck;
     }
 
-    private boolean isKingCheckWithOtherMove(CasePosition from, CasePosition to, Side playerSide, Pieces currentPiece, MoveType moveType, Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap, Map<CasePosition, Boolean> isPiecesMovedMap, Map<CasePosition, Integer> turnNumberPieceMap) {
+    private boolean isKingCheckWithOtherMove(CasePosition from, CasePosition to, Side playerSide, Pieces currentPiece, MoveType moveType) {
         boolean isKingCheck;
         Pieces pieceEaten = getPiece(to);
 
         removePieceFromBoard(from);
         setPiecePositionWithoutMoveState(currentPiece, to);
+
+        //To check if the pawn used the +2 move
+        Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap = new EnumMap<>(getIsPawnUsedSpecialMoveMap());
+
+        //To check if the piece moved in the current game
+        Map<CasePosition, Boolean> isPiecesMovedMap = new EnumMap<>(getIsPiecesMovedMap());
+
+        //To get the number of turns since last move
+        Map<CasePosition, Integer> turnNumberPieceMap = new EnumMap<>(getTurnNumberPieceMap());
 
         //Set the new values in the maps
         if (MoveType.PAWN_HOP.equals(moveType)) {
