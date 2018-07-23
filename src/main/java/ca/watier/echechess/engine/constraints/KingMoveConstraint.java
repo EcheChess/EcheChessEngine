@@ -18,6 +18,7 @@ package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
@@ -27,9 +28,6 @@ import ca.watier.echechess.engine.utils.GameUtils;
 import java.util.List;
 import java.util.Map;
 
-import static ca.watier.echechess.common.enums.CasePosition.*;
-import static ca.watier.echechess.common.enums.Side.BLACK;
-import static ca.watier.echechess.common.enums.Side.WHITE;
 import static ca.watier.echechess.common.interfaces.BaseUtils.getSafeBoolean;
 
 /**
@@ -83,29 +81,9 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         if (isCastlingPieces(pieceFrom, pieceTo)) {
             List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
 
-            boolean isQueenSide = Direction.WEST.equals(MathUtils.getDirectionFromPosition(from, to));
-
-            CasePosition kingPosition;
-            CasePosition positionWhereKingPass;
-            if (BLACK.equals(sideFrom)) {
-                if (isQueenSide) {
-                    kingPosition = C8;
-                    positionWhereKingPass = D8;
-                } else {
-                    kingPosition = G8;
-                    positionWhereKingPass = F8;
-                }
-            } else if (WHITE.equals(sideFrom)) {
-                if (isQueenSide) {
-                    kingPosition = C1;
-                    positionWhereKingPass = D1;
-                } else {
-                    kingPosition = G1;
-                    positionWhereKingPass = F1;
-                }
-            } else {
-                throw new IllegalStateException("The king position cannot be null!");
-            }
+            CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, sideFrom).invoke();
+            CasePosition kingPosition = castlingPositionHelper.getKingPosition();
+            CasePosition positionWhereKingPass = castlingPositionHelper.getRookPosition();
 
             boolean isPieceAreNotMoved = !getSafeBoolean(gameHandler.isPieceMoved(from)) && !getSafeBoolean(gameHandler.isPieceMoved(to));
             boolean isNoPieceBetweenKingAndRook = piecesBetweenKingAndRook.isEmpty();

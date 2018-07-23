@@ -32,13 +32,14 @@ import java.util.Map;
 public class GenericMoveConstraint implements MoveConstraint {
 
     private DirectionPattern pattern;
+    private List<Direction> directionList;
 
     public GenericMoveConstraint(DirectionPattern pattern) {
-        if (pattern == null) {
-            return;
-        }
-
         this.pattern = pattern;
+
+        if (pattern != null) {
+            directionList = Arrays.asList(pattern.getDirections());
+        }
     }
 
     @Override
@@ -46,8 +47,6 @@ public class GenericMoveConstraint implements MoveConstraint {
         if (from == null || to == null || pattern == null) {
             return false;
         }
-
-        List<Direction> directionList = Arrays.asList(pattern.getDirections());
 
         Map<CasePosition, Pieces> positionPiecesMap = gameHandler.getPiecesLocation();
         Pieces pieceTo = positionPiecesMap.get(to);
@@ -70,21 +69,14 @@ public class GenericMoveConstraint implements MoveConstraint {
             return false;
         }
 
-        boolean isMoveValid;
-
         switch (moveMode) {
             case NORMAL_OR_ATTACK_MOVE:
-                isMoveValid = whenNormalOrAttackMode(from, to, positionPiecesMap, pieceTo, sideFrom);
-                break;
+                return whenNormalOrAttackMode(from, to, positionPiecesMap, pieceTo, sideFrom);
             case IS_KING_CHECK_MODE:
-                isMoveValid = whenIsKingCheckMode(from, to, positionPiecesMap, sideFrom);
-                break;
+                return whenIsKingCheckMode(from, to, positionPiecesMap, sideFrom);
             default:
-                isMoveValid = false;
-                break;
+                return false;
         }
-
-        return isMoveValid;
     }
 
     private boolean whenNormalOrAttackMode(CasePosition from, CasePosition to, Map<CasePosition, Pieces> positionPiecesMap, Pieces pieceTo, Side sideFrom) {

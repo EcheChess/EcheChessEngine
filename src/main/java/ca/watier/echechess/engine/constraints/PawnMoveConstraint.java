@@ -83,9 +83,9 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
             return false;
         }
 
-        Direction direction = Direction.NORTH;
-        Direction directionAttack1 = Direction.NORTH_WEST;
-        Direction directionAttack2 = Direction.NORTH_EAST;
+        Direction direction;
+        Direction directionAttackOne;
+        Direction directionAttackTwo;
 
         Pieces pieceFrom = gameHandler.getPiece(from);
         Side sideFrom = pieceFrom.getSide();
@@ -93,8 +93,12 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         //Pre checks, MUST BE FIRST
         if (Side.BLACK.equals(sideFrom)) {
             direction = Direction.SOUTH;
-            directionAttack1 = Direction.SOUTH_WEST;
-            directionAttack2 = Direction.SOUTH_EAST;
+            directionAttackOne = Direction.SOUTH_WEST;
+            directionAttackTwo = Direction.SOUTH_EAST;
+        } else {
+            direction = Direction.NORTH;
+            directionAttackOne = Direction.NORTH_WEST;
+            directionAttackTwo = Direction.NORTH_EAST;
         }
 
         Pieces hittingPiece = gameHandler.getPiece(to);
@@ -102,21 +106,16 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         Direction directionFromPosition = MathUtils.getDirectionFromPosition(from, to);
 
         boolean otherPiecesBetweenTarget = GameUtils.isOtherPiecesBetweenTarget(from, to, gameHandler.getPiecesLocation());
-
         boolean isFrontMove = direction.equals(directionFromPosition);
         boolean isNbOfCaseIsOne = nbCaseBetweenPositions == 1;
-
-        boolean isSpecialMove = (isPawnMoveHop(from, pieceFrom, to, gameHandler, nbCaseBetweenPositions) && !otherPiecesBetweenTarget)
-                || MoveType.EN_PASSANT.equals(getMoveType(from, to, gameHandler));
-
-        boolean isMovable = (isSpecialMove || isNbOfCaseIsOne) &&
-                isFrontMove;
+        boolean isSpecialMove = isSpecialMove(from, to, gameHandler, pieceFrom, nbCaseBetweenPositions, otherPiecesBetweenTarget);
+        boolean isMovable = (isSpecialMove || isNbOfCaseIsOne) && isFrontMove;
 
         if (directionFromPosition == null) {
             return false;
         }
 
-        boolean isAttackMove = directionFromPosition.equals(directionAttack1) || directionFromPosition.equals(directionAttack2);
+        boolean isAttackMove = directionFromPosition.equals(directionAttackOne) || directionFromPosition.equals(directionAttackTwo);
         boolean isMoveValid = false;
 
         if (MoveMode.NORMAL_OR_ATTACK_MOVE.equals(moveMode)) {
@@ -125,16 +124,22 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
                 return true;
             } else if (isMovable) { //Blocked by another piece, with a normal move
                 return false;
+            } else if (hittingPiece == null) { //Not movable and target is null
+                return false;
             }
 
-            isMoveValid = hittingPiece != null && !hittingPiece.getSide().equals(sideFrom) && !Pieces.isKing(hittingPiece) &&
-                    isAttackMove;
+            isMoveValid = !Pieces.isSameSide(hittingPiece, sideFrom) && !Pieces.isKing(hittingPiece) && isAttackMove;
 
         } else if (MoveMode.IS_KING_CHECK_MODE.equals(moveMode)) {
             isMoveValid = isAttackMove;
         }
 
         return isMoveValid && isNbOfCaseIsOne;
+    }
+
+    private boolean isSpecialMove(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Pieces pieceFrom, int nbCaseBetweenPositions, boolean otherPiecesBetweenTarget) {
+        return (isPawnMoveHop(from, pieceFrom, to, gameHandler, nbCaseBetweenPositions) && !otherPiecesBetweenTarget)
+                || MoveType.EN_PASSANT.equals(getMoveType(from, to, gameHandler));
     }
 
     private boolean isPawnMoveHop(CasePosition from, Pieces pieceFrom, CasePosition to, GenericGameHandler gameHandler, int nbCaseBetweenPositions) {
@@ -177,7 +182,6 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
                 if (isEnPassant(from, to, gameHandler, currentSide, enemyPawnPosition, enemyPawn)) {
                     value = MoveType.EN_PASSANT;
                 }
-
             }
         }
 

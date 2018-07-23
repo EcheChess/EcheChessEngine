@@ -21,7 +21,6 @@ import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,14 +30,7 @@ import java.util.Map;
 public class KnightMoveConstraint implements MoveConstraint {
 
     public static final float KNIGHT_RADIUS_EQUATION = 2.23606797749979f;
-    private static final List<Direction> DEFAULT_RADIUS_FINDER_POSITION = new ArrayList<>();
-
-    static {
-        DEFAULT_RADIUS_FINDER_POSITION.add(Direction.NORTH);
-        DEFAULT_RADIUS_FINDER_POSITION.add(Direction.SOUTH);
-        DEFAULT_RADIUS_FINDER_POSITION.add(Direction.EAST);
-        DEFAULT_RADIUS_FINDER_POSITION.add(Direction.WEST);
-    }
+    private static final List<Direction> DEFAULT_RADIUS_FINDER_POSITION = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
     @Override
     public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
