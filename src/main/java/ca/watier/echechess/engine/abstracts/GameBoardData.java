@@ -8,12 +8,15 @@ import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.utils.GameUtils;
 import com.google.common.collect.ArrayListMultimap;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class GameBoardData implements Cloneable {
+public abstract class GameBoardData implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = -5242416504518941779L;
 
     //The default position of the board
     private final Map<CasePosition, Pieces> DEFAULT_POSITIONS;

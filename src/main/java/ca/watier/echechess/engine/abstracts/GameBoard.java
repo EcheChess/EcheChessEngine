@@ -33,6 +33,7 @@ import java.util.Stack;
  */
 public abstract class GameBoard extends GameBoardData {
 
+    private static final long serialVersionUID = 807194077405321185L;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GameBoard.class);
 
     private Stack<GameBoardData> historyStack;

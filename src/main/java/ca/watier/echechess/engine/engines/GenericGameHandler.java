@@ -43,6 +43,8 @@ import static ca.watier.echechess.common.utils.Constants.*;
  * Created by yannick on 5/5/2017.
  */
 public class GenericGameHandler extends GameBoard {
+    private static final long serialVersionUID = 1139291295474732218L;
+
     private final GameConstraints GAME_CONSTRAINTS;
     private final WebSocketService WEB_SOCKET_SERVICE;
     private final Set<SpecialGameRules> SPECIAL_GAME_RULES;
