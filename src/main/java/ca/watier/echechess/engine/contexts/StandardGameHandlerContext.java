@@ -18,7 +18,6 @@ package ca.watier.echechess.engine.contexts;
 
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.common.interfaces.WebSocketService;
 import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
 import ca.watier.echechess.engine.game.GameConstraints;
@@ -31,8 +30,8 @@ import java.util.UUID;
  */
 public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHandler {
 
-    public StandardGameHandlerContext(GameConstraints gameConstraints, WebSocketService webSocketService) {
-        super(gameConstraints, webSocketService);
+    public StandardGameHandlerContext(GameConstraints gameConstraints) {
+        super(gameConstraints);
         addBothPlayerToGameAndSetUUID();
     }
 
@@ -45,15 +44,15 @@ public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHand
         playerWhite.addJoinedGame(uuid);
     }
 
-    public StandardGameHandlerContext(GameConstraints gameConstraints, WebSocketService webSocketService, Map<CasePosition, Pieces> positionPieces) {
-        super(gameConstraints, webSocketService);
+    public StandardGameHandlerContext(GameConstraints gameConstraints, Map<CasePosition, Pieces> positionPieces) {
+        super(gameConstraints);
 
         setPieces(positionPieces);
         addBothPlayerToGameAndSetUUID();
     }
 
-    public StandardGameHandlerContext(GameConstraints gameConstraints, WebSocketService webSocketService, String positionPieces) {
-        super(gameConstraints, webSocketService);
+    public StandardGameHandlerContext(GameConstraints gameConstraints, String positionPieces) {
+        super(gameConstraints);
 
         setPieces(positionPieces);
         addBothPlayerToGameAndSetUUID();

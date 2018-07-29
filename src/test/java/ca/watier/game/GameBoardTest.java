@@ -34,7 +34,7 @@ public class GameBoardTest extends EngineGameTest {
 
     @Before
     public void setUp() {
-        context = new StandardGameHandlerContext(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE);
+        context = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
         context.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
     }
 

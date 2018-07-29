@@ -17,11 +17,13 @@
 package ca.watier.echechess.engine.engines;
 
 import ca.watier.echechess.common.enums.*;
-import ca.watier.echechess.common.interfaces.WebSocketService;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.responses.GameScoreResponse;
 import ca.watier.echechess.common.sessions.Player;
-import ca.watier.echechess.common.utils.*;
+import ca.watier.echechess.common.utils.CastlingPositionHelper;
+import ca.watier.echechess.common.utils.MathUtils;
+import ca.watier.echechess.common.utils.MultiArrayMap;
+import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
@@ -31,12 +33,9 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 
-import static ca.watier.echechess.common.enums.ChessEventMessage.*;
-import static ca.watier.echechess.common.enums.ChessEventMessage.PLAYER_TURN;
 import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.KingStatus.STALEMATE;
 import static ca.watier.echechess.common.enums.Side.*;
-import static ca.watier.echechess.common.utils.Constants.*;
 
 
 /**
@@ -44,12 +43,11 @@ import static ca.watier.echechess.common.utils.Constants.*;
  */
 public class GenericGameHandler extends GameBoard {
     private static final long serialVersionUID = 1139291295474732218L;
-
     private final GameConstraints GAME_CONSTRAINTS;
-    private final WebSocketService WEB_SOCKET_SERVICE;
     private final Set<SpecialGameRules> SPECIAL_GAME_RULES;
     protected Player playerWhite;
     protected Player playerBlack;
+    private KingStatus currentKingStatus, otherKingStatusAfterMove;
     private String uuid;
     private boolean allowOtherToJoin = false;
     private boolean allowObservers = false;
@@ -60,12 +58,13 @@ public class GenericGameHandler extends GameBoard {
     private short whitePlayerPoint = 0;
     private GameType gameType;
 
-    public GenericGameHandler(GameConstraints gameConstraints, WebSocketService webSocketService) {
+    public GenericGameHandler(GameConstraints gameConstraints) {
+        currentKingStatus = KingStatus.OK;
+        otherKingStatusAfterMove = KingStatus.OK;
         SPECIAL_GAME_RULES = new HashSet<>();
         observerList = new ArrayList<>();
         moveHistoryList = new ArrayList<>();
         this.GAME_CONSTRAINTS = gameConstraints;
-        this.WEB_SOCKET_SERVICE = webSocketService;
     }
 
 
@@ -120,13 +119,11 @@ public class GenericGameHandler extends GameBoard {
             setGamePaused(true);
             changeAllowedMoveSide();
 
-            sendPawnPromotionMessage(to, playerSide);
-            sendMovedMessages(from, to, playerSide);
             return MoveType.PAWN_PROMOTION;
         }
 
         MoveType moveType = GAME_CONSTRAINTS.getMoveType(from, to, this);
-        KingStatus currentKingStatus = OK;
+        KingStatus evaluatedCurrentKingStatus = OK;
         boolean isEatingPiece = piecesTo != null;
 
         if (MoveType.NORMAL_MOVE.equals(moveType) || MoveType.PAWN_HOP.equals(moveType)) {
@@ -135,9 +132,9 @@ public class GenericGameHandler extends GameBoard {
             }
 
             movePieceTo(from, to, piecesFrom);
-            currentKingStatus = getKingStatus(playerSide, true);
+            evaluatedCurrentKingStatus = getKingStatus(playerSide, true);
 
-            if (KingStatus.isCheckOrCheckMate(currentKingStatus)) { //Cannot move, revert
+            if (KingStatus.isCheckOrCheckMate(evaluatedCurrentKingStatus)) { //Cannot move, revert
                 handleCheckOrCheckMateMove(from, to, piecesFrom, piecesTo, isEatingPiece);
             } else {
                 changeAllowedMoveSide();
@@ -153,17 +150,22 @@ public class GenericGameHandler extends GameBoard {
             handleEnPassantWhenMove(from, to, playerSide, otherPlayerSide, piecesFrom);
         }
 
-        KingStatus otherKingStatusAfterMove = getKingStatus(otherPlayerSide, true);
+        KingStatus evaluatedOtherKingStatusAfterMove = getKingStatus(otherPlayerSide, true);
+        moveHistory.setCurrentKingStatus(evaluatedCurrentKingStatus);
+        moveHistory.setOtherKingStatus(evaluatedOtherKingStatusAfterMove);
 
-        if (MoveType.isMoved(moveType)) {
-            sendMovedMessages(from, to, playerSide);
-        }
-
-        moveHistory.setCurrentKingStatus(currentKingStatus);
-        moveHistory.setOtherKingStatus(otherKingStatusAfterMove);
-        sendCheckOrCheckmateMessages(currentKingStatus, otherKingStatusAfterMove, playerSide);
+        currentKingStatus = evaluatedCurrentKingStatus;
+        otherKingStatusAfterMove = evaluatedOtherKingStatusAfterMove;
 
         return moveType;
+    }
+
+    public KingStatus getCurrentKingStatus() {
+        return currentKingStatus;
+    }
+
+    public KingStatus getOtherKingStatusAfterMove() {
+        return otherKingStatusAfterMove;
     }
 
     private void handleCheckOrCheckMateMove(CasePosition from, CasePosition to, Pieces piecesFrom, Pieces piecesTo, boolean isEatingPiece) throws MoveNotAllowedException {
@@ -226,25 +228,6 @@ public class GenericGameHandler extends GameBoard {
         } else {
             currentAllowedMoveSide = BLACK;
         }
-    }
-
-    private void sendPawnPromotionMessage(CasePosition to, Side playerSide) {
-        if (to == null || playerSide == null) {
-            return;
-        }
-
-        WEB_SOCKET_SERVICE.fireSideEvent(uuid, playerSide, PAWN_PROMOTION, to.name());
-        WEB_SOCKET_SERVICE.fireGameEvent(uuid, PAWN_PROMOTION, String.format(GAME_PAUSED_PAWN_PROMOTION, playerSide));
-    }
-
-    private void sendMovedMessages(CasePosition from, CasePosition to, Side playerSide) {
-        if (from == null || to == null || playerSide == null) {
-            return;
-        }
-
-        WEB_SOCKET_SERVICE.fireGameEvent(uuid, MOVE, String.format(PLAYER_MOVE, playerSide, from, to));
-        WEB_SOCKET_SERVICE.fireSideEvent(uuid, getOtherPlayerSide(playerSide), PLAYER_TURN, Constants.PLAYER_TURN);
-        WEB_SOCKET_SERVICE.fireGameEvent(uuid, SCORE_UPDATE, getGameScore());
     }
 
     /**
@@ -388,27 +371,6 @@ public class GenericGameHandler extends GameBoard {
             default:
                 break;
         }
-    }
-
-    private void sendCheckOrCheckmateMessages(KingStatus currentkingStatus, KingStatus otherKingStatusAfterMove, Side playerSide) {
-        if (currentkingStatus == null || otherKingStatusAfterMove == null || playerSide == null) {
-            return;
-        }
-
-        Side otherPlayerSide = getOtherPlayerSide(playerSide);
-
-        if (KingStatus.CHECKMATE.equals(currentkingStatus)) {
-            WEB_SOCKET_SERVICE.fireGameEvent(uuid, KING_CHECKMATE, String.format(PLAYER_KING_CHECKMATE, playerSide));
-        } else if (KingStatus.CHECKMATE.equals(otherKingStatusAfterMove)) {
-            WEB_SOCKET_SERVICE.fireGameEvent(uuid, KING_CHECKMATE, String.format(PLAYER_KING_CHECKMATE, otherPlayerSide));
-        }
-
-        if (KingStatus.CHECK.equals(currentkingStatus)) {
-            WEB_SOCKET_SERVICE.fireSideEvent(uuid, playerSide, KING_CHECK, Constants.PLAYER_KING_CHECK);
-        } else if (KingStatus.CHECK.equals(otherKingStatusAfterMove)) {
-            WEB_SOCKET_SERVICE.fireSideEvent(uuid, otherPlayerSide, KING_CHECK, Constants.PLAYER_KING_CHECK);
-        }
-
     }
 
     public boolean isGameHaveRule(SpecialGameRules rule) {

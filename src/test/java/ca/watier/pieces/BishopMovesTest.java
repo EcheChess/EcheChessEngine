@@ -33,7 +33,7 @@ public class BishopMovesTest extends EngineGameTest {
     @Test
     public void moveTest() {
         String pattern = "E8:B_BISHOP;G8:B_BISHOP;F5:W_BISHOP;E2:W_BISHOP;D7:W_PAWN;G6:W_PAWN;E4:W_PAWN;G4:W_PAWN;";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE, pattern);
+        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, pattern);
         gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
 
         assertThat(gameHandler.getAllAvailableMoves(F5, WHITE)).containsOnly(E6);

@@ -18,7 +18,6 @@ package ca.watier.echechess.engine.game;
 
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.common.interfaces.WebSocketService;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,8 +30,8 @@ import java.util.Map;
 public class CustomPieceWithStandardRulesHandler extends GenericGameHandler {
     public static final String THE_NUMBER_OF_PARAMETER_IS_INCORRECT = "The number of parameter is incorrect !";
 
-    public CustomPieceWithStandardRulesHandler(GameConstraints gameConstraints, WebSocketService webSocketService) {
-        super(gameConstraints, webSocketService);
+    public CustomPieceWithStandardRulesHandler(GameConstraints gameConstraints) {
+        super(gameConstraints);
     }
 
     public void setPieces(Map<CasePosition, Pieces> positionPieces) {

@@ -31,7 +31,7 @@ public class AllPiecesTest extends EngineGameTest {
 
     @Test
     public void whiteTest() {
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE);
+        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
 
         List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = gameHandler.getAllPiecesThatCanMoveTo(CasePosition.F3, Side.WHITE);
         Assertions.assertThat(allPiecesThatCanMoveTo).hasSize(2);
@@ -47,7 +47,7 @@ public class AllPiecesTest extends EngineGameTest {
 
     @Test
     public void blackTest() {
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE);
+        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
 
         List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = gameHandler.getAllPiecesThatCanMoveTo(CasePosition.C6, Side.BLACK);
         Assertions.assertThat(allPiecesThatCanMoveTo).hasSize(2);

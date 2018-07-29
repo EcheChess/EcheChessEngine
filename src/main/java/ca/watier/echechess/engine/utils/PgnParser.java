@@ -17,7 +17,6 @@
 package ca.watier.echechess.engine.utils;
 
 import ca.watier.echechess.common.enums.*;
-import ca.watier.echechess.common.interfaces.WebSocketService;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.pojos.PieceDataSection;
 import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
@@ -45,16 +44,14 @@ public class PgnParser {
 
     private final List<GenericGameHandler> handlerList = new ArrayList<>();
     private final GameConstraints gameConstraints;
-    private final WebSocketService webSocketService;
 
     private GenericGameHandler gameHandler;
     private Side currentSide = WHITE;
     private Side otherSide = BLACK;
 
 
-    public PgnParser(GameConstraints gameConstraints, WebSocketService webSocketService) {
+    public PgnParser(GameConstraints gameConstraints) {
         this.gameConstraints = gameConstraints;
-        this.webSocketService = webSocketService;
     }
 
     public List<GenericGameHandler> parseMultipleGameWithHeader(String rawText) throws ChessException {
@@ -86,7 +83,7 @@ public class PgnParser {
         }
 
         resetSide();
-        gameHandler = new GenericGameHandler(gameConstraints, webSocketService);
+        gameHandler = new GenericGameHandler(gameConstraints);
         handlerList.add(gameHandler);
 
         for (String currentToken : tokens) {

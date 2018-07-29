@@ -16,7 +16,7 @@ public class GenericGameHandlerTest extends EngineGameTest {
 
     @Before
     public void setUp() {
-        context = new StandardGameHandlerContext(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE);
+        context = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
         playerOne = context.getPlayerWhite();
         playerTwo = context.getPlayerBlack();
     }

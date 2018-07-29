@@ -44,7 +44,7 @@ public class SpecialGameRulesTest extends EngineGameTest {
 
     @Test
     public void noPlayerTurnTest() {
-        GenericGameHandler gameHandler = new GenericGameHandler(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE);
+        GenericGameHandler gameHandler = new GenericGameHandler(CONSTRAINT_SERVICE);
 
         assertThat(gameHandler.getSpecialGameRules()).isEmpty(); //Make sure there's no rule applied at the beginning, in a standard game
 
@@ -67,7 +67,7 @@ public class SpecialGameRulesTest extends EngineGameTest {
     public void noCheckOrCheckmateTest() {
         String positionPieces = "A8:B_KING;E1:W_KING;E3:B_QUEEN;D3:B_QUEEN;F3:B_QUEEN";
 
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE, positionPieces);
+        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
 
         assertThat(gameHandler.getSpecialGameRules()).isEmpty(); //Make sure there's no rule applied at the beginning, in a standard game
 
@@ -83,7 +83,7 @@ public class SpecialGameRulesTest extends EngineGameTest {
     @Test
     public void addAndRemoveRuleTest() {
         String positionPieces = "A8:B_KING;E1:W_KING;E3:B_QUEEN;D3:B_QUEEN;F3:B_QUEEN";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, WEB_SOCKET_SERVICE, positionPieces);
+        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
         assertThat(gameHandler.getSpecialGameRules()).isEmpty(); //Make sure there's no rule applied at the beginning, in a standard game
 
         gameHandler.addSpecialRule(NO_CHECK_OR_CHECKMATE, NO_PLAYER_TURN);
