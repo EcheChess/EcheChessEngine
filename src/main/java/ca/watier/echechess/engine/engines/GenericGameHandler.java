@@ -29,6 +29,7 @@ import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
 import ca.watier.echechess.engine.factories.GameConstraintFactory;
 import ca.watier.echechess.engine.interfaces.GameConstraint;
+import ca.watier.echechess.engine.pojos.KingStatusHolderPojo;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -44,11 +45,11 @@ import static ca.watier.echechess.common.enums.Side.*;
  */
 public class GenericGameHandler extends GameBoard {
     private static final long serialVersionUID = 1139291295474732218L;
+    private final KingStatusHolderPojo KING_HOLDER = new KingStatusHolderPojo();
     private final GameConstraint GAME_CONSTRAINTS;
     private final Set<SpecialGameRules> SPECIAL_GAME_RULES;
     protected Player playerWhite;
     protected Player playerBlack;
-    private KingStatus currentKingStatus, otherKingStatusAfterMove;
     private String uuid;
     private boolean allowOtherToJoin = false;
     private boolean allowObservers = false;
@@ -60,8 +61,6 @@ public class GenericGameHandler extends GameBoard {
     private GameType gameType;
 
     public GenericGameHandler(GameConstraint gameConstraint) {
-        currentKingStatus = KingStatus.OK;
-        otherKingStatusAfterMove = KingStatus.OK;
         SPECIAL_GAME_RULES = new HashSet<>();
         observerList = new ArrayList<>();
         moveHistoryList = new ArrayList<>();
@@ -69,8 +68,6 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public GenericGameHandler() {
-        currentKingStatus = KingStatus.OK;
-        otherKingStatusAfterMove = KingStatus.OK;
         SPECIAL_GAME_RULES = new HashSet<>();
         observerList = new ArrayList<>();
         moveHistoryList = new ArrayList<>();
@@ -164,18 +161,14 @@ public class GenericGameHandler extends GameBoard {
         moveHistory.setCurrentKingStatus(evaluatedCurrentKingStatus);
         moveHistory.setOtherKingStatus(evaluatedOtherKingStatusAfterMove);
 
-        currentKingStatus = evaluatedCurrentKingStatus;
-        otherKingStatusAfterMove = evaluatedOtherKingStatusAfterMove;
+        KING_HOLDER.setKingStatusBySide(evaluatedCurrentKingStatus, playerSide);
+        KING_HOLDER.setKingStatusBySide(evaluatedOtherKingStatusAfterMove, Side.getOtherPlayerSide(playerSide));
 
         return moveType;
     }
 
-    public KingStatus getCurrentKingStatus() {
-        return currentKingStatus;
-    }
-
-    public KingStatus getOtherKingStatusAfterMove() {
-        return otherKingStatusAfterMove;
+    public KingStatus getEvaluatedKingStatusBySide(Side side) {
+        return KING_HOLDER.getKingStatusBySide(side);
     }
 
     private void handleCheckOrCheckMateMove(CasePosition from, CasePosition to, Pieces piecesFrom, Pieces piecesTo, boolean isEatingPiece) throws MoveNotAllowedException {
@@ -827,9 +820,8 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public boolean isGameDone() {
-
-        return KingStatus.CHECKMATE.equals(getKingStatus(BLACK, false)) ||
-                KingStatus.CHECKMATE.equals(getKingStatus(WHITE, false)) ||
+        return KingStatus.CHECKMATE.equals(KING_HOLDER.getKingStatusBySide(BLACK)) ||
+                KingStatus.CHECKMATE.equals(KING_HOLDER.getKingStatusBySide(WHITE)) ||
                 isGameDraw();
     }
 
