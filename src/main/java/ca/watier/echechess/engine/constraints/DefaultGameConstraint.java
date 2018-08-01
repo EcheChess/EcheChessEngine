@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-package ca.watier.echechess.engine.game;
+package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.engine.constraints.*;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
+import ca.watier.echechess.engine.interfaces.GameConstraint;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
 
@@ -31,7 +32,7 @@ import static ca.watier.echechess.common.enums.Pieces.*;
  * Created by yannick on 4/26/2017.
  */
 
-public class GameConstraints {
+public class DefaultGameConstraint implements GameConstraint {
 
     private static final Map<Pieces, MoveConstraint> MOVE_CONSTRAINT_MAP = new EnumMap<>(Pieces.class);
     private static final MoveConstraint KING = new KingMoveConstraint();
@@ -56,16 +57,7 @@ public class GameConstraints {
         MOVE_CONSTRAINT_MAP.put(B_PAWN, PAWN);
     }
 
-    /**
-     * Checks if the piece is movable to the specified location
-     *
-     * @param from
-     * @param to
-     * @param playerSide
-     * @param gameHandler
-     * @param moveMode    - Gives the full move of the piece, ignoring the other pieces
-     * @return
-     */
+    @Override
     public boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide, GenericGameHandler gameHandler, MoveMode moveMode) {
         if (from == null || to == null || playerSide == null) {
             return false;
@@ -82,6 +74,7 @@ public class GameConstraints {
     }
 
 
+    @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
         if (from == null || to == null || gameHandler == null) {
             return MoveType.MOVE_NOT_ALLOWED;

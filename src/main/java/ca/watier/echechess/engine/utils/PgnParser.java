@@ -24,7 +24,7 @@ import ca.watier.echechess.common.utils.MultiArrayMap;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
-import ca.watier.echechess.engine.game.GameConstraints;
+import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -43,15 +43,15 @@ public class PgnParser {
     private static final Pattern POSITION_PATTERN = Pattern.compile("[a-h][1-8]");
 
     private final List<GenericGameHandler> handlerList = new ArrayList<>();
-    private final GameConstraints gameConstraints;
+    private final DefaultGameConstraint defaultGameConstraint;
 
     private GenericGameHandler gameHandler;
     private Side currentSide = WHITE;
     private Side otherSide = BLACK;
 
 
-    public PgnParser(GameConstraints gameConstraints) {
-        this.gameConstraints = gameConstraints;
+    public PgnParser(DefaultGameConstraint defaultGameConstraint) {
+        this.defaultGameConstraint = defaultGameConstraint;
     }
 
     public List<GenericGameHandler> parseMultipleGameWithHeader(String rawText) throws ChessException {
@@ -83,7 +83,7 @@ public class PgnParser {
         }
 
         resetSide();
-        gameHandler = new GenericGameHandler(gameConstraints);
+        gameHandler = new GenericGameHandler(defaultGameConstraint);
         handlerList.add(gameHandler);
 
         for (String currentToken : tokens) {

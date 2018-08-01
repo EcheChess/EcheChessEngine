@@ -27,7 +27,8 @@ import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
-import ca.watier.echechess.engine.game.GameConstraints;
+import ca.watier.echechess.engine.factories.GameConstraintFactory;
+import ca.watier.echechess.engine.interfaces.GameConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -43,7 +44,7 @@ import static ca.watier.echechess.common.enums.Side.*;
  */
 public class GenericGameHandler extends GameBoard {
     private static final long serialVersionUID = 1139291295474732218L;
-    private final GameConstraints GAME_CONSTRAINTS;
+    private final GameConstraint GAME_CONSTRAINTS;
     private final Set<SpecialGameRules> SPECIAL_GAME_RULES;
     protected Player playerWhite;
     protected Player playerBlack;
@@ -58,13 +59,22 @@ public class GenericGameHandler extends GameBoard {
     private short whitePlayerPoint = 0;
     private GameType gameType;
 
-    public GenericGameHandler(GameConstraints gameConstraints) {
+    public GenericGameHandler(GameConstraint gameConstraint) {
         currentKingStatus = KingStatus.OK;
         otherKingStatusAfterMove = KingStatus.OK;
         SPECIAL_GAME_RULES = new HashSet<>();
         observerList = new ArrayList<>();
         moveHistoryList = new ArrayList<>();
-        this.GAME_CONSTRAINTS = gameConstraints;
+        this.GAME_CONSTRAINTS = gameConstraint;
+    }
+
+    public GenericGameHandler() {
+        currentKingStatus = KingStatus.OK;
+        otherKingStatusAfterMove = KingStatus.OK;
+        SPECIAL_GAME_RULES = new HashSet<>();
+        observerList = new ArrayList<>();
+        moveHistoryList = new ArrayList<>();
+        this.GAME_CONSTRAINTS = GameConstraintFactory.getDefaultGameConstraint();
     }
 
 
