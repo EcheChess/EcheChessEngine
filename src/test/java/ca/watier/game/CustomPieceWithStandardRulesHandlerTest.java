@@ -19,8 +19,6 @@ package ca.watier.game;
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.SpecialGameRules;
-import ca.watier.echechess.common.impl.WebSocketServiceTestImpl;
-import ca.watier.echechess.common.utils.Constants;
 import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
@@ -80,42 +78,42 @@ public class CustomPieceWithStandardRulesHandlerTest extends EngineGameTest {
     public void getKingStatusStaleMate() {
         customPieceWithStandardRulesHandler.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
 
-        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(WHITE, true));
-        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(WHITE));
+        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
         /*
             STALEMATE
         */
         customPieceWithStandardRulesHandler.setPieces("H1:W_KING;D5:B_KING;C7:W_ROOK;E7:W_ROOK;B6:W_ROOK;B4:W_ROOK");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
         customPieceWithStandardRulesHandler.setPieces("D8:B_KING;D7:W_PAWN;D6:W_KING");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
         customPieceWithStandardRulesHandler.setPieces("D8:B_KING;D6:W_KING;D7:W_PAWN;C8:B_PAWN;A8:W_ROOK");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
 
         customPieceWithStandardRulesHandler.setPieces("D1:B_KING;C1:B_PAWN;C2:B_PAWN;D2:B_PAWN;E2:B_PAWN;E1:B_PAWN;D8:W_KING;C8:W_PAWN;C7:W_PAWN;D7:W_PAWN;E7:W_PAWN;E8:W_PAWN");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(WHITE, true));
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(WHITE));
+        Assert.assertEquals(KingStatus.STALEMATE, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
 
         /*
             Not STALEMATE
          */
         customPieceWithStandardRulesHandler.setPieces("D8:B_KING;D6:W_KING;D7:W_PAWN;C8:B_PAWN;A8:W_ROOK;E8:B_PAWN");
-        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
         customPieceWithStandardRulesHandler.setPieces("H1:W_KING;D5:B_KING;C7:W_ROOK;B6:W_ROOK;B4:W_ROOK");
-        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
         customPieceWithStandardRulesHandler.setPieces("D8:B_KING;D6:W_KING;D7:W_PAWN;C8:B_PAWN");
-        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
         customPieceWithStandardRulesHandler.setPieces("D1:B_KING;C1:B_PAWN;C2:B_PAWN;D2:B_PAWN;E2:B_PAWN;D8:W_KING;C8:W_PAWN;C7:W_PAWN;D7:W_PAWN;E7:W_PAWN");
-        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(WHITE, true));
-        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(WHITE));
+        Assert.assertEquals(KingStatus.OK, customPieceWithStandardRulesHandler.getKingStatus(BLACK));
 
     }
 
@@ -128,8 +126,8 @@ public class CustomPieceWithStandardRulesHandlerTest extends EngineGameTest {
                         "E6:B_ROOK;E5:B_ROOK;E4:B_ROOK;E3:B_ROOK;E2:B_ROOK;F2:B_ROOK;G2:B_ROOK;H2:B_ROOK;"
         );
 
-        assertThat(customPieceWithStandardRulesHandler.getKingStatus(WHITE, false)).isEqualByComparingTo(KingStatus.OK);
+        assertThat(customPieceWithStandardRulesHandler.getKingStatus(WHITE)).isEqualByComparingTo(KingStatus.OK);
         customPieceWithStandardRulesHandler.movePiece(F7, F5, BLACK); //Pawn hop
-        assertThat(customPieceWithStandardRulesHandler.getKingStatus(WHITE, false)).isEqualByComparingTo(KingStatus.CHECK); //Check by the pawn (can kill it by "en passant")
+        assertThat(customPieceWithStandardRulesHandler.getKingStatus(WHITE)).isEqualByComparingTo(KingStatus.CHECK); //Check by the pawn (can kill it by "en passant")
     }
 }

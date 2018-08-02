@@ -38,12 +38,12 @@ public class MoveModeTest extends EngineGameTest {
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B5, B4);
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
 
         gameHandler.removePieceFromBoard(A7); //remove the pawn blocking
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(B6, B5, B4);
-        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE));
 
     }
 
@@ -55,7 +55,7 @@ public class MoveModeTest extends EngineGameTest {
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(C6, D6, E6, C5, C4);
-        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE));
     }
 
 
@@ -66,12 +66,12 @@ public class MoveModeTest extends EngineGameTest {
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(D4, E4, E5);
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
 
         gameHandler.removePieceFromBoard(C6); //remove the rook blocking
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(D6, E6, E5, D4, C4, C5);
-        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE));
     }
 
 
@@ -82,7 +82,7 @@ public class MoveModeTest extends EngineGameTest {
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(C4, D4, E4, E5, E6);
-        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE));
     }
 
 
@@ -93,12 +93,12 @@ public class MoveModeTest extends EngineGameTest {
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(D6, E6, C5, C4, D4, E4, E5);
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
 
         gameHandler.removePieceFromBoard(C6); //remove the pawn blocking
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(D6, E6, C5, C4, D4, E5);
-        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE));
     }
 
     @Test
@@ -108,12 +108,12 @@ public class MoveModeTest extends EngineGameTest {
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B4);
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
 
         gameHandler.removePieceFromBoard(A6); //remove the pawn blocking
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B4, B5);
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
 
     }
 
@@ -124,6 +124,6 @@ public class MoveModeTest extends EngineGameTest {
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(B7, C5, C7, D7, B6, D6, B5, D5);
-        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.CHECK, gameHandler.getKingStatus(WHITE));
     }
 }

@@ -72,12 +72,12 @@ public class SpecialGameRulesTest extends EngineGameTest {
         assertThat(gameHandler.getSpecialGameRules()).isEmpty(); //Make sure there's no rule applied at the beginning, in a standard game
 
         //No rule
-        Assert.assertEquals(KingStatus.CHECKMATE, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.CHECKMATE, gameHandler.getKingStatus(WHITE));
 
         //With the rule
         gameHandler.addSpecialRule(NO_CHECK_OR_CHECKMATE);
 
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE, true));
+        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
     }
 
     @Test

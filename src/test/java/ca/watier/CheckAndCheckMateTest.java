@@ -19,10 +19,8 @@ package ca.watier;
 
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.common.impl.WebSocketServiceTestImpl;
-import ca.watier.echechess.common.interfaces.WebSocketService;
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
 import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
+import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
 import org.junit.Test;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
@@ -40,7 +38,6 @@ public class CheckAndCheckMateTest {
 
     private static final Side WHITE = Side.WHITE;
     private static final DefaultGameConstraint CONSTRAINT_SERVICE = new DefaultGameConstraint();
-    private static final WebSocketService WEB_SOCKET_SERVICE = new WebSocketServiceTestImpl();
 
     /**
      * In this test, the king should be movable only to E5, F5 & F3
@@ -51,7 +48,7 @@ public class CheckAndCheckMateTest {
         StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
-        assertEquals(CHECK, gameHandler.getKingStatus(WHITE, true));
+        assertEquals(CHECK, gameHandler.getKingStatus(WHITE));
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(E5, F3, F5);
     }
 
@@ -64,7 +61,7 @@ public class CheckAndCheckMateTest {
         String positionPieces = "H8:B_KING;E4:W_KING;B5:B_QUEEN;H5:B_QUEEN;E3:B_PAWN;E5:B_PAWN;D4:B_PAWN;F4:B_PAWN;D5:B_PAWN;F5:B_PAWN;D3:B_PAWN;F3:B_PAWN";
         StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
-        assertEquals(CHECK, gameHandler.getKingStatus(WHITE, true));
+        assertEquals(CHECK, gameHandler.getKingStatus(WHITE));
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(E5);
     }
 
@@ -81,9 +78,9 @@ public class CheckAndCheckMateTest {
         StandardGameHandlerContext context = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
         context.addSpecialRule(NO_PLAYER_TURN);
 
-        assertEquals(CHECKMATE, context.getKingStatus(WHITE, true));
+        assertEquals(CHECKMATE, context.getKingStatus(WHITE));
         context.movePieceTo(H1, A1);
-        assertEquals(CHECKMATE, context.getKingStatus(WHITE, true));
+        assertEquals(CHECKMATE, context.getKingStatus(WHITE));
     }
 
 
@@ -99,9 +96,9 @@ public class CheckAndCheckMateTest {
         StandardGameHandlerContext context = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
         context.addSpecialRule(NO_PLAYER_TURN);
 
-        assertEquals(CHECKMATE, context.getKingStatus(WHITE, true));
+        assertEquals(CHECKMATE, context.getKingStatus(WHITE));
         context.movePieceTo(A8, A1); //Move the rook
-        assertEquals(CHECKMATE, context.getKingStatus(WHITE, true));
+        assertEquals(CHECKMATE, context.getKingStatus(WHITE));
     }
 
     @Test
@@ -110,7 +107,7 @@ public class CheckAndCheckMateTest {
         StandardGameHandlerContext context = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
         context.addSpecialRule(NO_PLAYER_TURN);
 
-        assertEquals(OK, context.getKingStatus(WHITE, true));
+        assertEquals(OK, context.getKingStatus(WHITE));
     }
 
     @Test
@@ -134,7 +131,7 @@ public class CheckAndCheckMateTest {
     private void assertPattern(StandardGameHandlerContext context, String[] patterns, KingStatus status, Side side) {
         for (String pattern : patterns) {
             context.setPieces(pattern);
-            assertEquals(String.format("The pattern '%s' has failed !", pattern), status, context.getKingStatus(side, true));
+            assertEquals(String.format("The pattern '%s' has failed !", pattern), status, context.getKingStatus(side));
         }
     }
 

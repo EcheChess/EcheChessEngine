@@ -169,12 +169,12 @@ public class PgnParser {
     private void validateGameEnding(PgnEndGameToken ending) throws InvalidGameEndingException {
         switch (ending) {
             case WHITE_WIN:
-                if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(BLACK, false)))) {
+                if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(BLACK)))) {
                     throw new InvalidGameEndingException(WHITE);
                 }
                 break;
             case BLACK_WIN:
-                if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(WHITE, false)))) {
+                if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(WHITE)))) {
                     throw new InvalidGameEndingException(BLACK);
                 }
                 break;
@@ -211,7 +211,7 @@ public class PgnParser {
     }
 
     private void validateCheck() throws InvalidCheckException {
-        if (!KingStatus.CHECK.equals(gameHandler.getKingStatus(otherSide, false))) {
+        if (!KingStatus.CHECK.equals(gameHandler.getKingStatus(otherSide))) {
             throw new InvalidCheckException("The other player king is not check!");
         } else {
             LOGGER.debug("{} is CHECK", otherSide);
@@ -219,7 +219,7 @@ public class PgnParser {
     }
 
     private void validateCheckMate() throws InvalidCheckMateException {
-        if (!KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(otherSide, false))) {
+        if (!KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(otherSide))) {
             throw new InvalidCheckMateException("The other player king is not checkmate!");
         } else {
             LOGGER.debug("{} is CHECKMATE", otherSide);

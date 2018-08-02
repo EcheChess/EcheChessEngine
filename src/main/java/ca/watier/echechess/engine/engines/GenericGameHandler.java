@@ -139,10 +139,11 @@ public class GenericGameHandler extends GameBoard {
             }
 
             movePieceTo(from, to, piecesFrom);
-            evaluatedCurrentKingStatus = getKingStatus(playerSide, true);
+            evaluatedCurrentKingStatus = getKingStatus(playerSide);
 
             if (KingStatus.isCheckOrCheckMate(evaluatedCurrentKingStatus)) { //Cannot move, revert
                 handleCheckOrCheckMateMove(from, to, piecesFrom, piecesTo, isEatingPiece);
+                evaluatedCurrentKingStatus = KING_HOLDER.getKingStatusBySide(playerSide);
             } else {
                 changeAllowedMoveSide();
 
@@ -157,7 +158,7 @@ public class GenericGameHandler extends GameBoard {
             handleEnPassantWhenMove(from, to, playerSide, otherPlayerSide, piecesFrom);
         }
 
-        KingStatus evaluatedOtherKingStatusAfterMove = getKingStatus(otherPlayerSide, true);
+        KingStatus evaluatedOtherKingStatusAfterMove = getKingStatus(otherPlayerSide);
         moveHistory.setCurrentKingStatus(evaluatedCurrentKingStatus);
         moveHistory.setOtherKingStatus(evaluatedOtherKingStatusAfterMove);
 
@@ -239,10 +240,9 @@ public class GenericGameHandler extends GameBoard {
      * 3) If not, the king is checkmate.
      *
      * @param playerSide
-     * @param enableCheckForStalemate - Prevent an infinite loop when evaluating
      * @return
      */
-    public KingStatus getKingStatus(Side playerSide, boolean enableCheckForStalemate) {
+    public KingStatus getKingStatus(Side playerSide) {
         if (playerSide == null) {
             return null;
         }
@@ -260,7 +260,7 @@ public class GenericGameHandler extends GameBoard {
 
         if (!piecesThatCanHitOriginalPosition.isEmpty()) { //One or more piece can hit the king
             kingStatus = getKingStatusWhenPiecesCanHitKing(playerSide, kingPosition, piecesThatCanHitOriginalPosition, piecesThatCanHitOriginalPosition);
-        } else if (getPositionKingCanMove(playerSide).isEmpty() && enableCheckForStalemate) { //Check if not a stalemate
+        } else if (getPositionKingCanMove(playerSide).isEmpty()) { //Check if not a stalemate
             kingStatus = isStalemate(playerSide, kingPiece, kingPosition) ? STALEMATE : kingStatus;
         }
 

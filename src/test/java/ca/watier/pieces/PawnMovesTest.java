@@ -56,7 +56,7 @@ public class PawnMovesTest extends EngineGameTest {
     @Test
     public void check_with_pawns_front_move_two_position_Test() {
         context.setPieces("B7:B_PAWN;B8:B_KING;B5:W_KING");
-        Assert.assertEquals(KingStatus.OK, context.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.OK, context.getKingStatus(BLACK));
     }
 
 
@@ -66,7 +66,7 @@ public class PawnMovesTest extends EngineGameTest {
     @Test
     public void check_with_pawns_front_move_one_position_Test() {
         context.setPieces("B7:B_PAWN;B8:B_KING;B6:W_KING");
-        Assert.assertEquals(KingStatus.OK, context.getKingStatus(BLACK, true));
+        Assert.assertEquals(KingStatus.OK, context.getKingStatus(BLACK));
     }
 
 
