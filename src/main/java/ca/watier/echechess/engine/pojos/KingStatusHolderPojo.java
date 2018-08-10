@@ -3,7 +3,11 @@ package ca.watier.echechess.engine.pojos;
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
 
-public class KingStatusHolderPojo {
+import java.io.Serializable;
+
+public class KingStatusHolderPojo implements Serializable {
+    private static final long serialVersionUID = -4106042665849861588L;
+
     private KingStatus whiteKingStatus;
     private KingStatus blackKingStatus;
 
