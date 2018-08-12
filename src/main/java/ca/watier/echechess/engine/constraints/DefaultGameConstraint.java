@@ -17,12 +17,12 @@
 package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
-import ca.watier.echechess.engine.constraints.*;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.GameConstraint;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
 
+import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -32,7 +32,9 @@ import static ca.watier.echechess.common.enums.Pieces.*;
  * Created by yannick on 4/26/2017.
  */
 
-public class DefaultGameConstraint implements GameConstraint {
+public class DefaultGameConstraint implements GameConstraint, Serializable {
+
+    private static final long serialVersionUID = -7763545818654487544L;
 
     private static final Map<Pieces, MoveConstraint> MOVE_CONSTRAINT_MAP = new EnumMap<>(Pieces.class);
     private static final MoveConstraint KING = new KingMoveConstraint();
@@ -58,23 +60,6 @@ public class DefaultGameConstraint implements GameConstraint {
     }
 
     @Override
-    public boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide, GenericGameHandler gameHandler, MoveMode moveMode) {
-        if (from == null || to == null || playerSide == null) {
-            return false;
-        }
-
-        Pieces fromPiece = gameHandler.getPiece(from);
-
-        if (Side.OBSERVER.equals(playerSide) || !fromPiece.getSide().equals(playerSide)) {
-            return false;
-        }
-
-        MoveConstraint moveConstraint = MOVE_CONSTRAINT_MAP.get(fromPiece);
-        return moveConstraint.isMoveValid(from, to, gameHandler, moveMode);
-    }
-
-
-    @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
         if (from == null || to == null || gameHandler == null) {
             return MoveType.MOVE_NOT_ALLOWED;
@@ -94,5 +79,21 @@ public class DefaultGameConstraint implements GameConstraint {
         }
 
         return value;
+    }
+
+    @Override
+    public boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide, GenericGameHandler gameHandler, MoveMode moveMode) {
+        if (from == null || to == null || playerSide == null) {
+            return false;
+        }
+
+        Pieces fromPiece = gameHandler.getPiece(from);
+
+        if (Side.OBSERVER.equals(playerSide) || !fromPiece.getSide().equals(playerSide)) {
+            return false;
+        }
+
+        MoveConstraint moveConstraint = MOVE_CONSTRAINT_MAP.get(fromPiece);
+        return moveConstraint.isMoveValid(from, to, gameHandler, moveMode);
     }
 }
