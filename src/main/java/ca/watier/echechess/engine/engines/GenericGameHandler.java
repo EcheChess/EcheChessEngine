@@ -74,7 +74,6 @@ public class GenericGameHandler extends GameBoard {
         this.GAME_CONSTRAINTS = GameConstraintFactory.getDefaultGameConstraint();
     }
 
-
     /**
      * Move a piece to a selected position
      *

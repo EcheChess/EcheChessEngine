@@ -38,9 +38,9 @@ public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHand
     private void addBothPlayerToGameAndSetUUID() {
         UUID uuid = UUID.randomUUID();
         setUuid(uuid.toString());
-        playerBlack = new Player();
+        playerBlack = new Player(UUID.randomUUID().toString());
         playerBlack.addJoinedGame(uuid);
-        playerWhite = new Player();
+        playerWhite = new Player(UUID.randomUUID().toString());
         playerWhite.addJoinedGame(uuid);
     }
 
