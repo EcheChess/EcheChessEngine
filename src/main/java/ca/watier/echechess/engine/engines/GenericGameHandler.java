@@ -701,7 +701,7 @@ public class GenericGameHandler extends GameBoard {
     }
 
     private void removePlayerFromWhite(Player player) {
-        if (playerWhite == player) {
+        if (player != null && player.equals(playerWhite)) {
             playerWhite = null;
         }
     }
@@ -739,9 +739,13 @@ public class GenericGameHandler extends GameBoard {
     public final Side getPlayerSide(Player player) {
         Side side = null;
 
-        if (playerWhite == player) {
+        if (player == null) {
+            return null;
+        }
+
+        if (player.equals(playerWhite)) {
             side = WHITE;
-        } else if (playerBlack == player) {
+        } else if (player.equals(playerBlack)) {
             side = BLACK;
         } else if (observerList.contains(player)) {
             side = Side.OBSERVER;
@@ -759,7 +763,11 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public final boolean hasPlayer(Player player) {
-        return observerList.contains(player) || playerBlack == player || playerWhite == player;
+        if (player == null) {
+            return false;
+        }
+
+        return observerList.contains(player) || player.equals(playerBlack) || player.equals(playerWhite);
     }
 
     public Player getPlayerWhite() {
@@ -823,5 +831,4 @@ public class GenericGameHandler extends GameBoard {
                 KingStatus.CHECKMATE.equals(KING_HOLDER.getKingStatusBySide(WHITE)) ||
                 isGameDraw();
     }
-
 }
