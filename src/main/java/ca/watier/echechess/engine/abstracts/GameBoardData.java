@@ -291,6 +291,11 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         cloned.isPawnUsedSpecialMoveMap = new EnumMap<>(isPawnUsedSpecialMoveMap);
         cloned.turnNumberPieceMap = new EnumMap<>(turnNumberPieceMap);
         cloned.pawnPromotionMap = ArrayListMultimap.create(pawnPromotionMap);
+        cloned.totalMove = this.totalMove;
+        cloned.blackTurnNumber = this.blackTurnNumber;
+        cloned.whiteTurnNumber = this.whiteTurnNumber;
+        cloned.isGameDraw = this.isGameDraw;
+        cloned.isGamePaused = this.isGamePaused;
 
         return cloned;
     }
