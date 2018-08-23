@@ -22,9 +22,9 @@ import ca.watier.echechess.common.pojos.PieceDataSection;
 import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
 import ca.watier.echechess.common.utils.MultiArrayMap;
 import ca.watier.echechess.common.utils.Pair;
+import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
-import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class PgnParser {
     }
 
     private static String getGame(String rawCurrentGame) {
-        return rawCurrentGame.substring(2, rawCurrentGame.length()).replace("\n", " ");
+        return rawCurrentGame.substring(2).replace("\n", " ");
     }
 
     private void resetSide() {

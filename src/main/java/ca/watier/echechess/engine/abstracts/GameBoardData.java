@@ -1,23 +1,24 @@
 package ca.watier.echechess.engine.abstracts;
 
 import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.utils.Pair;
+import ca.watier.echechess.engine.pojos.KingStatusHolderPojo;
 import ca.watier.echechess.engine.utils.GameUtils;
 import com.google.common.collect.ArrayListMultimap;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static ca.watier.echechess.common.enums.Side.WHITE;
 
 public abstract class GameBoardData implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -5242416504518941779L;
-
     //The default position of the board
     private final Map<CasePosition, Pieces> DEFAULT_POSITIONS;
     //The pieces position on the board
@@ -34,8 +35,13 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     private int blackTurnNumber;
     private int whiteTurnNumber;
     private int totalMove = 0;
+    private short blackPlayerPoint;
+    private short whitePlayerPoint;
     private boolean isGameDraw = false;
     private boolean isGamePaused = false;
+    private List<MoveHistory> moveHistoryList;
+    private KingStatusHolderPojo kingHolder;
+    private Side currentAllowedMoveSide;
 
     public GameBoardData() {
         pawnPromotionMap = ArrayListMultimap.create();
@@ -44,6 +50,11 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
         isPawnUsedSpecialMoveMap = GameUtils.initPawnMap(positionPiecesMap);
         turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);
+        kingHolder = new KingStatusHolderPojo();
+        moveHistoryList = new ArrayList<>();
+        blackPlayerPoint = 0;
+        whitePlayerPoint = 0;
+        currentAllowedMoveSide = WHITE;
     }
 
     protected List<Pair<CasePosition, CasePosition>> getPawnPromotionBySide(Side playerSide) {
@@ -218,6 +229,10 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         totalMove++;
     }
 
+    public void addHistory(MoveHistory move) {
+        moveHistoryList.add(move);
+    }
+
     protected void setPiecesGameState(Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap,
                                       Map<CasePosition, Integer> turnNumberPieceMap,
                                       Map<CasePosition, Boolean> isPiecesMovedMap) {
@@ -271,6 +286,10 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         isGamePaused = gamePaused;
     }
 
+    public List<MoveHistory> getMoveHistory() {
+        return Collections.unmodifiableList(moveHistoryList);
+    }
+
     public boolean isGameDraw() {
         return isGameDraw;
     }
@@ -281,6 +300,14 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         this.isPawnUsedSpecialMoveMap = gameBoardData.isPawnUsedSpecialMoveMap;
         this.turnNumberPieceMap = gameBoardData.turnNumberPieceMap;
         this.pawnPromotionMap = gameBoardData.pawnPromotionMap;
+    }
+
+    protected void setKingStatusBySide(KingStatus kingStatus, Side side) {
+        kingHolder.setKingStatusBySide(kingStatus, side);
+    }
+
+    public KingStatus getEvaluatedKingStatusBySide(Side side) {
+        return kingHolder.getKingStatusBySide(side);
     }
 
     @Override
@@ -296,7 +323,36 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         cloned.whiteTurnNumber = this.whiteTurnNumber;
         cloned.isGameDraw = this.isGameDraw;
         cloned.isGamePaused = this.isGamePaused;
+        cloned.kingHolder = this.kingHolder;
+        cloned.moveHistoryList = new ArrayList<>(moveHistoryList);
+        cloned.blackPlayerPoint = blackPlayerPoint;
+        cloned.whitePlayerPoint = whitePlayerPoint;
+        cloned.currentAllowedMoveSide = currentAllowedMoveSide;
 
         return cloned;
+    }
+
+    protected final void changeAllowedMoveSide() {
+        currentAllowedMoveSide = Side.getOtherPlayerSide(currentAllowedMoveSide);
+    }
+
+    public Side getCurrentAllowedMoveSide() {
+        return currentAllowedMoveSide;
+    }
+
+    protected void addBlackPlayerPoint(byte point) {
+        blackPlayerPoint += point;
+    }
+
+    protected void addWhitePlayerPoint(byte point) {
+        whitePlayerPoint += point;
+    }
+
+    public short getBlackPlayerPoint() {
+        return blackPlayerPoint;
+    }
+
+    public short getWhitePlayerPoint() {
+        return whitePlayerPoint;
     }
 }

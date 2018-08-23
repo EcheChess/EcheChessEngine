@@ -30,6 +30,7 @@ import java.util.Map;
  */
 public class CustomPieceWithStandardRulesHandler extends GenericGameHandler {
     public static final String THE_NUMBER_OF_PARAMETER_IS_INCORRECT = "The number of parameter is incorrect !";
+    private static final long serialVersionUID = -9161505401277359093L;
 
     public CustomPieceWithStandardRulesHandler(DefaultGameConstraint defaultGameConstraint) {
         super(defaultGameConstraint);

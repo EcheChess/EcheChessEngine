@@ -154,6 +154,27 @@ public class PawnMovesTest extends EngineGameTest {
     }
 
     @Test
+    public void pawnHopAndNormalWhiteSideBlackKingCheckMate1() {
+        //FEN = 8/8/1ppp4/1pkp4/1p6/1P2P3/3P4/4K3 w KQkq -
+        context.setPieces("B6:B_PAWN;C6:B_PAWN;D6:B_PAWN;B5:B_PAWN;D5:B_PAWN;B4:B_PAWN;C5:B_KING;B3:W_PAWN;E3:W_PAWN;D2:W_PAWN;E1:W_KING");
+        assertThat(context.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.OK);
+        context.movePiece(D2, D4, WHITE);
+        assertThat(context.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.CHECKMATE);
+    }
+
+    @Test
+    public void pawnHopAndCheck_enPassantAndOk() {
+        //FEN = 8/8/4R3/kp6/p1p4R/8/1P6/RR5K w KQkq -
+        context.setPieces("E6:W_ROOK;H4:W_ROOK;A1:W_ROOK;B1:W_ROOK;H1:W_KING;B2:W_PAWN;C4:B_PAWN;A4:B_PAWN;B5:B_PAWN;A5:B_KING");
+        assertThat(context.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.OK);
+        context.movePiece(B2, B4, WHITE);
+
+        //Checked because of the pawn, can be killed with the en passant move (A4 & C4)
+        assertThat(context.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.CHECK);
+    }
+
+
+    @Test
     public void enPassantBlackSide() {
         context.movePiece(H2, H4, WHITE);
         context.movePiece(H4, H5, WHITE);

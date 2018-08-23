@@ -120,10 +120,27 @@ public class CustomPieceWithStandardRulesHandlerTest extends EngineGameTest {
     @Test
     public void getKingStatusCheckmateWithEnPassant() {
         customPieceWithStandardRulesHandler.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
+
+        //k7/5p2/4r3/4r1PP/4rPKP/4rPPP/4rrrr/8 w - -
         customPieceWithStandardRulesHandler.setPieces(
-                "A8:B_KING;G4:W_KING;" +
-                        "F3:W_PAWN;G3:W_PAWN;H3:W_PAWN;F4:W_PAWN;H4:W_PAWN;G5:W_PAWN;H5:W_PAWN;F7:B_PAWN;" +
-                        "E6:B_ROOK;E5:B_ROOK;E4:B_ROOK;E3:B_ROOK;E2:B_ROOK;F2:B_ROOK;G2:B_ROOK;H2:B_ROOK;"
+                "A8:B_KING;" +
+                        "G4:W_KING;" +
+                        "F3:W_PAWN;" +
+                        "G3:W_PAWN;" +
+                        "H3:W_PAWN;" +
+                        "F4:W_PAWN;" +
+                        "H4:W_PAWN;" +
+                        "G5:W_PAWN;" +
+                        "H5:W_PAWN;" +
+                        "F7:B_PAWN;" +
+                        "E6:B_ROOK;" +
+                        "E5:B_ROOK;" +
+                        "E4:B_ROOK;" +
+                        "E3:B_ROOK;" +
+                        "E2:B_ROOK;" +
+                        "F2:B_ROOK;" +
+                        "G2:B_ROOK;" +
+                        "H2:B_ROOK;"
         );
 
         assertThat(customPieceWithStandardRulesHandler.getKingStatus(WHITE)).isEqualByComparingTo(KingStatus.OK);

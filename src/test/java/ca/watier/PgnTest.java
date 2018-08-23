@@ -28,6 +28,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import static org.junit.Assert.fail;
+
 public class PgnTest extends EngineGameTest {
 
     private static String gamesAsFile;
@@ -46,9 +48,10 @@ public class PgnTest extends EngineGameTest {
         PgnParser pgnParser = new PgnParser(new DefaultGameConstraint());
         try {
             pgnParser.parseSingleGameWithoutHeader(
-                    "1. d4 c5 2. d5 e6 3. e4 Bd6 4. dxe6 dxe6 5. Bb5+ Nc6 6. Nf3 Qa5+ 7. Nc3 Ke7 8. O-O h5 9. e5 Bc7 10. Bxc6 bxc6 11. Bd2 Qb6 12. Na4 Qa6 13. Nxc5 Qb5 14. Nb3 f6 15. exf6+ Nxf6 16. a3 Ba6 17. Bb4+ Kf7 18. Ng5+ Qxg5 19. Re1 Rad8 20. Qf3 h4 21. Qxc6 Bxh2+ 22. Kh1 Bc8 23. Rad1 h3 24. Rxd8 Rxd8 25. Kxh2 Ng4+ 26. Kg1 h2+ 27. Kf1 h1=Q+ 28. Ke2 Qe5+ 29. Kf3 Qhxe1 0-1");
+                    "1. e4 e5 2. d3 Nf6 3. Be2 c6 4. Bd2 Be7 5. Nf3 d6 6. Nc3 h6 7. h4 Nbd7 8. O-O Ng4 9. g3 Nf8 10. Nxe5 Nxe5 11. d4 Ned7 12. d5 Qc7 13. h5 Nf6 14. a4 a6 15. b3 N8d7 16. dxc6 bxc6 17. g4 Nh7 18. Be1 Ne5 19. f4 Nd7 20. e5 Bb7 21. exd6 Qb6+ 22. Kh2 Bf6 23. g5 hxg5 24. fxg5 Be5+ 25. Kh3 Nxg5+ 26. Kh4 f6 27. Ne4 Nxe4 28. Kg4 Bc8 29. Bf3 Ndc5+ 30. Kh4 g5# 0-1");
         } catch (ChessException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -60,6 +63,7 @@ public class PgnTest extends EngineGameTest {
             Assertions.assertThat(pgnParser.parseMultipleGameWithHeader(gamesAsFile)).isNotEmpty();
         } catch (ChessException e) {
             e.printStackTrace();
+            fail();
         }
     }
 }

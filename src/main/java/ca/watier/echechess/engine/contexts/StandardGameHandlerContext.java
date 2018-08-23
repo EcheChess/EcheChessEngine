@@ -19,8 +19,8 @@ package ca.watier.echechess.engine.contexts;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.sessions.Player;
-import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
 import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
+import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
 
 import java.util.Map;
 import java.util.UUID;
@@ -29,6 +29,8 @@ import java.util.UUID;
  * Created by yannick on 5/20/2017.
  */
 public class StandardGameHandlerContext extends CustomPieceWithStandardRulesHandler {
+
+    private static final long serialVersionUID = 7740850538837362456L;
 
     public StandardGameHandlerContext(DefaultGameConstraint defaultGameConstraint) {
         super(defaultGameConstraint);

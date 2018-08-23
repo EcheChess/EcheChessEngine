@@ -116,7 +116,7 @@ public class CheckAndCheckMateTest {
         StandardGameHandlerContext context = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
         context.addSpecialRule(NO_PLAYER_TURN);
 
-        String[] patterns = new String[]{
+        String[] patterns = {
                 "D5:B_KING;C4:W_PAWN;E4:W_PAWN",
                 "D5:B_KING;B6:W_KNIGHT",
                 "D5:B_KING;B7:W_BISHOP",
@@ -142,7 +142,7 @@ public class CheckAndCheckMateTest {
         context.addSpecialRule(NO_PLAYER_TURN);
 
         //Thanks to www.serverchess.com/checkmate.htm and https://en.wikipedia.org/wiki/Checkmate_pattern for the patterns !
-        String[] patterns = new String[]{
+        String[] patterns = {
                 "H8:B_KING;G7:B_PAWN;E7:W_KNIGHT;H4:W_ROOK;G2:W_PAWN;G1:W_KING", //Anastasia's Mate
                 "H8:W_ROOK;G8:B_KING;G7:W_PAWN;F6:W_PAWN;F7:B_PAWN;B6:B_PAWN;G1:W_KING", //Anderssen's Mate
                 "H8:B_KING;H7:W_ROOK;F6:W_KNIGHT;G1:W_KING;A7:B_PAWN", //Arabian Mate

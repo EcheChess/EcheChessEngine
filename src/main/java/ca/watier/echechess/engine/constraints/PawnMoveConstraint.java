@@ -35,7 +35,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
             return false;
         }
 
-        CasePosition enemyPawnPosition = getEnPassantEnemyPawnPosition(to, Side.getOtherPlayerSide(currentSide));
+        CasePosition enemyPawnPosition = getEnemyPawnPositionFromEnPassant(to, Side.getOtherPlayerSide(currentSide));
 
         if (enemyPawnPosition == null) {
             return false;
@@ -44,12 +44,46 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         return isEnPassant(from, to, gameHandler, currentSide, enemyPawnPosition, gameHandler.getPiece(enemyPawnPosition));
     }
 
-    public static CasePosition getEnPassantEnemyPawnPosition(CasePosition to, Side otherSide) {
-        if (to == null || otherSide == null) {
+    /**
+     * Get the enemy pawn, from the position of the "en passant" move
+     *
+     * @param enPassantMovePosition - The "en passant" position (not the pawn!)
+     * @param otherSide
+     * @return
+     */
+    public static CasePosition getEnemyPawnPositionFromEnPassant(CasePosition enPassantMovePosition, Side otherSide) {
+        if (enPassantMovePosition == null || otherSide == null) {
             return null;
         }
 
-        return MathUtils.getNearestPositionFromDirection(to, otherSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH);
+        return MathUtils.getNearestPositionFromDirection(enPassantMovePosition, otherSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH);
+    }
+
+    /**
+     * Get the "en passant" move, from the pawn position
+     * @param pawnPosition
+     * @param otherSide
+     * @return
+     */
+    public static CasePosition getEnPassantPositionFromEnemyPawn(CasePosition pawnPosition, Side otherSide) {
+        if (pawnPosition == null || otherSide == null) {
+            return null;
+        }
+
+        Direction direction;
+
+        switch (Ranks.getRank(pawnPosition, otherSide)) {
+            case TWO: //Not moved
+                direction = otherSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH;
+                break;
+            case FOUR: //Pawn hop
+                direction = otherSide.equals(Side.BLACK) ? Direction.NORTH : Direction.SOUTH;
+                break;
+            default:
+                return null; //Not Valid
+        }
+
+        return MathUtils.getNearestPositionFromDirection(pawnPosition, direction);
     }
 
     private static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide, CasePosition enemyPawnPosition, Pieces enemyPawn) {
@@ -166,7 +200,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
             Side currentSide = pieceFrom.getSide();
             Side otherSide = Side.getOtherPlayerSide(currentSide);
 
-            CasePosition enemyPawnPosition = getEnPassantEnemyPawnPosition(to, otherSide);
+            CasePosition enemyPawnPosition = getEnemyPawnPositionFromEnPassant(to, otherSide);
 
             if (enemyPawnPosition != null) {
                 Pieces enemyPawn = gameHandler.getPiece(enemyPawnPosition);
