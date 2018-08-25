@@ -48,7 +48,14 @@ public class PgnTest extends EngineGameTest {
         PgnParser pgnParser = new PgnParser(new DefaultGameConstraint());
         try {
             pgnParser.parseSingleGameWithoutHeader(
-                    "1. e4 e5 2. d3 Nf6 3. Be2 c6 4. Bd2 Be7 5. Nf3 d6 6. Nc3 h6 7. h4 Nbd7 8. O-O Ng4 9. g3 Nf8 10. Nxe5 Nxe5 11. d4 Ned7 12. d5 Qc7 13. h5 Nf6 14. a4 a6 15. b3 N8d7 16. dxc6 bxc6 17. g4 Nh7 18. Be1 Ne5 19. f4 Nd7 20. e5 Bb7 21. exd6 Qb6+ 22. Kh2 Bf6 23. g5 hxg5 24. fxg5 Be5+ 25. Kh3 Nxg5+ 26. Kh4 f6 27. Ne4 Nxe4 28. Kg4 Bc8 29. Bf3 Ndc5+ 30. Kh4 g5# 0-1");
+                    "1. e4 e5 2. Nf3 d6 3. Bc4 Bg4 4. h3 Bxf3 5. Qxf3 Nf6 6. d3 Nc6 7. Be3 Be7\n" +
+                            "8. O-O O-O 9. Nc3 a6 10. Nd5 Nxd5 11. exd5 Na5 12. Bb3 Nxb3 13. axb3 b5\n" +
+                            "14. c4 Bg5 15. Bxg5 Qxg5 16. Qe3 Qxe3 17. fxe3 bxc4 18. bxc4 a5 19. Ra2 a4\n" +
+                            "20. Rfa1 Rfb8 21. Rb1 h6 22. Kf2 a3 23. b3 Rb4 24. Kf3 g5 25. g4 f6 26. d4 Rab8\n" +
+                            "27. Rxa3 Kf7 28. dxe5 fxe5 29. Ke4 Kg6 30. Kd3 Rf8 31. Ra7 Rfb8 32. Kc3 R4b7\n" +
+                            "33. Rxb7 Rxb7 34. b4 h5 35. b5 hxg4 36. hxg4 Kf6 37. Rf1+ Kg6 38. Rf8 Kg7\n" +
+                            "39. Rc8 Kf6 40. Kb4 e4 41. Re8 c5+ 42. dxc6 Re7 43. Rxe7 Kxe7 44. b6 Ke6\n" +
+                            "45. c7 Ke5 46. c8=Q d5 47. cxd5 Kxd5 48. Qf5+ 1-0");
         } catch (ChessException e) {
             e.printStackTrace();
             fail();
@@ -56,7 +63,7 @@ public class PgnTest extends EngineGameTest {
     }
 
     @Test
-    public void pgnTest1() {
+    public void pgnTestFromFile() {
         PgnParser pgnParser = new PgnParser(CONSTRAINT_SERVICE);
 
         try {

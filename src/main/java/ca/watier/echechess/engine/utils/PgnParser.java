@@ -20,7 +20,6 @@ import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.pojos.PieceDataSection;
 import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
-import ca.watier.echechess.common.utils.MultiArrayMap;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
@@ -30,8 +29,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
@@ -244,12 +245,11 @@ public class PgnParser {
         }
 
         PgnPieceFound pgnPieceFound = isPawnPromotion(action, pieceMovesFromLetter);
-        List<Pieces> validPiecesFromAction = pgnPieceFound.getPieces();
         List<Pair<CasePosition, Pieces>> piecesThatCanHitPosition = gameHandler.getAllPiecesThatCanMoveTo(to, currentSide);
-        MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget = getSimilarPiecesThatCanHitSameTarget(piecesThatCanHitPosition, validPiecesFromAction, to, gameHandler);
+        List<CasePosition> similarPieceThatHitTarget = getSimilarPiecesPositionThatCanHitSameTarget(piecesThatCanHitPosition, pgnPieceFound.getPieceBySide(currentSide));
 
         CasePosition from = (!similarPieceThatHitTarget.isEmpty() ?
-                getPositionWhenMultipleTargetCanHit(action, casePositions, similarPieceThatHitTarget) :
+                getFromPositionWhenMultipleTargetCanHit(action, casePositions, similarPieceThatHitTarget) :
                 getPositionWhenOneTargetCanHit(piecesThatCanHitPosition, pgnPieceFound));
 
         LOGGER.debug("MOVE {} to {} ({}) | action -> {}", from, to, currentSide, action);
@@ -315,49 +315,29 @@ public class PgnParser {
         return pieceMovesFromLetter.contains(PgnMoveToken.PAWN_PROMOTION) ? PgnPieceFound.PAWN : PgnPieceFound.getPieceFromAction(action);
     }
 
-    private MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> getSimilarPiecesThatCanHitSameTarget(List<Pair<CasePosition, Pieces>> piecesThatCanHitPosition, List<Pieces> validPiecesFromAction, CasePosition to, GenericGameHandler gameHandler) {
-        MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget = new MultiArrayMap<>();
+    /**
+     * Return a list of position when there's more than one target, with the same type, that can hit the same position.
+     *
+     * @param piecesThatCanHitPosition
+     * @param wantedType
+     * @return
+     */
+    private List<CasePosition> getSimilarPiecesPositionThatCanHitSameTarget(List<Pair<CasePosition, Pieces>> piecesThatCanHitPosition, Pieces wantedType) {
 
-        //Group all similar pieces that can hit the target
-        for (int i = 0; i < piecesThatCanHitPosition.size(); i++) {
-            Pair<CasePosition, Pieces> firstLayer = piecesThatCanHitPosition.get(i);
-            CasePosition firstPosition = firstLayer.getFirstValue();
-            Pieces firstPiece = firstLayer.getSecondValue();
-
-            if (!validPiecesFromAction.contains(firstPiece) || gameHandler.isKingCheckAfterMove(firstPosition, to, firstPiece.getSide())) {
-                continue;
-            }
-
-            boolean isOtherFound = false;
-
-            for (int j = (i + 1); j < piecesThatCanHitPosition.size(); j++) {
-                Pair<CasePosition, Pieces> secondLayer = piecesThatCanHitPosition.get(j);
-                CasePosition secondPosition = secondLayer.getFirstValue();
-                Pieces secondPiece = secondLayer.getSecondValue();
-
-                if (firstPiece.equals(secondPiece) && !gameHandler.isKingCheckAfterMove(secondPosition, to, secondPiece.getSide())) {
-                    similarPieceThatHitTarget.put(secondPiece, new Pair<>(secondPosition, secondPiece));
-                    isOtherFound = true;
-                }
-            }
-
-            if (isOtherFound) {
-                similarPieceThatHitTarget.put(firstPiece, new Pair<>(firstPosition, firstPiece));
-            }
+        if (piecesThatCanHitPosition == null || piecesThatCanHitPosition.isEmpty() || piecesThatCanHitPosition.size() < 2 || wantedType == null) {
+            return new ArrayList<>();
         }
 
+        Predicate<Pair<CasePosition, Pieces>> similarPiecePredicate = p -> wantedType.equals(p.getSecondValue());
 
-        return similarPieceThatHitTarget;
+        List<CasePosition> similarPieces = piecesThatCanHitPosition.stream().filter(similarPiecePredicate).map(Pair::getFirstValue).collect(Collectors.toList());
+
+        return similarPieces.size() > 1 ? similarPieces : new ArrayList<>();
     }
 
-    private CasePosition getPositionWhenMultipleTargetCanHit(String action, List<String> casePositions, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) throws ChessException {
+    private CasePosition getFromPositionWhenMultipleTargetCanHit(String action, List<String> casePositions, List<CasePosition> similarPieceThatHitTarget) throws ChessException {
         CasePosition value;
         int length = casePositions.size();
-        Byte row = null;
-        Character column = null;
-        boolean isRow;
-        boolean isColumn;
-        PgnPieceFound pieceFromAction;
 
         if (length == 2) {
             return CasePosition.valueOf(casePositions.get(0).toUpperCase()); //Contain from (0) and to (1) positions
@@ -365,58 +345,23 @@ public class PgnParser {
             throw new IllegalStateException("Invalid type of positioning");
         }
 
-        //Actions
         if (action.contains(PgnMoveToken.CAPTURE.getChars().get(0)) ||
                 action.contains(PgnMoveToken.PAWN_PROMOTION.getChars().get(0))) {
 
-            //The position from is in the first action
-            PieceDataSection parsedActions = PieceDataSection.getParsedActions(action).stream().findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Unable to find an action!"));
-
-            String before = parsedActions.getBefore();
-
-            pieceFromAction = PgnPieceFound.getPieceFromAction(before);
-
-            if (!PgnPieceFound.PAWN.equals(pieceFromAction)) {
-                before = before.substring(1); //Remove the piece, if not a pawn
-            }
+            String before = getParsedBefore(action);
 
             switch (before.length()) {
                 case 1: //Row or column
-                    char tmp = before.charAt(0);
-
-                    if (Character.isLetter(tmp)) {
-                        column = tmp;
-                    } else if (Character.isDigit(tmp)) {
-                        row = (byte) Character.getNumericValue(tmp);
-                    } else {
-                        throw new IllegalStateException("Invalid type of Character!");
-                    }
-
-                    pieceFromAction = PgnPieceFound.getPieceFromAction(action.substring(0, 1));
-
-                    value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column, pieceFromAction);
+                    value = getPositionWhenRowOrCol(similarPieceThatHitTarget, before);
                     break;
                 case 2: //Full position
-                    value = getCasePositionWhenFullCoordinate(CasePosition.valueOf(before.toUpperCase()), similarPieceThatHitTarget);
+                    value = getPositionWhenFullCoordinate(CasePosition.valueOf(before.toUpperCase()), similarPieceThatHitTarget);
                     break;
                 default:
                     throw new IllegalStateException("Invalid number of characters!");
             }
         } else { //Normal move
-            PieceSingleMoveSection parsedActions = PieceSingleMoveSection.getParsedActions(action);
-            row = parsedActions.getRow();
-            column = parsedActions.getColumn();
-            isRow = row != null && column == null;
-            isColumn = row == null && column != null;
-
-            if (parsedActions.isFromPositionFullCoordinate()) { //Full
-                value = getCasePositionWhenFullCoordinate(parsedActions.getFromFullCoordinate(), similarPieceThatHitTarget);
-            } else if (isRow || isColumn) { //Row
-                value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column, parsedActions.getPgnPieceFound());
-            } else {
-                throw new InvalidMoveException("The position is now known!");
-            }
+            value = getPositionWhenNormalMove(action, similarPieceThatHitTarget);
         }
 
         return value;
@@ -444,33 +389,75 @@ public class PgnParser {
         return value;
     }
 
-    private CasePosition getCasePositionWhenRowOrCol(MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget, Byte row, Character column, PgnPieceFound pgnPieceFound) {
-        CasePosition value = null;
-        boolean isRow = row != null && column == null;
-        boolean isColumn = row == null && column != null;
+    private String getParsedBefore(String action) {
+        //The position from is in the first action
+        PieceDataSection parsedActions = PieceDataSection.getParsedActions(action).stream().findFirst()
+                .orElseThrow(() -> new IllegalStateException("Unable to find an action!"));
 
-        mainLoop:
-        for (Map.Entry<Pieces, List<Pair<CasePosition, Pieces>>> entry : similarPieceThatHitTarget.entrySet()) {
-            Pieces key = entry.getKey();
+        String before = parsedActions.getBefore();
+        PgnPieceFound pieceFromAction = PgnPieceFound.getPieceFromAction(before);
 
-            if (!pgnPieceFound.getPieces().contains(key)) {
-                continue;
-            }
+        //Remove the piece, if not a pawn
+        return !PgnPieceFound.PAWN.equals(pieceFromAction) ? before.substring(1) : before;
+    }
 
-            for (Pair<CasePosition, Pieces> casePositionPiecesPair : entry.getValue()) {
-                CasePosition firstValue = casePositionPiecesPair.getFirstValue();
+    private CasePosition getPositionWhenRowOrCol(List<CasePosition> similarPieceThatHitTarget, String before) {
+        CasePosition value;
+        Character column = null;
+        Byte row = null;
+        char tmp = before.charAt(0);
 
-                if ((isColumn && firstValue.isOnSameColumn(column)) || (isRow && firstValue.isOnSameRow(Character.forDigit(row, 10)))) {
-                    value = firstValue;
-                    break mainLoop;
-                }
-            }
+        if (Character.isLetter(tmp)) {
+            column = tmp;
+        } else if (Character.isDigit(tmp)) {
+            row = (byte) Character.getNumericValue(tmp);
+        } else {
+            throw new IllegalStateException("Invalid type of Character!");
+        }
+        value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column);
+        return value;
+    }
+
+    private CasePosition getPositionWhenFullCoordinate(CasePosition fromFullCoordinate, List<CasePosition> similarPieceThatHitTarget) {
+        throw new IllegalStateException("Not Implemented");
+    }
+
+    private CasePosition getPositionWhenNormalMove(String action, List<CasePosition> similarPieceThatHitTarget) throws InvalidMoveException {
+        boolean isRow;
+        boolean isColumn;
+        CasePosition value;
+        Character column;
+        Byte row = null;
+
+        PieceSingleMoveSection parsedActions = PieceSingleMoveSection.getParsedActions(action);
+        row = parsedActions.getRow();
+        column = parsedActions.getColumn();
+        isRow = row != null && column == null;
+        isColumn = row == null && column != null;
+
+        if (parsedActions.isFromPositionFullCoordinate()) { //Full
+            value = getPositionWhenFullCoordinate(parsedActions.getFromFullCoordinate(), similarPieceThatHitTarget);
+        } else if (isRow || isColumn) { //Row
+            value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column);
+        } else {
+            throw new InvalidMoveException("The position is now known!");
         }
         return value;
     }
 
-    private CasePosition getCasePositionWhenFullCoordinate(CasePosition fromFullCoordinate, MultiArrayMap<Pieces, Pair<CasePosition, Pieces>> similarPieceThatHitTarget) {
-        throw new IllegalStateException("Not Implemented");
+    private CasePosition getCasePositionWhenRowOrCol(List<CasePosition> similarPieceThatHitTarget, Byte row, Character column) {
+        CasePosition value = null;
+        boolean isRow = row != null && column == null;
+        boolean isColumn = row == null && column != null;
+
+        for (CasePosition position : similarPieceThatHitTarget) {
+            if ((isColumn && position.isOnSameColumn(column)) || (isRow && position.isOnSameRow(Character.forDigit(row, 10)))) {
+                value = position;
+                break;
+            }
+        }
+
+        return value;
     }
 
     public GenericGameHandler parseSingleGameWithoutHeader(String rawText) throws ChessException {

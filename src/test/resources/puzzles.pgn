@@ -1159,3 +1159,52 @@ Bb5 57. Be2 Bc6 58. Ba6 Rg1 59. b5 Bxg2 60. b6 Kg5 61. Bc8 Kf4
 14. Nxd6+ Qxd6 15. Bg5 bxc4 16. Bxc4 Bb7 17. O-O-O Na6 18. Bb3 Rc8
 19. Kb2 Nc7 20. Rhe1 Kf7 21. c4 e4 22. Qf4 Qxf4 23. Bxf4 Ne8 24. d6 Ke6
 25. c5+ Kf6 26. h4 Bc6 27. Bg5+ Ke5 28. f4# 1-0
+
+[Event "Rated Blitz game"]
+[Site "https://lichess.org/bqKORjXj"]
+[White "Javicho"].[Black "Cbonfim125"]
+[Result "1-0"].[UTCDate "2016.07.01"]
+[UTCTime "19:31:35"]
+[WhiteElo "1645"]
+[BlackElo "1385"]
+[WhiteRatingDiff "+4"]
+[BlackRatingDiff "-5"]
+[ECO "C41"]
+[Opening "Philidor Defense #3"]
+[TimeControl "300+0"]
+[Termination "Normal"]
+
+1. e4 e5 2. Nf3 d6 3. Bc4 Bg4 4. h3 Bxf3 5. Qxf3 Nf6 6. d3 Nc6 7. Be3 Be7
+8. O-O O-O 9. Nc3 a6 10. Nd5 Nxd5 11. exd5 Na5 12. Bb3 Nxb3 13. axb3 b5
+14. c4 Bg5 15. Bxg5 Qxg5 16. Qe3 Qxe3 17. fxe3 bxc4 18. bxc4 a5 19. Ra2 a4
+20. Rfa1 Rfb8 21. Rb1 h6 22. Kf2 a3 23. b3 Rb4 24. Kf3 g5 25. g4 f6 26. d4 Rab8
+27. Rxa3 Kf7 28. dxe5 fxe5 29. Ke4 Kg6 30. Kd3 Rf8 31. Ra7 Rfb8 32. Kc3 R4b7
+33. Rxb7 Rxb7 34. b4 h5 35. b5 hxg4 36. hxg4 Kf6 37. Rf1+ Kg6 38. Rf8 Kg7
+39. Rc8 Kf6 40. Kb4 e4 41. Re8 c5+ 42. dxc6 Re7 43. Rxe7 Kxe7 44. b6 Ke6
+45. c7 Ke5 46. c8=Q d5 47. cxd5 Kxd5 48. Qf5+ 1-0
+
+[Event "Rated Blitz game"]
+[Site "https://lichess.org/LXdNe5tE"]
+[White "sarah-92"]
+[Black "GustavoE"]
+[Result "0-1"]
+[UTCDate "2016.07.01"]
+[UTCTime "22:39:07"]
+[WhiteElo "1823"]
+[BlackElo "1847"]
+[WhiteRatingDiff "-10"]
+[BlackRatingDiff "+10"]
+[ECO "A00"]
+[Opening "Van't Kruijs Opening"]
+[TimeControl "180+0"]
+[Termination "Time forfeit"]
+
+1. e3 e5 2. Be2 d5 3. c3 Nf6 4. d4 exd4 5. cxd4 Bd6 6. Nc3 c6 7. Nf3 O-O
+8. h3 Re8 9. O-O Bf5 10. Nh4 Qd7 11. Nxf5 Qxf5 12. Bd3 Ne4 13. Nxe4 dxe4
+14. Be2 Nd7 15. a3 Nf6 16. b4 a6 17. Bb2 Nd5 18. Rc1 Rac8 19. Bg4 Qg5 20. Bxc8 Rxc8
+21. Qg4 Qxg4 22. hxg4 Nf6 23. f3 exf3 24. gxf3 h5 25. g5 Nd5 26. Kf2 h4 27. Ke2 Bg3
+28. e4 Re8 29. e5 Nf4+ 30. Ke3 Nd5+ 31. Ke4 f5+ 32. gxf6 gxf6 33. f4 fxe5 34. fxe5 Kg7
+35. Rc2 Kg6 36. Bc1 Rd8 37. Rf5 Ne7 38. Rg5+ Kf7 39. Bf4 Bf2 40. Rd2 Nd5 41. Rf5+ Ke6
+42. Bg5 Bxd4 43. Bxd8 Nc3+ 44. Kf4 Nd5+ 45. Kg5 Be3+ 46. Kg6 Bxd2 47. Bxh4 Ne7+
+48. Bxe7 Kxe7 49. Rh5 Bc1 50. Kf5 Bxa3 51. Rh7+ Kd8 52. Rxb7 Kc8 53. Rb6 Kc7 54. Rxa6 Bxb4
+55. e6 Kd6 56. Kf6 Bc3+ 57. Kf7 Ke5 0-1
