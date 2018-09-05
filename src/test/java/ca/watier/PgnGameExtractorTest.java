@@ -18,7 +18,7 @@ package ca.watier;
 
 import ca.watier.echechess.engine.exceptions.ChessException;
 import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
-import ca.watier.echechess.engine.utils.PgnParser;
+import ca.watier.echechess.engine.utils.PgnGameExtractor;
 import ca.watier.utils.EngineGameTest;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
@@ -30,13 +30,13 @@ import java.nio.charset.Charset;
 
 import static org.junit.Assert.fail;
 
-public class PgnTest extends EngineGameTest {
+public class PgnGameExtractorTest extends EngineGameTest {
 
     private static String gamesAsFile;
 
     static {
         try {
-            gamesAsFile = IOUtils.toString(PgnTest.class.getResourceAsStream("/puzzles.pgn"), Charset.forName("UTF-8"));
+            gamesAsFile = IOUtils.toString(PgnGameExtractorTest.class.getResourceAsStream("/puzzles.pgn"), Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -45,9 +45,9 @@ public class PgnTest extends EngineGameTest {
     @Test
     @Ignore("PgnTest.pgnManualTest - Not really unit tests, only used to test the stability of the engine by running games with a string")
     public void pgnManualTest() {
-        PgnParser pgnParser = new PgnParser(new DefaultGameConstraint());
+        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(new DefaultGameConstraint());
         try {
-            pgnParser.parseSingleGameWithoutHeader(
+            pgnGameExtractor.parseSingleGameWithoutHeader(
                     "1. e4 e5 2. Nf3 d6 3. Bc4 Bg4 4. h3 Bxf3 5. Qxf3 Nf6 6. d3 Nc6 7. Be3 Be7\n" +
                             "8. O-O O-O 9. Nc3 a6 10. Nd5 Nxd5 11. exd5 Na5 12. Bb3 Nxb3 13. axb3 b5\n" +
                             "14. c4 Bg5 15. Bxg5 Qxg5 16. Qe3 Qxe3 17. fxe3 bxc4 18. bxc4 a5 19. Ra2 a4\n" +
@@ -64,10 +64,10 @@ public class PgnTest extends EngineGameTest {
 
     @Test
     public void pgnTestFromFile() {
-        PgnParser pgnParser = new PgnParser(CONSTRAINT_SERVICE);
+        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(CONSTRAINT_SERVICE);
 
         try {
-            Assertions.assertThat(pgnParser.parseMultipleGameWithHeader(gamesAsFile)).isNotEmpty();
+            Assertions.assertThat(pgnGameExtractor.parseMultipleGameWithHeader(gamesAsFile)).isNotEmpty();
         } catch (ChessException e) {
             e.printStackTrace();
             fail();

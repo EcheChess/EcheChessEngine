@@ -19,7 +19,7 @@ package ca.watier.pieces;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
-import ca.watier.echechess.engine.game.CustomPieceWithStandardRulesHandler;
+import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,11 +44,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class KingMovesTest extends EngineGameTest {
 
 
-    private CustomPieceWithStandardRulesHandler gameHandler;
+    private SimpleCustomPositionGameHandler gameHandler;
 
     @Before
     public void setUp() {
-        gameHandler = new CustomPieceWithStandardRulesHandler(CONSTRAINT_SERVICE);
+        gameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
     }
 

@@ -202,6 +202,26 @@ public class GenericGameHandler extends GameBoard {
         CasePosition kingPosition = castlingPositionHelper.getKingPosition();
         CasePosition rookPosition = castlingPositionHelper.getRookPosition();
 
+        if (castlingPositionHelper.isQueenSide()) {
+            switch (playerSide) {
+                case BLACK:
+                    setBlackQueenCastlingAvailable(false);
+                    break;
+                case WHITE:
+                    setWhiteQueenCastlingAvailable(false);
+                    break;
+            }
+        } else {
+            switch (playerSide) {
+                case BLACK:
+                    setBlackKingCastlingAvailable(false);
+                    break;
+                case WHITE:
+                    setWhiteKingCastlingAvailable(false);
+                    break;
+            }
+        }
+
         movePieceTo(from, kingPosition, piecesFrom);
 
         if (isEatingPiece) {

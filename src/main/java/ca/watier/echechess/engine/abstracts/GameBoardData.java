@@ -34,11 +34,15 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     //Used to track the number of turn of each player
     private int blackTurnNumber;
     private int whiteTurnNumber;
-    private int totalMove = 0;
+    private int totalMove;
     private short blackPlayerPoint;
     private short whitePlayerPoint;
-    private boolean isGameDraw = false;
-    private boolean isGamePaused = false;
+    private boolean isGameDraw;
+    private boolean isGamePaused;
+    private boolean isWhiteQueenCastlingAvailable;
+    private boolean isWhiteKingCastlingAvailable;
+    private boolean isBlackQueenCastlingAvailable;
+    private boolean isBlackKingCastlingAvailable;
     private List<MoveHistory> moveHistoryList;
     private KingStatusHolderPojo kingHolder;
     private Side currentAllowedMoveSide;
@@ -55,6 +59,13 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         blackPlayerPoint = 0;
         whitePlayerPoint = 0;
         currentAllowedMoveSide = WHITE;
+        totalMove = 0;
+        isGameDraw = false;
+        isGamePaused = false;
+        isWhiteQueenCastlingAvailable = true;
+        isWhiteKingCastlingAvailable = true;
+        isBlackQueenCastlingAvailable = true;
+        isBlackKingCastlingAvailable = true;
     }
 
     protected List<Pair<CasePosition, CasePosition>> getPawnPromotionBySide(Side playerSide) {
@@ -313,21 +324,25 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     @Override
     protected GameBoardData clone() throws CloneNotSupportedException {
         GameBoardData cloned = (GameBoardData) super.clone();
-        cloned.positionPiecesMap = new EnumMap<>(positionPiecesMap);
-        cloned.isPiecesMovedMap = new EnumMap<>(isPiecesMovedMap);
-        cloned.isPawnUsedSpecialMoveMap = new EnumMap<>(isPawnUsedSpecialMoveMap);
-        cloned.turnNumberPieceMap = new EnumMap<>(turnNumberPieceMap);
-        cloned.pawnPromotionMap = ArrayListMultimap.create(pawnPromotionMap);
+        cloned.positionPiecesMap = new EnumMap<>(this.positionPiecesMap);
+        cloned.isPiecesMovedMap = new EnumMap<>(this.isPiecesMovedMap);
+        cloned.isPawnUsedSpecialMoveMap = new EnumMap<>(this.isPawnUsedSpecialMoveMap);
+        cloned.turnNumberPieceMap = new EnumMap<>(this.turnNumberPieceMap);
+        cloned.pawnPromotionMap = ArrayListMultimap.create(this.pawnPromotionMap);
         cloned.totalMove = this.totalMove;
         cloned.blackTurnNumber = this.blackTurnNumber;
         cloned.whiteTurnNumber = this.whiteTurnNumber;
         cloned.isGameDraw = this.isGameDraw;
         cloned.isGamePaused = this.isGamePaused;
         cloned.kingHolder = this.kingHolder;
-        cloned.moveHistoryList = new ArrayList<>(moveHistoryList);
-        cloned.blackPlayerPoint = blackPlayerPoint;
-        cloned.whitePlayerPoint = whitePlayerPoint;
-        cloned.currentAllowedMoveSide = currentAllowedMoveSide;
+        cloned.moveHistoryList = new ArrayList<>(this.moveHistoryList);
+        cloned.blackPlayerPoint = this.blackPlayerPoint;
+        cloned.whitePlayerPoint = this.whitePlayerPoint;
+        cloned.currentAllowedMoveSide = this.currentAllowedMoveSide;
+        cloned.isWhiteQueenCastlingAvailable = this.isWhiteQueenCastlingAvailable;
+        cloned.isWhiteKingCastlingAvailable = this.isWhiteKingCastlingAvailable;
+        cloned.isBlackQueenCastlingAvailable = this.isBlackQueenCastlingAvailable;
+        cloned.isBlackKingCastlingAvailable = this.isBlackKingCastlingAvailable;
 
         return cloned;
     }
@@ -338,6 +353,10 @@ public abstract class GameBoardData implements Cloneable, Serializable {
 
     public Side getCurrentAllowedMoveSide() {
         return currentAllowedMoveSide;
+    }
+
+    protected final void setCurrentAllowedMoveSide(Side side) {
+        this.currentAllowedMoveSide = side;
     }
 
     protected void addBlackPlayerPoint(byte point) {
@@ -354,5 +373,37 @@ public abstract class GameBoardData implements Cloneable, Serializable {
 
     public short getWhitePlayerPoint() {
         return whitePlayerPoint;
+    }
+
+    public final boolean isWhiteQueenCastlingAvailable() {
+        return isWhiteQueenCastlingAvailable;
+    }
+
+    protected final void setWhiteQueenCastlingAvailable(boolean whiteQueenCastlingAvailable) {
+        isWhiteQueenCastlingAvailable = whiteQueenCastlingAvailable;
+    }
+
+    public final boolean isWhiteKingCastlingAvailable() {
+        return isWhiteKingCastlingAvailable;
+    }
+
+    protected final void setWhiteKingCastlingAvailable(boolean whiteKingCastlingAvailable) {
+        isWhiteKingCastlingAvailable = whiteKingCastlingAvailable;
+    }
+
+    public final boolean isBlackQueenCastlingAvailable() {
+        return isBlackQueenCastlingAvailable;
+    }
+
+    protected final void setBlackQueenCastlingAvailable(boolean blackQueenCastlingAvailable) {
+        isBlackQueenCastlingAvailable = blackQueenCastlingAvailable;
+    }
+
+    public final boolean isBlackKingCastlingAvailable() {
+        return isBlackKingCastlingAvailable;
+    }
+
+    protected final void setBlackKingCastlingAvailable(boolean blackKingCastlingAvailable) {
+        isBlackKingCastlingAvailable = blackKingCastlingAvailable;
     }
 }

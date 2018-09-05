@@ -38,8 +38,8 @@ import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
 
 
-public class PgnParser {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PgnParser.class);
+public class PgnGameExtractor {
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PgnGameExtractor.class);
     private static final List<PgnMoveToken> PAWN_PROMOTION_WITH_CAPTURE_TOKENS = List.of(PgnMoveToken.PAWN_PROMOTION, PgnMoveToken.CAPTURE);
     private static final Pattern POSITION_PATTERN = Pattern.compile("[a-h][1-8]");
 
@@ -51,7 +51,7 @@ public class PgnParser {
     private Side otherSide = BLACK;
 
 
-    public PgnParser(DefaultGameConstraint defaultGameConstraint) {
+    public PgnGameExtractor(DefaultGameConstraint defaultGameConstraint) {
         this.defaultGameConstraint = defaultGameConstraint;
     }
 
@@ -72,11 +72,6 @@ public class PgnParser {
 
     private void parseGame(String rawCurrentGame) throws ChessException {
         String currentGame = getGame(rawCurrentGame);
-
-        LOGGER.debug("=================================================");
-        LOGGER.debug(currentGame);
-        LOGGER.debug("=================================================");
-
         String[] tokens = currentGame.split("\\s+\\d+\\.");
 
         if (tokens.length == 0) {
@@ -330,7 +325,11 @@ public class PgnParser {
 
         Predicate<Pair<CasePosition, Pieces>> similarPiecePredicate = p -> wantedType.equals(p.getSecondValue());
 
-        List<CasePosition> similarPieces = piecesThatCanHitPosition.stream().filter(similarPiecePredicate).map(Pair::getFirstValue).collect(Collectors.toList());
+        List<CasePosition> similarPieces =
+                piecesThatCanHitPosition.
+                        stream().
+                        filter(similarPiecePredicate).
+                        map(Pair::getFirstValue).collect(Collectors.toList());
 
         return similarPieces.size() > 1 ? similarPieces : new ArrayList<>();
     }
@@ -402,7 +401,6 @@ public class PgnParser {
     }
 
     private CasePosition getPositionWhenRowOrCol(List<CasePosition> similarPieceThatHitTarget, String before) {
-        CasePosition value;
         Character column = null;
         Byte row = null;
         char tmp = before.charAt(0);
@@ -414,8 +412,8 @@ public class PgnParser {
         } else {
             throw new IllegalStateException("Invalid type of Character!");
         }
-        value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column);
-        return value;
+
+        return getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column);
     }
 
     private CasePosition getPositionWhenFullCoordinate(CasePosition fromFullCoordinate, List<CasePosition> similarPieceThatHitTarget) {
@@ -423,26 +421,19 @@ public class PgnParser {
     }
 
     private CasePosition getPositionWhenNormalMove(String action, List<CasePosition> similarPieceThatHitTarget) throws InvalidMoveException {
-        boolean isRow;
-        boolean isColumn;
-        CasePosition value;
-        Character column;
-        Byte row = null;
-
         PieceSingleMoveSection parsedActions = PieceSingleMoveSection.getParsedActions(action);
-        row = parsedActions.getRow();
-        column = parsedActions.getColumn();
-        isRow = row != null && column == null;
-        isColumn = row == null && column != null;
+        Byte row = parsedActions.getRow();
+        Character column = parsedActions.getColumn();
+        boolean isRow = row != null && column == null;
+        boolean isColumn = row == null && column != null;
 
         if (parsedActions.isFromPositionFullCoordinate()) { //Full
-            value = getPositionWhenFullCoordinate(parsedActions.getFromFullCoordinate(), similarPieceThatHitTarget);
+            return getPositionWhenFullCoordinate(parsedActions.getFromFullCoordinate(), similarPieceThatHitTarget);
         } else if (isRow || isColumn) { //Row
-            value = getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column);
+            return getCasePositionWhenRowOrCol(similarPieceThatHitTarget, row, column);
         } else {
             throw new InvalidMoveException("The position is now known!");
         }
-        return value;
     }
 
     private CasePosition getCasePositionWhenRowOrCol(List<CasePosition> similarPieceThatHitTarget, Byte row, Character column) {

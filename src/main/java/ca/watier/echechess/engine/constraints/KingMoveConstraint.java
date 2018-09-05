@@ -82,6 +82,26 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
             List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
 
             CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, sideFrom).invoke();
+            boolean queenSideCastling = castlingPositionHelper.isQueenSide();
+
+            boolean isQueenSideAvail = false;
+            boolean isKingSideAvail = false;
+
+            switch (sideFrom) {
+                case BLACK:
+                    isKingSideAvail = gameHandler.isBlackKingCastlingAvailable();
+                    isQueenSideAvail = gameHandler.isBlackQueenCastlingAvailable();
+                    break;
+                case WHITE:
+                    isKingSideAvail = gameHandler.isWhiteKingCastlingAvailable();
+                    isQueenSideAvail = gameHandler.isWhiteQueenCastlingAvailable();
+                    break;
+            }
+
+            if ((queenSideCastling && !isQueenSideAvail) || (!queenSideCastling && !isKingSideAvail)) {
+                return MoveType.MOVE_NOT_ALLOWED;
+            }
+
             CasePosition kingPosition = castlingPositionHelper.getKingPosition();
             CasePosition positionWhereKingPass = castlingPositionHelper.getRookPosition();
 
