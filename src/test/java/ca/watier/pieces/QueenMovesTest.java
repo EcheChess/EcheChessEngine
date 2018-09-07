@@ -17,23 +17,26 @@
 package ca.watier.pieces;
 
 import ca.watier.echechess.common.enums.CasePosition;
-import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
+import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.engine.exceptions.FenParserException;
+import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.utils.FenGameParser;
 import ca.watier.utils.EngineGameTest;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.MoveType.CAPTURE;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
-import static ca.watier.echechess.common.enums.Pieces.*;
+import static ca.watier.echechess.common.enums.Pieces.B_ROOK;
+import static ca.watier.echechess.common.enums.Pieces.W_QUEEN;
 import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
 import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by yannick on 5/8/2017.
@@ -41,50 +44,29 @@ import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 public class QueenMovesTest extends EngineGameTest {
 
     @Test
-    public void moveTest() {
+    public void moveTest() throws FenParserException {
         List<CasePosition> allowedMoves = Arrays.asList(A8, C8, A6, C6, B8, B6, C7, A7);
-        Map<CasePosition, Pieces> pieces = new HashMap<>();
 
-        //Cannot move (blocked in all ways)
-        pieces.put(E4, W_QUEEN);
-        pieces.put(E5, W_PAWN);
-        pieces.put(E3, W_PAWN);
-        pieces.put(D5, W_PAWN);
-        pieces.put(D3, W_PAWN);
-        pieces.put(D4, W_PAWN);
-        pieces.put(F4, W_PAWN);
-        pieces.put(F5, W_PAWN);
-        pieces.put(F3, W_PAWN);
-
-
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, pieces);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/8/3PPP2/3PQP2/3PPP2/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
 
         //Cannot move (blocked in all ways)
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, E2, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, E6, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C4, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, G2, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, G2, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, G6, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C6, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C2, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, E2, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, E6, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C4, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, G2, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, G2, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, G6, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C6, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C2, WHITE));
+    }
 
 
-        //Kill in all direction
-        for (CasePosition position : allowedMoves) {
-            pieces.clear();
-            pieces.put(B7, W_QUEEN);
-            pieces.put(A8, B_ROOK);
-            pieces.put(C8, B_ROOK);
-            pieces.put(A6, B_ROOK);
-            pieces.put(C6, B_ROOK);
-            pieces.put(B8, B_ROOK);
-            pieces.put(B6, B_ROOK);
-            pieces.put(C7, B_ROOK);
-            pieces.put(A7, B_ROOK);
+    @Test
+    public void attackTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("rrr5/rQr5/rrr5/8/8/8/8/8 w KQkq");
+        gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
 
-            Assert.assertEquals(CAPTURE, gameHandler.movePiece(B7, position, WHITE));
-        }
+        Assertions.assertThat(gameHandler.getAllAvailableMoves(B7, WHITE)).containsOnly(A8, C8, A6, C6, B8, B6, C7, A7);
     }
 }

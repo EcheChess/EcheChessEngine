@@ -20,20 +20,27 @@ import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.utils.Pair;
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
+import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
 import ca.watier.utils.EngineGameTest;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 public class AllPiecesTest extends EngineGameTest {
 
+
+    private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
+
+    @Before
+    public void setUp() {
+        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
+    }
+
     @Test
     public void whiteTest() {
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
-
-        List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = gameHandler.getAllPiecesThatCanMoveTo(CasePosition.F3, Side.WHITE);
+        List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = simpleCustomPositionGameHandler.getAllPiecesThatCanMoveTo(CasePosition.F3, Side.WHITE);
         Assertions.assertThat(allPiecesThatCanMoveTo).hasSize(2);
 
         Pair<CasePosition, Pieces> whitePawn = allPiecesThatCanMoveTo.get(0); //Pawn
@@ -47,9 +54,7 @@ public class AllPiecesTest extends EngineGameTest {
 
     @Test
     public void blackTest() {
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
-
-        List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = gameHandler.getAllPiecesThatCanMoveTo(CasePosition.C6, Side.BLACK);
+        List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = simpleCustomPositionGameHandler.getAllPiecesThatCanMoveTo(CasePosition.C6, Side.BLACK);
         Assertions.assertThat(allPiecesThatCanMoveTo).hasSize(2);
 
         Pair<CasePosition, Pieces> blackKnight = allPiecesThatCanMoveTo.get(0); //Knight

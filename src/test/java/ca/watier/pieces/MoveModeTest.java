@@ -17,7 +17,9 @@
 package ca.watier.pieces;
 
 import ca.watier.echechess.common.enums.KingStatus;
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
+import ca.watier.echechess.engine.exceptions.FenParserException;
+import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.utils.FenGameParser;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,9 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MoveModeTest extends EngineGameTest {
 
     @Test
-    public void rook_Test() {
-        String positionPieces = "A8:B_ROOK;A7:B_PAWN;A5:W_KING";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void rook_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r7/p7/8/K7/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B5, B4);
@@ -49,9 +50,8 @@ public class MoveModeTest extends EngineGameTest {
 
 
     @Test
-    public void knight_Test() {
-        String positionPieces = "D5:W_KING;F6:B_KNIGHT;F3:B_KNIGHT";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void knight_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/5n2/3K4/8/5n2/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(C6, D6, E6, C5, C4);
@@ -60,9 +60,8 @@ public class MoveModeTest extends EngineGameTest {
 
 
     @Test
-    public void bishop_Test() {
-        String positionPieces = "D5:W_KING;C6:B_ROOK;B7:B_BISHOP";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void bishop_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/1b6/2r5/3K4/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(D4, E4, E5);
@@ -76,9 +75,8 @@ public class MoveModeTest extends EngineGameTest {
 
 
     @Test
-    public void king_Test() {
-        String positionPieces = "D5:W_KING;C6:B_KING";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void king_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/2k5/3K4/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(C4, D4, E4, E5, E6);
@@ -87,9 +85,8 @@ public class MoveModeTest extends EngineGameTest {
 
 
     @Test
-    public void queen_Test() {
-        String positionPieces = "D5:W_KING;C6:W_PAWN;B7:B_QUEEN";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void queen_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/1q6/2P5/3K4/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(D6, E6, C5, C4, D4, E4, E5);
@@ -102,9 +99,8 @@ public class MoveModeTest extends EngineGameTest {
     }
 
     @Test
-    public void pawn_front_Test() {
-        String positionPieces = "A5:W_KING;A6:B_PAWN;A7:B_PAWN";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void pawn_front_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/p7/p7/K7/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B4);
@@ -114,13 +110,11 @@ public class MoveModeTest extends EngineGameTest {
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B4, B5);
         Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
-
     }
 
     @Test
-    public void pawn_diagonal_Test() {
-        String positionPieces = "B7:B_PAWN;C6:W_KING";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void pawn_diagonal_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/1p6/2K5/8/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         assertThat(gameHandler.getPositionKingCanMove(WHITE)).containsOnly(B7, C5, C7, D7, B6, D6, B5, D5);

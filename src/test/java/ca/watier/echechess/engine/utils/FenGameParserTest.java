@@ -5,7 +5,6 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.EnumMap;
@@ -13,17 +12,9 @@ import java.util.Map;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.Pieces.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FenGameParserTest {
-    private FenGameParser gameParser;
-
-    @Before
-    public void setUp() {
-        gameParser = new FenGameParser();
-    }
 
     @Test
     public void parseStartingPosition() throws FenParserException {
@@ -65,7 +56,7 @@ public class FenGameParserTest {
         whitePositions.put(H1, W_ROOK);
 
         // when
-        FenPositionGameHandler game = gameParser.parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
+        FenPositionGameHandler game = FenGameParser.parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq");
 
         // then
         Map<CasePosition, Pieces> piecesLocationBlack = game.getPiecesLocation(Side.BLACK);
@@ -122,7 +113,7 @@ public class FenGameParserTest {
         whitePositions.put(H1, W_ROOK);
 
         // when
-        FenPositionGameHandler game = gameParser.parse("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR b Qq");
+        FenPositionGameHandler game = FenGameParser.parse("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR b Qq");
         Map<CasePosition, Pieces> piecesLocationBlack = game.getPiecesLocation(Side.BLACK);
         Map<CasePosition, Pieces> piecesLocationWhite = game.getPiecesLocation(Side.WHITE);
         Side currentAllowedMoveSide = game.getCurrentAllowedMoveSide();
@@ -183,7 +174,7 @@ public class FenGameParserTest {
         whitePositions.put(H3, W_KNIGHT);
 
         // when
-        FenPositionGameHandler game = gameParser.parse("r1bqkb1r/ppppp1pp/2n2n2/5p2/3P4/N2Q3N/PPP1PPPP/R1B1KB1R W");
+        FenPositionGameHandler game = FenGameParser.parse("r1bqkb1r/ppppp1pp/2n2n2/5p2/3P4/N2Q3N/PPP1PPPP/R1B1KB1R W");
         Map<CasePosition, Pieces> piecesLocationBlack = game.getPiecesLocation(Side.BLACK);
         Map<CasePosition, Pieces> piecesLocationWhite = game.getPiecesLocation(Side.WHITE);
         Side currentAllowedMoveSide = game.getCurrentAllowedMoveSide();

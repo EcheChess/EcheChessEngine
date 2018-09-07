@@ -18,7 +18,7 @@ public class FenGameParser {
     private static final String FEN_SECTION_SEPARATOR = " ((?i)[wb]) *";
     private static final Pattern FEN_SECTION_SEPARATOR_MATCHER = Pattern.compile(FEN_SECTION_SEPARATOR);
 
-    public FenPositionGameHandler parse(String fen) throws FenParserException {
+    public static FenPositionGameHandler parse(String fen) throws FenParserException {
         if (StringUtils.isBlank(fen) || !fen.matches(VALID_FEN_PATTERN)) {
             throw new FenParserException();
         }

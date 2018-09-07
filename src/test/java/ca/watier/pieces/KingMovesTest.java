@@ -16,25 +16,17 @@
 
 package ca.watier.pieces;
 
-import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
-import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
+import ca.watier.echechess.engine.exceptions.FenParserException;
+import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.utils.FenGameParser;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static ca.watier.echechess.common.enums.CasePosition.*;
-import static ca.watier.echechess.common.enums.MoveType.*;
-import static ca.watier.echechess.common.enums.Pieces.B_PAWN;
-import static ca.watier.echechess.common.enums.Pieces.W_KING;
-import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
+import static ca.watier.echechess.common.enums.MoveType.CASTLING;
+import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,45 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class KingMovesTest extends EngineGameTest {
 
-
-    private SimpleCustomPositionGameHandler gameHandler;
-
-    @Before
-    public void setUp() {
-        gameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
+    @Test
+    public void validPathCastlingTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/8/8/8/8/8/8/R3K2R w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
-    }
-
-    @Test
-    public void moveTest() {
-        List<CasePosition> allowedMoves = Arrays.asList(A8, C8, A6, C6, B8, B6, C7, A7);
-        Map<CasePosition, Pieces> pieces = new HashMap<>();
-        pieces.put(B7, W_KING);
-
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, pieces);
-        gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
-
-        //Kill in all direction
-        for (CasePosition position : allowedMoves) {
-            pieces.clear();
-            pieces.put(B7, W_KING);
-            pieces.put(A8, B_PAWN);
-            pieces.put(C8, B_PAWN);
-            pieces.put(A6, B_PAWN);
-            pieces.put(C6, B_PAWN);
-            pieces.put(B8, B_PAWN);
-            pieces.put(B6, B_PAWN);
-            pieces.put(C7, B_PAWN);
-            pieces.put(A7, B_PAWN);
-
-            Assert.assertEquals(CAPTURE, gameHandler.movePiece(B7, position, WHITE));
-        }
-
-    }
-
-    @Test
-    public void validPathCastlingTest() {
-        gameHandler.setPieces("E8:B_KING;E1:W_KING;A8:B_ROOK;H8:B_ROOK;H1:W_ROOK;A1:W_ROOK");
 
         Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
@@ -91,8 +48,9 @@ public class KingMovesTest extends EngineGameTest {
 
 
     @Test
-    public void attackedBothPathCastlingTest() {
-        gameHandler.setPieces("E8:B_KING;E1:W_KING;A1:W_ROOK;A8:B_ROOK;H8:B_ROOK;H1:W_ROOK;B2:B_ROOK;G7:W_ROOK;C7:W_ROOK;F2:B_ROOK");
+    public void attackedBothPathCastlingTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/2R3R1/8/8/8/8/1r3r2/R3K2R w KQkq");
+        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling
@@ -102,8 +60,9 @@ public class KingMovesTest extends EngineGameTest {
 
 
     @Test
-    public void attackedQueenSidePathCastlingTest() {
-        gameHandler.setPieces("E8:B_KING;E1:W_KING;A1:W_ROOK;A8:B_ROOK;H8:B_ROOK;H1:W_ROOK;B2:B_ROOK;E2:W_PAWN;F2:W_PAWN;G2:W_PAWN;H2:W_PAWN;E7:B_PAWN;F7:B_PAWN;G7:B_PAWN;H7:B_PAWN;B7:W_ROOK");
+    public void attackedQueenSidePathCastlingTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/1r2pppp/8/8/8/8/1r2PPPP/R3K2R w KQkq");
+        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side, blocked the previous castling by the rook on D1
@@ -117,8 +76,9 @@ public class KingMovesTest extends EngineGameTest {
 
 
     @Test
-    public void checkAtBeginningPositionQueenSidePathCastlingTest() {
-        gameHandler.setPieces("E8:B_KING;E1:W_KING;A1:W_ROOK;A8:B_ROOK;H8:B_ROOK;H1:W_ROOK;F2:W_PAWN;G2:W_PAWN;H2:W_PAWN;F7:B_PAWN;G7:B_PAWN;H7:B_PAWN;E4:B_ROOK;E5:W_ROOK");
+    public void checkAtBeginningPositionQueenSidePathCastlingTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/1r3ppp/8/4R3/4r3/8/1r3PPP/R3K2R w KQkq");
+        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
@@ -128,8 +88,9 @@ public class KingMovesTest extends EngineGameTest {
 
 
     @Test
-    public void checkAtEndingPositionQueenSidePathCastlingTest() {
-        gameHandler.setPieces("E8:B_KING;E1:W_KING;A1:W_ROOK;A8:B_ROOK;H8:B_ROOK;H1:W_ROOK;E2:W_PAWN;F2:W_PAWN;G2:W_PAWN;H2:W_PAWN;E7:B_PAWN;F7:B_PAWN;G7:B_PAWN;H7:B_PAWN;C7:W_ROOK;C2:B_ROOK");
+    public void checkAtEndingPositionQueenSidePathCastlingTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/2R1pppp/8/8/8/8/2r1PPPP/R3K2R w KQkq");
+        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
@@ -143,9 +104,9 @@ public class KingMovesTest extends EngineGameTest {
     }
 
     @Test
-    public void blockingPieceQueenSidePathCastlingTest() {
-        gameHandler.setPieces("E8:B_KING;E1:W_KING;A1:W_ROOK;A8:B_ROOK;H8:B_ROOK;H1:W_ROOK;E2:W_PAWN;F2:W_PAWN;G2:W_PAWN;H2:W_PAWN;E7:B_PAWN;F7:B_PAWN;G7:B_PAWN;H7:B_PAWN;D8:B_PAWN;D1:W_PAWN");
-
+    public void blockingPieceQueenSidePathCastlingTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r2pk2r/4pppp/8/8/8/8/4PPPP/R2PK2R w KQkq");
+        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
@@ -160,8 +121,9 @@ public class KingMovesTest extends EngineGameTest {
 
 
     @Test
-    public void movedPiecesQueenSidePathCastlingTest() {
-        gameHandler.setPieces("E8:B_KING;E1:W_KING;A1:W_ROOK;A8:B_ROOK;H8:B_ROOK;H1:W_ROOK;E2:W_PAWN;F2:W_PAWN;G2:W_PAWN;H2:W_PAWN;E7:B_PAWN;F7:B_PAWN;G7:B_PAWN;H7:B_PAWN");
+    public void movedPiecesQueenSidePathCastlingTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/4pppp/8/8/8/8/4PPPP/R3K2R w KQkq");
+        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         //Move the white king
         gameHandler.movePiece(E1, D2, WHITE);

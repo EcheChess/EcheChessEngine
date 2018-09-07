@@ -16,7 +16,9 @@
 
 package ca.watier.pieces;
 
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
+import ca.watier.echechess.engine.exceptions.FenParserException;
+import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.utils.FenGameParser;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Test;
 
@@ -31,9 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BishopMovesTest extends EngineGameTest {
 
     @Test
-    public void moveTest() {
-        String pattern = "E8:B_BISHOP;G8:B_BISHOP;F5:W_BISHOP;E2:W_BISHOP;D7:W_PAWN;G6:W_PAWN;E4:W_PAWN;G4:W_PAWN;";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, pattern);
+    public void moveTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("4b1b1/3P4/6P1/5B2/4P1P1/8/4B3/8 w");
         gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
 
         assertThat(gameHandler.getAllAvailableMoves(F5, WHITE)).containsOnly(E6);

@@ -17,7 +17,7 @@
 package ca.watier.game;
 
 import ca.watier.echechess.common.enums.SpecialGameRules;
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
+import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,72 +30,72 @@ import static org.junit.Assert.*;
  * Created by yannick on 7/1/2017.
  */
 public class GameBoardTest extends EngineGameTest {
-    private StandardGameHandlerContext context;
+    private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
 
     @Before
     public void setUp() {
-        context = new StandardGameHandlerContext(CONSTRAINT_SERVICE);
-        context.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
+        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
+        simpleCustomPositionGameHandler.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
     }
 
     @Test
     public void getBlackTurnNumber() {
-        assertThat(context.getBlackTurnNumber()).isZero();
-        context.movePiece(H7, H6, BLACK);
-        assertThat(context.getBlackTurnNumber()).isEqualTo(1);
-        context.movePiece(H6, H5, BLACK);
-        context.movePiece(H5, H4, BLACK);
-        assertThat(context.getBlackTurnNumber()).isEqualTo(3);
+        assertThat(simpleCustomPositionGameHandler.getBlackTurnNumber()).isZero();
+        simpleCustomPositionGameHandler.movePiece(H7, H6, BLACK);
+        assertThat(simpleCustomPositionGameHandler.getBlackTurnNumber()).isEqualTo(1);
+        simpleCustomPositionGameHandler.movePiece(H6, H5, BLACK);
+        simpleCustomPositionGameHandler.movePiece(H5, H4, BLACK);
+        assertThat(simpleCustomPositionGameHandler.getBlackTurnNumber()).isEqualTo(3);
     }
 
     @Test
     public void getWhiteTurnNumber() {
-        assertThat(context.getWhiteTurnNumber()).isZero();
-        context.movePiece(H2, H3, WHITE);
-        assertThat(context.getWhiteTurnNumber()).isEqualTo(1);
-        context.movePiece(H3, H4, WHITE);
-        context.movePiece(H4, H5, WHITE);
-        assertThat(context.getWhiteTurnNumber()).isEqualTo(3);
+        assertThat(simpleCustomPositionGameHandler.getWhiteTurnNumber()).isZero();
+        simpleCustomPositionGameHandler.movePiece(H2, H3, WHITE);
+        assertThat(simpleCustomPositionGameHandler.getWhiteTurnNumber()).isEqualTo(1);
+        simpleCustomPositionGameHandler.movePiece(H3, H4, WHITE);
+        simpleCustomPositionGameHandler.movePiece(H4, H5, WHITE);
+        assertThat(simpleCustomPositionGameHandler.getWhiteTurnNumber()).isEqualTo(3);
     }
 
     @Test
     public void isPieceMoved() {
-        assertFalse(context.isPieceMoved(G1));
+        assertFalse(simpleCustomPositionGameHandler.isPieceMoved(G1));
 
-        context.movePiece(G1, F3, WHITE);
+        simpleCustomPositionGameHandler.movePiece(G1, F3, WHITE);
 
-        assertTrue(context.isPieceMoved(F3));
-        assertNull(context.isPieceMoved(G1));
+        assertTrue(simpleCustomPositionGameHandler.isPieceMoved(F3));
+        assertNull(simpleCustomPositionGameHandler.isPieceMoved(G1));
     }
 
     @Test
     public void isPawnUsedSpecialMove() {
-        assertFalse(context.isPawnUsedSpecialMove(H2));
-        context.movePiece(H2, H4, WHITE);
-        assertTrue(context.isPawnUsedSpecialMove(H4));
+        assertFalse(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(H2));
+        simpleCustomPositionGameHandler.movePiece(H2, H4, WHITE);
+        assertTrue(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(H4));
 
-        assertFalse(context.isPawnUsedSpecialMove(G2));
-        context.movePiece(G2, G3, WHITE);
-        assertFalse(context.isPawnUsedSpecialMove(G3));
+        assertFalse(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(G2));
+        simpleCustomPositionGameHandler.movePiece(G2, G3, WHITE);
+        assertFalse(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(G3));
 
     }
 
     @Test
     public void getDefaultPositions() {
-        assertThat(context.getDefaultPositions()).isEqualTo(context.getPiecesLocation());
-        context.movePiece(G2, G3, WHITE);
-        assertThat(context.getDefaultPositions()).isNotEqualTo(context.getPiecesLocation());
+        assertThat(simpleCustomPositionGameHandler.getDefaultPositions()).isEqualTo(simpleCustomPositionGameHandler.getPiecesLocation());
+        simpleCustomPositionGameHandler.movePiece(G2, G3, WHITE);
+        assertThat(simpleCustomPositionGameHandler.getDefaultPositions()).isNotEqualTo(simpleCustomPositionGameHandler.getPiecesLocation());
     }
 
 
     @Test
     public void getTurnNumberPiece() {
-        assertThat(context.getPieceTurn(G2)).isZero();
-        context.movePiece(G2, G3, WHITE);
-        assertThat(context.getPieceTurn(G3)).isZero();
-        context.movePiece(G3, G4, WHITE);
-        assertThat(context.getPieceTurn(G3)).isNull();
-        assertThat(context.getPieceTurn(G4)).isEqualTo(1);
+        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G2)).isZero();
+        simpleCustomPositionGameHandler.movePiece(G2, G3, WHITE);
+        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G3)).isZero();
+        simpleCustomPositionGameHandler.movePiece(G3, G4, WHITE);
+        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G3)).isNull();
+        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G4)).isEqualTo(1);
     }
 
 

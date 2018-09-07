@@ -22,8 +22,8 @@ package ca.watier;
 
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
+import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -65,9 +65,8 @@ public class SpecialGameRulesTest extends EngineGameTest {
 
     @Test
     public void noCheckOrCheckmateTest() {
-        String positionPieces = "A8:B_KING;E1:W_KING;E3:B_QUEEN;D3:B_QUEEN;F3:B_QUEEN";
-
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+        SimpleCustomPositionGameHandler gameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
+        gameHandler.setPieces("A8:B_KING;E1:W_KING;E3:B_QUEEN;D3:B_QUEEN;F3:B_QUEEN");
 
         assertThat(gameHandler.getSpecialGameRules()).isEmpty(); //Make sure there's no rule applied at the beginning, in a standard game
 
@@ -82,8 +81,8 @@ public class SpecialGameRulesTest extends EngineGameTest {
 
     @Test
     public void addAndRemoveRuleTest() {
-        String positionPieces = "A8:B_KING;E1:W_KING;E3:B_QUEEN;D3:B_QUEEN;F3:B_QUEEN";
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+        SimpleCustomPositionGameHandler gameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
+        gameHandler.setPieces("A8:B_KING;E1:W_KING;E3:B_QUEEN;D3:B_QUEEN;F3:B_QUEEN");
         assertThat(gameHandler.getSpecialGameRules()).isEmpty(); //Make sure there's no rule applied at the beginning, in a standard game
 
         gameHandler.addSpecialRule(NO_CHECK_OR_CHECKMATE, NO_PLAYER_TURN);

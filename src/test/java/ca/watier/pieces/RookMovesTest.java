@@ -16,7 +16,9 @@
 
 package ca.watier.pieces;
 
-import ca.watier.echechess.engine.contexts.StandardGameHandlerContext;
+import ca.watier.echechess.engine.exceptions.FenParserException;
+import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.utils.FenGameParser;
 import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,11 +35,8 @@ import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 public class RookMovesTest extends EngineGameTest {
 
     @Test
-    public void moveTest() {
-
-        String positionPieces = "E4:W_ROOK;E5:B_PAWN;E3:B_PAWN;F4:B_PAWN;D4:B_PAWN;H1:W_ROOK;H8:B_ROOK;A8:B_ROOK;A1:B_ROOK;G1:B_ROOK";
-
-        StandardGameHandlerContext gameHandler = new StandardGameHandlerContext(CONSTRAINT_SERVICE, positionPieces);
+    public void moveTest() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r6r/8/8/4p3/3pRp2/4p3/8/r5rR w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
 
         //Cannot move (blocked in all ways)
