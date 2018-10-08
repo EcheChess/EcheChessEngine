@@ -59,33 +59,6 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         return MathUtils.getNearestPositionFromDirection(enPassantMovePosition, otherSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH);
     }
 
-    /**
-     * Get the "en passant" move, from the pawn position
-     * @param pawnPosition
-     * @param otherSide
-     * @return
-     */
-    public static CasePosition getEnPassantPositionFromEnemyPawn(CasePosition pawnPosition, Side otherSide) {
-        if (pawnPosition == null || otherSide == null) {
-            return null;
-        }
-
-        Direction direction;
-
-        switch (Ranks.getRank(pawnPosition, otherSide)) {
-            case TWO: //Not moved
-                direction = otherSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH;
-                break;
-            case FOUR: //Pawn hop
-                direction = otherSide.equals(Side.BLACK) ? Direction.NORTH : Direction.SOUTH;
-                break;
-            default:
-                return null; //Not Valid
-        }
-
-        return MathUtils.getNearestPositionFromDirection(pawnPosition, direction);
-    }
-
     private static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide, CasePosition enemyPawnPosition, Pieces enemyPawn) {
         if (from == null || to == null || gameHandler == null || currentSide == null || enemyPawnPosition == null || enemyPawn == null) {
             return false;
@@ -109,6 +82,34 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
         }
 
         return isEnPassant;
+    }
+
+    /**
+     * Get the "en passant" move, from the pawn position
+     *
+     * @param pawnPosition
+     * @param otherSide
+     * @return
+     */
+    public static CasePosition getEnPassantPositionFromEnemyPawn(CasePosition pawnPosition, Side otherSide) {
+        if (pawnPosition == null || otherSide == null) {
+            return null;
+        }
+
+        Direction direction;
+
+        switch (Ranks.getRank(pawnPosition, otherSide)) {
+            case TWO: //Not moved
+                direction = otherSide.equals(Side.BLACK) ? Direction.SOUTH : Direction.NORTH;
+                break;
+            case FOUR: //Pawn hop
+                direction = otherSide.equals(Side.BLACK) ? Direction.NORTH : Direction.SOUTH;
+                break;
+            default:
+                return null; //Not Valid
+        }
+
+        return MathUtils.getNearestPositionFromDirection(pawnPosition, direction);
     }
 
     @Override

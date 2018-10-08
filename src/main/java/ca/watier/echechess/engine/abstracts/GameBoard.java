@@ -21,13 +21,11 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Ranks;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
-import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.Pair;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Stack;
 
 /**
