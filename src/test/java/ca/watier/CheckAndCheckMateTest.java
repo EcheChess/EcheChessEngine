@@ -19,7 +19,6 @@ package ca.watier;
 
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;

@@ -19,6 +19,7 @@ package ca.watier.echechess.engine.constraints;
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
+import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
@@ -31,7 +32,8 @@ import ca.watier.echechess.engine.utils.GameUtils;
 public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint {
 
     public static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide) {
-        if (from == null || to == null || gameHandler == null || currentSide == null) {
+
+        if (ObjectUtils.hasNull(from, to, gameHandler, currentSide)) {
             return false;
         }
 
@@ -52,7 +54,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
      * @return
      */
     public static CasePosition getEnemyPawnPositionFromEnPassant(CasePosition enPassantMovePosition, Side otherSide) {
-        if (enPassantMovePosition == null || otherSide == null) {
+        if (ObjectUtils.hasNull(enPassantMovePosition, otherSide)) {
             return null;
         }
 
@@ -60,7 +62,9 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     private static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide, CasePosition enemyPawnPosition, Pieces enemyPawn) {
-        if (from == null || to == null || gameHandler == null || currentSide == null || enemyPawnPosition == null || enemyPawn == null) {
+
+
+        if (ObjectUtils.hasNull(from, to, gameHandler, currentSide, enemyPawnPosition, enemyPawn)) {
             return false;
         }
 
@@ -92,7 +96,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
      * @return
      */
     public static CasePosition getEnPassantPositionFromEnemyPawn(CasePosition pawnPosition, Side otherSide) {
-        if (pawnPosition == null || otherSide == null) {
+        if (ObjectUtils.hasNull(pawnPosition, otherSide)) {
             return null;
         }
 
@@ -114,7 +118,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
 
     @Override
     public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
-        if (from == null || to == null || gameHandler == null || moveMode == null) {
+        if (ObjectUtils.hasNull(from, to, gameHandler, moveMode)) {
             return false;
         }
 
@@ -178,7 +182,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     }
 
     private boolean isPawnMoveHop(CasePosition from, Pieces pieceFrom, CasePosition to, GenericGameHandler gameHandler, int nbCaseBetweenPositions) {
-        if (from == null || pieceFrom == null || to == null || gameHandler == null) {
+        if (ObjectUtils.hasNull(from, pieceFrom, to, gameHandler)) {
             return false;
         }
 
@@ -190,7 +194,7 @@ public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint
 
     @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        if (from == null || to == null || gameHandler == null) {
+        if (ObjectUtils.hasNull(from, to, gameHandler)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 

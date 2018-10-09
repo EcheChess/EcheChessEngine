@@ -2,6 +2,7 @@ package ca.watier.echechess.engine.pojos;
 
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.common.utils.ObjectUtils;
 
 import java.io.Serializable;
 
@@ -12,7 +13,7 @@ public class KingStatusHolderPojo implements Serializable {
     private KingStatus blackKingStatus;
 
     public void setKingStatusBySide(KingStatus kingStatus, Side side) {
-        if (kingStatus == null || side == null) {
+        if (ObjectUtils.hasNull(kingStatus, side)) {
             return;
         }
 

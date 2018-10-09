@@ -20,6 +20,7 @@ import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
+import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
@@ -63,8 +64,7 @@ public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint
     */
     @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-
-        if (from == null || to == null || gameHandler == null) {
+        if (ObjectUtils.hasNull(from, to, gameHandler)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 

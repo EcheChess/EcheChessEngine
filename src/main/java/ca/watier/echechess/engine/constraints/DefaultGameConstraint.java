@@ -17,6 +17,7 @@
 package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.GameConstraint;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
@@ -61,7 +62,8 @@ public class DefaultGameConstraint implements GameConstraint, Serializable {
 
     @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        if (from == null || to == null || gameHandler == null) {
+
+        if (ObjectUtils.hasNull(from, to, gameHandler)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 
@@ -83,7 +85,7 @@ public class DefaultGameConstraint implements GameConstraint, Serializable {
 
     @Override
     public boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide, GenericGameHandler gameHandler, MoveMode moveMode) {
-        if (from == null || to == null || playerSide == null) {
+        if (ObjectUtils.hasNull(from, to, playerSide)) {
             return false;
         }
 

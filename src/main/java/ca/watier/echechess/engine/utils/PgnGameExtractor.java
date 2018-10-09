@@ -21,14 +21,12 @@ import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.pojos.PieceDataSection;
 import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
 import ca.watier.echechess.common.utils.Pair;
-import ca.watier.echechess.common.utils.PositionUtils;
 import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;

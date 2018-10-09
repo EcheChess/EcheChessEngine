@@ -11,12 +11,15 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FenGameParser {
+public final class FenGameParser {
     //language=regexp
     private static final String VALID_FEN_PATTERN = "(?i)^(([rqkbnp]|[1-8]){1,8}/){7}(([rqkbnp]|[1-8]){1,8}) [w|b]( [kq]{1,4})*$";
     //language=regexp
     private static final String FEN_SECTION_SEPARATOR = " ((?i)[wb]) *";
     private static final Pattern FEN_SECTION_SEPARATOR_MATCHER = Pattern.compile(FEN_SECTION_SEPARATOR);
+
+    private FenGameParser() {
+    }
 
     public static FenPositionGameHandler parse(String fen) throws FenParserException {
         if (StringUtils.isBlank(fen) || !fen.matches(VALID_FEN_PATTERN)) {

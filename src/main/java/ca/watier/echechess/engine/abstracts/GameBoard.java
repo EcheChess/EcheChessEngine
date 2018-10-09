@@ -22,11 +22,14 @@ import ca.watier.echechess.common.enums.Ranks;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
+import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.common.utils.Pair;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Stack;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Created by yannick on 6/29/2017.
@@ -50,17 +53,23 @@ public abstract class GameBoard extends GameBoardData {
      * @param column
      */
     protected CasePosition getPositionByRankAndColumn(Ranks rank, char column, Side side) {
-        if (rank == null || side == null) {
+        if (ObjectUtils.hasNull(rank, side)) {
             return null;
         }
 
-        return Arrays.stream(CasePosition.values()).filter(casePosition -> rank.equals(Ranks.getRank(casePosition, side))
-                && casePosition.isOnSameColumn(column)).findFirst().orElse(null);
+        Stream<CasePosition> arrayStream = Arrays.stream(CasePosition.values());
+        return arrayStream.filter(getCasePositionPredicateOnSameColumnAndRank(rank, column, side))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Predicate<CasePosition> getCasePositionPredicateOnSameColumnAndRank(Ranks rank, char column, Side side) {
+        return casePosition -> rank.equals(Ranks.getRank(casePosition, side)) && casePosition.isOnSameColumn(column);
     }
 
 
     protected final void addPawnPromotion(CasePosition from, CasePosition to, Side side) {
-        if (side == null || from == null || to == null || Side.OBSERVER.equals(side)) {
+        if (ObjectUtils.hasNull(side, from, to) || Side.OBSERVER.equals(side)) {
             return;
         }
 
@@ -85,7 +94,7 @@ public abstract class GameBoard extends GameBoardData {
      * @param piece
      */
     protected final void movePieceTo(CasePosition from, CasePosition to, Pieces piece) {
-        if (from == null || to == null || piece == null) {
+        if (ObjectUtils.hasNull(from, to, piece)) {
             return;
         }
 
@@ -134,7 +143,8 @@ public abstract class GameBoard extends GameBoardData {
     }
 
     public final boolean upgradePiece(CasePosition to, Pieces pieces, Side playerSide) {
-        if (to == null || pieces == null || playerSide == null) {
+
+        if (ObjectUtils.hasNull(to, pieces, playerSide)) {
             return false;
         }
 

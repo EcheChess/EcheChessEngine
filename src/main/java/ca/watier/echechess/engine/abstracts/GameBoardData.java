@@ -6,6 +6,7 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.pojos.MoveHistory;
+import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.pojos.KingStatusHolderPojo;
 import ca.watier.echechess.engine.utils.GameUtils;
@@ -134,7 +135,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     }
 
     protected void addPawnPromotionToMap(Side side, Pair<CasePosition, CasePosition> casePositionCasePositionPair) {
-        if (side == null || casePositionCasePositionPair == null) {
+        if (ObjectUtils.hasNull(side, casePositionCasePositionPair)) {
             return;
         }
 
@@ -150,7 +151,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     }
 
     protected void setPiecePositionWithoutMoveState(Pieces piece, CasePosition to) {
-        if (piece == null || to == null) {
+        if (ObjectUtils.hasNull(piece, to)) {
             return;
         }
 
@@ -165,7 +166,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
      * @param to
      */
     protected void changeMovedStateOfPiece(Pieces piece, CasePosition from, CasePosition to) {
-        if (piece == null || from == null || to == null) {
+        if (ObjectUtils.hasNull(piece, from, to)) {
             return;
         }
 
@@ -228,7 +229,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     }
 
     protected void changePieceTurnNumber(CasePosition from, CasePosition to) {
-        if (to == null || from == null) {
+        if (ObjectUtils.hasNull(to, from)) {
             return;
         }
 
@@ -270,7 +271,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     }
 
     protected void removePawnPromotion(Pair<CasePosition, CasePosition> pair, Side side) {
-        if (pair == null || side == null || Side.OBSERVER.equals(side)) {
+        if (ObjectUtils.hasNull(pair, side) || Side.OBSERVER.equals(side)) {
             return;
         }
 

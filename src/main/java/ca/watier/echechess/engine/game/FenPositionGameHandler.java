@@ -16,6 +16,7 @@ import java.util.*;
 public class FenPositionGameHandler extends GenericGameHandler {
 
     private static final String NO_PIECES_ON_ROW = "8";
+    private static final long serialVersionUID = 9073722042994714192L;
 
     public FenPositionGameHandler(GameConstraint defaultGameConstraint) {
         super(defaultGameConstraint);

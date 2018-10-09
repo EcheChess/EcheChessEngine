@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class SimpleCustomPositionGameHandler extends GenericGameHandler {
     public static final String THE_NUMBER_OF_PARAMETER_IS_INCORRECT = "The number of parameter is incorrect !";
+    private static final long serialVersionUID = 5207738868839259022L;
 
     public SimpleCustomPositionGameHandler(DefaultGameConstraint defaultGameConstraint) {
         super(defaultGameConstraint);

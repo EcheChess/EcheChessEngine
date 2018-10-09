@@ -18,6 +18,7 @@ package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.utils.MathUtils;
+import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
@@ -37,14 +38,16 @@ public class GenericMoveConstraint implements MoveConstraint {
     public GenericMoveConstraint(DirectionPattern pattern) {
         this.pattern = pattern;
 
-        if (pattern != null) {
-            directionList = Arrays.asList(pattern.getDirections());
+        if (pattern == null) {
+            throw new IllegalArgumentException("The pattern cannot be null!");
         }
+
+        directionList = Arrays.asList(pattern.getDirections());
     }
 
     @Override
     public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
-        if (from == null || to == null || pattern == null) {
+        if (ObjectUtils.hasNull(from, to, pattern)) {
             return false;
         }
 

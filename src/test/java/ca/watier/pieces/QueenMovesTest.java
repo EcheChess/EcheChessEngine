@@ -17,23 +17,18 @@
 package ca.watier.pieces;
 
 import ca.watier.echechess.common.enums.CasePosition;
-import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import ca.watier.utils.EngineGameTest;
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
-import static ca.watier.echechess.common.enums.MoveType.CAPTURE;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
-import static ca.watier.echechess.common.enums.Pieces.B_ROOK;
-import static ca.watier.echechess.common.enums.Pieces.W_QUEEN;
 import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
 import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 import static org.junit.Assert.assertEquals;

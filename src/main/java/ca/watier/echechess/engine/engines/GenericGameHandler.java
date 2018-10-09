@@ -20,10 +20,7 @@ import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.responses.GameScoreResponse;
 import ca.watier.echechess.common.sessions.Player;
-import ca.watier.echechess.common.utils.CastlingPositionHelper;
-import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.MultiArrayMap;
-import ca.watier.echechess.common.utils.Pair;
+import ca.watier.echechess.common.utils.*;
 import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
@@ -77,7 +74,7 @@ public class GenericGameHandler extends GameBoard {
      * @return
      */
     public MoveType movePiece(CasePosition from, CasePosition to, Side playerSide) {
-        if (from == null || to == null || playerSide == null) {
+        if (ObjectUtils.hasNull(from, to, playerSide)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 
@@ -104,7 +101,7 @@ public class GenericGameHandler extends GameBoard {
     }
 
     private MoveType movePiece(CasePosition from, CasePosition to, Side playerSide, MoveHistory moveHistory) throws MoveNotAllowedException {
-        if (from == null || to == null || playerSide == null || moveHistory == null) {
+        if (ObjectUtils.hasNull(from, to, playerSide, moveHistory)) {
             throw new MoveNotAllowedException();
         }
 
@@ -465,7 +462,7 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide) {
-        if (currentPosition == null || playerSide == null || isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
+        if (ObjectUtils.hasNull(currentPosition, playerSide) || isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
             return false;
         }
 
@@ -482,7 +479,7 @@ public class GenericGameHandler extends GameBoard {
     public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide) {
         List<CasePosition> positions = new ArrayList<>();
 
-        if (from == null || playerSide == null) {
+        if (ObjectUtils.hasNull(from, playerSide)) {
             return positions;
         }
 
@@ -514,7 +511,7 @@ public class GenericGameHandler extends GameBoard {
     public List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep) {
         List<Pair<CasePosition, Pieces>> values = new ArrayList<>();
 
-        if (to == null || sideToKeep == null) {
+        if (ObjectUtils.hasNull(to, sideToKeep)) {
             return values;
         }
 
@@ -538,7 +535,7 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public boolean isKingCheckAfterMove(CasePosition from, CasePosition to, Side playerSide) {
-        if (from == null || to == null || playerSide == null) {
+        if (ObjectUtils.hasNull(from, to, playerSide)) {
             return false;
         }
 
@@ -565,7 +562,7 @@ public class GenericGameHandler extends GameBoard {
      * @return
      */
     public final boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide) {
-        if (from == null || to == null || playerSide == null) {
+        if (ObjectUtils.hasNull(from, to, playerSide)) {
             return false;
         }
 
@@ -683,7 +680,7 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public final boolean setPlayerToSide(Player player, Side side) {
-        if (player == null || side == null) {
+        if (ObjectUtils.hasNull(player, side)) {
             return false;
         }
 
