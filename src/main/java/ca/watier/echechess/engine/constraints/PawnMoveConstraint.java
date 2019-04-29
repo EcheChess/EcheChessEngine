@@ -22,14 +22,13 @@ import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
-import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
 
 
 /**
  * Created by yannick on 4/23/2017.
  */
-public class PawnMoveConstraint implements MoveConstraint, SpecialMoveConstraint {
+public class PawnMoveConstraint implements MoveConstraint {
 
     public static boolean isEnPassant(CasePosition from, CasePosition to, GenericGameHandler gameHandler, Side currentSide) {
 

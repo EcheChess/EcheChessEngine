@@ -21,9 +21,9 @@ import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.pojos.PieceDataSection;
 import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
 import ca.watier.echechess.common.utils.Pair;
-import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
+import ca.watier.echechess.engine.handlers.DefaultGameConstraintHandler;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -44,15 +44,27 @@ public class PgnGameExtractor {
     private static final Pattern POSITION_PATTERN = Pattern.compile("[a-h][1-8]");
 
     private final List<GenericGameHandler> handlerList = new ArrayList<>();
-    private final DefaultGameConstraint defaultGameConstraint;
+    private final DefaultGameConstraintHandler defaultGameConstraintHandler;
 
     private GenericGameHandler gameHandler;
     private Side currentSide = WHITE;
     private Side otherSide = BLACK;
 
 
-    public PgnGameExtractor(DefaultGameConstraint defaultGameConstraint) {
-        this.defaultGameConstraint = defaultGameConstraint;
+    public PgnGameExtractor(DefaultGameConstraintHandler defaultGameConstraintHandler) {
+        this.defaultGameConstraintHandler = defaultGameConstraintHandler;
+    }
+
+    public static String[] getRawHeadersAndGames(String rawText) {
+        return replaceInvalidCharacters(rawText).split("\n\n");
+    }
+
+    private static String replaceInvalidCharacters(String rawText) {
+        return rawText.replace("\r\n", "\n");
+    }
+
+    private static String getGame(String rawCurrentGame) {
+        return rawCurrentGame.substring(2).replace("\n", " ");
     }
 
     public List<GenericGameHandler> parseMultipleGameWithHeader(String rawText) throws ChessException {
@@ -66,10 +78,6 @@ public class PgnGameExtractor {
         return handlerList;
     }
 
-    public static String[] getRawHeadersAndGames(String rawText) {
-        return replaceInvalidCharacters(rawText).split("\n\n");
-    }
-
     private void parseGame(String rawCurrentGame) throws ChessException {
         String currentGame = getGame(rawCurrentGame);
         String[] tokens = currentGame.split("\\s+\\d+\\.");
@@ -79,7 +87,7 @@ public class PgnGameExtractor {
         }
 
         resetSide();
-        gameHandler = new GenericGameHandler(defaultGameConstraint);
+        gameHandler = new GenericGameHandler(defaultGameConstraintHandler);
         handlerList.add(gameHandler);
 
         for (String currentToken : tokens) {
@@ -95,14 +103,6 @@ public class PgnGameExtractor {
                 parseAction(action, currentGame);
             }
         }
-    }
-
-    private static String replaceInvalidCharacters(String rawText) {
-        return rawText.replace("\r\n", "\n");
-    }
-
-    private static String getGame(String rawCurrentGame) {
-        return rawCurrentGame.substring(2).replace("\n", " ");
     }
 
     private void resetSide() {

@@ -23,7 +23,6 @@ import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
-import ca.watier.echechess.engine.interfaces.SpecialMoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
 
 import java.util.List;
@@ -34,7 +33,7 @@ import static ca.watier.echechess.common.interfaces.BaseUtils.getSafeBoolean;
 /**
  * Created by yannick on 4/23/2017.
  */
-public class KingMoveConstraint implements MoveConstraint, SpecialMoveConstraint {
+public class KingMoveConstraint implements MoveConstraint {
 
     @Override
     public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {

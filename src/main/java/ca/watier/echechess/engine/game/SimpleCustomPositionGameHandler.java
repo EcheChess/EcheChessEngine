@@ -2,8 +2,8 @@ package ca.watier.echechess.engine.game;
 
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.engine.constraints.DefaultGameConstraint;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
+import ca.watier.echechess.engine.handlers.DefaultGameConstraintHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.EnumMap;
@@ -13,8 +13,8 @@ public class SimpleCustomPositionGameHandler extends GenericGameHandler {
     public static final String THE_NUMBER_OF_PARAMETER_IS_INCORRECT = "The number of parameter is incorrect !";
     private static final long serialVersionUID = 5207738868839259022L;
 
-    public SimpleCustomPositionGameHandler(DefaultGameConstraint defaultGameConstraint) {
-        super(defaultGameConstraint);
+    public SimpleCustomPositionGameHandler(DefaultGameConstraintHandler defaultGameConstraintHandler) {
+        super(defaultGameConstraintHandler);
     }
 
     public void setPieces(String specialGamePieces) {
