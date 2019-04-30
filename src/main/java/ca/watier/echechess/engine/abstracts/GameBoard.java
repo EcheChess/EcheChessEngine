@@ -26,7 +26,9 @@ import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.common.utils.Pair;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -38,12 +40,13 @@ public abstract class GameBoard extends GameBoardData {
 
     private static final long serialVersionUID = 807194077405321185L;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GameBoard.class);
+    private static final byte MAX_ELEMENT_HISTORY = 64;
 
-    private Stack<GameBoardData> historyStack;
+    private Deque<GameBoardData> historyStack;
 
     public GameBoard() {
         super();
-        historyStack = new Stack<>();
+        historyStack = new ArrayDeque<>(MAX_ELEMENT_HISTORY);
     }
 
     /**

@@ -23,7 +23,7 @@ import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
-import ca.watier.echechess.engine.handlers.DefaultGameConstraintHandler;
+import ca.watier.echechess.engine.interfaces.GameConstraintHandler;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -44,15 +44,15 @@ public class PgnGameExtractor {
     private static final Pattern POSITION_PATTERN = Pattern.compile("[a-h][1-8]");
 
     private final List<GenericGameHandler> handlerList = new ArrayList<>();
-    private final DefaultGameConstraintHandler defaultGameConstraintHandler;
+    private final GameConstraintHandler gameConstraintHandler;
 
     private GenericGameHandler gameHandler;
     private Side currentSide = WHITE;
     private Side otherSide = BLACK;
 
 
-    public PgnGameExtractor(DefaultGameConstraintHandler defaultGameConstraintHandler) {
-        this.defaultGameConstraintHandler = defaultGameConstraintHandler;
+    public PgnGameExtractor(GameConstraintHandler gameConstraintHandler) {
+        this.gameConstraintHandler = gameConstraintHandler;
     }
 
     public static String[] getRawHeadersAndGames(String rawText) {
@@ -87,7 +87,7 @@ public class PgnGameExtractor {
         }
 
         resetSide();
-        gameHandler = new GenericGameHandler(defaultGameConstraintHandler);
+        gameHandler = new GenericGameHandler(gameConstraintHandler);
         handlerList.add(gameHandler);
 
         for (String currentToken : tokens) {

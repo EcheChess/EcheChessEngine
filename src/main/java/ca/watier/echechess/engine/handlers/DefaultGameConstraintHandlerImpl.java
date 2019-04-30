@@ -20,7 +20,7 @@ import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.engine.constraints.*;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.NoMoveTypeDefinedException;
-import ca.watier.echechess.engine.interfaces.GameConstraint;
+import ca.watier.echechess.engine.interfaces.GameConstraintHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -31,7 +31,7 @@ import java.util.Objects;
  * Created by yannick on 4/26/2017.
  */
 
-public class DefaultGameConstraintHandler implements GameConstraint, Serializable {
+public class DefaultGameConstraintHandlerImpl implements GameConstraintHandler, Serializable {
 
     private static final long serialVersionUID = -7763545818654487544L;
 

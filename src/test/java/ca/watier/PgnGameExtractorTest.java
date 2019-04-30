@@ -17,7 +17,7 @@
 package ca.watier;
 
 import ca.watier.echechess.engine.exceptions.ChessException;
-import ca.watier.echechess.engine.handlers.DefaultGameConstraintHandler;
+import ca.watier.echechess.engine.handlers.DefaultGameConstraintHandlerImpl;
 import ca.watier.echechess.engine.utils.PgnGameExtractor;
 import ca.watier.utils.EngineGameTest;
 import org.apache.commons.io.IOUtils;
@@ -45,7 +45,7 @@ public class PgnGameExtractorTest extends EngineGameTest {
     @Test
     @Ignore("PgnTest.pgnManualTest - Not really unit tests, only used to test the stability of the engine by running games with a string")
     public void pgnManualTest() {
-        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(new DefaultGameConstraintHandler());
+        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(new DefaultGameConstraintHandlerImpl());
         try {
             pgnGameExtractor.parseSingleGameWithoutHeader(
                     "1. e4 e5 2. Nf3 d6 3. Bc4 Bg4 4. h3 Bxf3 5. Qxf3 Nf6 6. d3 Nc6 7. Be3 Be7\n" +

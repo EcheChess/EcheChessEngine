@@ -7,7 +7,7 @@ import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.utils.PositionUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.FenParserException;
-import ca.watier.echechess.engine.interfaces.GameConstraint;
+import ca.watier.echechess.engine.interfaces.GameConstraintHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.CharUtils;
 
@@ -18,8 +18,8 @@ public class FenPositionGameHandler extends GenericGameHandler {
     private static final String NO_PIECES_ON_ROW = "8";
     private static final long serialVersionUID = 9073722042994714192L;
 
-    public FenPositionGameHandler(GameConstraint defaultGameConstraint) {
-        super(defaultGameConstraint);
+    public FenPositionGameHandler(GameConstraintHandler defaultGameConstraintHandler) {
+        super(defaultGameConstraintHandler);
     }
 
     public void init(char sideToPlay,

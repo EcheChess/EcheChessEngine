@@ -291,11 +291,11 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static List<CasePosition> getPiecesPosition(Pieces pieces, Map<CasePosition, Pieces> positionPiecesMap) {
-        if (pieces == null || positionPiecesMap == null) {
-            return null;
-        }
-
         List<CasePosition> positions = new ArrayList<>();
+
+        if (pieces == null || positionPiecesMap == null) {
+            return positions;
+        }
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {
             if (pieces.equals(casePositionPiecesEntry.getValue())) {

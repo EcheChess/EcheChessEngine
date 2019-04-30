@@ -6,7 +6,7 @@ import ca.watier.echechess.common.enums.MoveType;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 
-public interface GameConstraint {
+public interface GameConstraintHandler {
 
     /**
      * Get the move type of the current move, based on coordinates

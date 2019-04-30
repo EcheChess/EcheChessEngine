@@ -115,7 +115,6 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         return Collections.unmodifiableMap(isPawnUsedSpecialMoveMap);
     }
 
-
     protected Map<CasePosition, Integer> getTurnNumberPieceMap() {
         return Collections.unmodifiableMap(turnNumberPieceMap);
     }
