@@ -165,12 +165,12 @@ public class PgnGameExtractor {
     private void validateGameEnding(PgnEndGameToken ending) throws InvalidGameEndingException {
         switch (ending) {
             case WHITE_WIN:
-                if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(BLACK)))) {
+                if (!(gameHandler.isGameDone() && gameHandler.isCheckMate(BLACK))) {
                     throw new InvalidGameEndingException(WHITE);
                 }
                 break;
             case BLACK_WIN:
-                if (!(gameHandler.isGameDone() && KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(WHITE)))) {
+                if (!(gameHandler.isGameDone() && gameHandler.isCheckMate(WHITE))) {
                     throw new InvalidGameEndingException(BLACK);
                 }
                 break;
@@ -207,7 +207,7 @@ public class PgnGameExtractor {
     }
 
     private void validateCheck() throws InvalidCheckException {
-        if (!KingStatus.CHECK.equals(gameHandler.getKingStatus(otherSide))) {
+        if (!gameHandler.isCheck(otherSide)) {
             throw new InvalidCheckException("The other player king is not check!");
         } else {
             LOGGER.debug("{} is CHECK", otherSide);
@@ -215,7 +215,7 @@ public class PgnGameExtractor {
     }
 
     private void validateCheckMate() throws InvalidCheckMateException {
-        if (!KingStatus.CHECKMATE.equals(gameHandler.getKingStatus(otherSide))) {
+        if (!gameHandler.isCheckMate(otherSide)) {
             throw new InvalidCheckMateException("The other player king is not checkmate!");
         } else {
             LOGGER.debug("{} is CHECKMATE", otherSide);

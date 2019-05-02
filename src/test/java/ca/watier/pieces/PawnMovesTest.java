@@ -46,7 +46,7 @@ public class PawnMovesTest extends EngineGameTest {
         FenPositionGameHandler gameHandler = FenGameParser.parse("1k6/1p6/8/1K6/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
+        assertThat(gameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
     }
 
 
@@ -58,7 +58,7 @@ public class PawnMovesTest extends EngineGameTest {
         FenPositionGameHandler gameHandler = FenGameParser.parse("1k6/1p6/1K6/8/8/8/8/8 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
+        assertThat(gameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
     }
 
 
@@ -105,6 +105,13 @@ public class PawnMovesTest extends EngineGameTest {
         Assert.assertEquals(CAPTURE, gameHandler.movePiece(F3, G2, BLACK));
     }
 
+    @Test
+    public void pawnHopBlocked() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("k7/6p1/6n1/8/8/6N1/6P1/K7 w");
+
+        assertThat(gameHandler.getAllAvailableMoves(G2, WHITE)).isEmpty();
+        assertThat(gameHandler.getAllAvailableMoves(G7, BLACK)).isEmpty();
+    }
 
     @Test
     public void pawnHopAndNormalBlackSide() throws FenParserException {
@@ -129,20 +136,21 @@ public class PawnMovesTest extends EngineGameTest {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/1ppp4/1pkp4/1p6/1P2P3/3P4/4K3 w KQkq");
         gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
-        assertThat(gameHandler.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.OK);
+
+        assertThat(gameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
         gameHandler.movePiece(D2, D4, WHITE);
-        assertThat(gameHandler.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.CHECKMATE);
+        assertThat(gameHandler.isCheckMate(BLACK)).isTrue();
     }
 
     @Test
     public void pawnHopAndCheck_enPassantAndOk() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/4R3/kp6/p1p4R/8/1P6/RR5K w KQkq");
 
-        assertThat(gameHandler.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.OK);
+        assertThat(gameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
         gameHandler.movePiece(B2, B4, WHITE);
 
         //Checked because of the pawn, can be killed with the en passant move (A4 & C4)
-        assertThat(gameHandler.getKingStatus(BLACK)).isEqualByComparingTo(KingStatus.CHECK);
+        assertThat(gameHandler.isCheck(BLACK)).isTrue();
     }
 
 

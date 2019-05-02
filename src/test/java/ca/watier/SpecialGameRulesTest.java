@@ -20,15 +20,16 @@ package ca.watier;
  * Created by yannick on 5/8/2017.
  */
 
-import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
 import ca.watier.utils.EngineGameTest;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.MoveType.*;
 import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
 import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
@@ -71,12 +72,12 @@ public class SpecialGameRulesTest extends EngineGameTest {
         assertThat(gameHandler.getSpecialGameRules()).isEmpty(); //Make sure there's no rule applied at the beginning, in a standard game
 
         //No rule
-        Assert.assertEquals(KingStatus.CHECKMATE, gameHandler.getKingStatus(WHITE));
+        Assertions.assertThat(gameHandler.isCheckMate(WHITE)).isTrue();
 
         //With the rule
         gameHandler.addSpecialRule(NO_CHECK_OR_CHECKMATE);
 
-        Assert.assertEquals(KingStatus.OK, gameHandler.getKingStatus(WHITE));
+        Assertions.assertThat(gameHandler.isKing(OK, WHITE)).isTrue();
     }
 
     @Test

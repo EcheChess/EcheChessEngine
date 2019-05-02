@@ -18,7 +18,6 @@ package ca.watier.echechess.engine.abstracts;
 
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.common.enums.Ranks;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
@@ -27,11 +26,7 @@ import ca.watier.echechess.common.utils.Pair;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
-import java.util.Stack;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /**
  * Created by yannick on 6/29/2017.
@@ -48,28 +43,6 @@ public abstract class GameBoard extends GameBoardData {
         super();
         historyStack = new ArrayDeque<>(MAX_ELEMENT_HISTORY);
     }
-
-    /**
-     * Find the position for a column and a rank
-     *
-     * @param rank
-     * @param column
-     */
-    protected CasePosition getPositionByRankAndColumn(Ranks rank, char column, Side side) {
-        if (ObjectUtils.hasNull(rank, side)) {
-            return null;
-        }
-
-        Stream<CasePosition> arrayStream = Arrays.stream(CasePosition.values());
-        return arrayStream.filter(getCasePositionPredicateOnSameColumnAndRank(rank, column, side))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private Predicate<CasePosition> getCasePositionPredicateOnSameColumnAndRank(Ranks rank, char column, Side side) {
-        return casePosition -> rank.equals(Ranks.getRank(casePosition, side)) && casePosition.isOnSameColumn(column);
-    }
-
 
     protected final void addPawnPromotion(CasePosition from, CasePosition to, Side side) {
         if (ObjectUtils.hasNull(side, from, to) || Side.OBSERVER.equals(side)) {

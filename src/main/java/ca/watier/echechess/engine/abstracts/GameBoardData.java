@@ -106,16 +106,16 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     }
 
 
-    protected Map<CasePosition, Boolean> getIsPiecesMovedMap() {
+    public Map<CasePosition, Boolean> getIsPiecesMovedMap() {
         return Collections.unmodifiableMap(isPiecesMovedMap);
     }
 
 
-    protected Map<CasePosition, Boolean> getIsPawnUsedSpecialMoveMap() {
+    public Map<CasePosition, Boolean> getIsPawnUsedSpecialMoveMap() {
         return Collections.unmodifiableMap(isPawnUsedSpecialMoveMap);
     }
 
-    protected Map<CasePosition, Integer> getTurnNumberPieceMap() {
+    public Map<CasePosition, Integer> getTurnNumberPieceMap() {
         return Collections.unmodifiableMap(turnNumberPieceMap);
     }
 
@@ -149,7 +149,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         positionPiecesMap.remove(from);
     }
 
-    protected void setPiecePositionWithoutMoveState(Pieces piece, CasePosition to) {
+    public void setPiecePositionWithoutMoveState(Pieces piece, CasePosition to) {
         if (ObjectUtils.hasNull(piece, to)) {
             return;
         }
@@ -244,13 +244,17 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         moveHistoryList.add(move);
     }
 
-    protected void setPiecesGameState(Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap,
-                                      Map<CasePosition, Integer> turnNumberPieceMap,
-                                      Map<CasePosition, Boolean> isPiecesMovedMap) {
+    public void setPiecesGameState(Map<CasePosition, Boolean> isPawnUsedSpecialMoveMap,
+                                   Map<CasePosition, Integer> turnNumberPieceMap,
+                                   Map<CasePosition, Boolean> isPiecesMovedMap) {
 
-        this.isPawnUsedSpecialMoveMap = isPawnUsedSpecialMoveMap;
-        this.turnNumberPieceMap = turnNumberPieceMap;
-        this.isPiecesMovedMap = isPiecesMovedMap;
+        if (Objects.isNull(isPawnUsedSpecialMoveMap) || Objects.isNull(turnNumberPieceMap) || Objects.isNull(isPiecesMovedMap)) {
+            return;
+        }
+
+        this.isPawnUsedSpecialMoveMap = new HashMap<>(isPawnUsedSpecialMoveMap);
+        this.turnNumberPieceMap = new HashMap<>(turnNumberPieceMap);
+        this.isPiecesMovedMap = new HashMap<>(isPiecesMovedMap);
     }
 
     /**

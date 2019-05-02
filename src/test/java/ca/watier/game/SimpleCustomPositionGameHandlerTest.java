@@ -75,50 +75,49 @@ public class SimpleCustomPositionGameHandlerTest extends EngineGameTest {
 
 
     @Test
-    public void getKingStatusStaleMate() {
+    public void isCheckMateStaleMate() {
         customPieceGameHandler.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
 
-        Assert.assertEquals(KingStatus.OK, customPieceGameHandler.getKingStatus(WHITE));
-        Assert.assertEquals(KingStatus.OK, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
         /*
             STALEMATE
         */
         customPieceGameHandler.setPieces("H1:W_KING;D5:B_KING;C7:W_ROOK;E7:W_ROOK;B6:W_ROOK;B4:W_ROOK");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
 
         customPieceGameHandler.setPieces("D8:B_KING;D7:W_PAWN;D6:W_KING");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
 
         customPieceGameHandler.setPieces("D8:B_KING;D6:W_KING;D7:W_PAWN;C8:B_PAWN;A8:W_ROOK");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceGameHandler.getKingStatus(BLACK));
-
+        assertThat(customPieceGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
 
         customPieceGameHandler.setPieces("D1:B_KING;C1:B_PAWN;C2:B_PAWN;D2:B_PAWN;E2:B_PAWN;E1:B_PAWN;D8:W_KING;C8:W_PAWN;C7:W_PAWN;D7:W_PAWN;E7:W_PAWN;E8:W_PAWN");
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceGameHandler.getKingStatus(WHITE));
-        Assert.assertEquals(KingStatus.STALEMATE, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
+        assertThat(customPieceGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isTrue();
 
 
         /*
             Not STALEMATE
          */
         customPieceGameHandler.setPieces("D8:B_KING;D6:W_KING;D7:W_PAWN;C8:B_PAWN;A8:W_ROOK;E8:B_PAWN");
-        Assert.assertEquals(KingStatus.OK, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
         customPieceGameHandler.setPieces("H1:W_KING;D5:B_KING;C7:W_ROOK;B6:W_ROOK;B4:W_ROOK");
-        Assert.assertEquals(KingStatus.OK, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
         customPieceGameHandler.setPieces("D8:B_KING;D6:W_KING;D7:W_PAWN;C8:B_PAWN");
-        Assert.assertEquals(KingStatus.OK, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
         customPieceGameHandler.setPieces("D1:B_KING;C1:B_PAWN;C2:B_PAWN;D2:B_PAWN;E2:B_PAWN;D8:W_KING;C8:W_PAWN;C7:W_PAWN;D7:W_PAWN;E7:W_PAWN");
-        Assert.assertEquals(KingStatus.OK, customPieceGameHandler.getKingStatus(WHITE));
-        Assert.assertEquals(KingStatus.OK, customPieceGameHandler.getKingStatus(BLACK));
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
     }
 
     @Test
-    public void getKingStatusCheckmateWithEnPassant() {
+    public void isCheckMateCheckmateWithEnPassant() {
         customPieceGameHandler.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
 
         //k7/5p2/4r3/4r1PP/4rPKP/4rPPP/4rrrr/8 w - -
@@ -143,8 +142,8 @@ public class SimpleCustomPositionGameHandlerTest extends EngineGameTest {
                         "H2:B_ROOK;"
         );
 
-        assertThat(customPieceGameHandler.getKingStatus(WHITE)).isEqualByComparingTo(KingStatus.OK);
+        assertThat(customPieceGameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
         customPieceGameHandler.movePiece(F7, F5, BLACK); //Pawn hop
-        assertThat(customPieceGameHandler.getKingStatus(WHITE)).isEqualByComparingTo(KingStatus.CHECK); //Check by the pawn (can kill it by "en passant")
+        assertThat(customPieceGameHandler.isKing(KingStatus.CHECK, WHITE)).isTrue(); //Check by the pawn (can kill it by "en passant")
     }
 }
