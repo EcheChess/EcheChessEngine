@@ -6,8 +6,8 @@ import ca.watier.echechess.common.utils.MultiArrayMap;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
-import ca.watier.echechess.engine.interfaces.GameConstraintHandler;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.GameUtils;
 
@@ -23,11 +23,11 @@ import static ca.watier.echechess.common.enums.Side.getOtherPlayerSide;
 public class KingHandlerImpl implements KingHandler {
 
     private GenericGameHandler genericGameHandler;
-    private GameConstraintHandler gameConstraintHandler;
+    private PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
 
-    public KingHandlerImpl(GenericGameHandler genericGameHandler, GameConstraintHandler gameConstraintHandler) {
+    public KingHandlerImpl(GenericGameHandler genericGameHandler, PieceMoveConstraintDelegate pieceMoveConstraintDelegate) {
         this.genericGameHandler = genericGameHandler;
-        this.gameConstraintHandler = gameConstraintHandler;
+        this.pieceMoveConstraintDelegate = pieceMoveConstraintDelegate;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class KingHandlerImpl implements KingHandler {
         //Add the position, if the castling is authorized on the rook
         Pieces rook = WHITE.equals(playerSide) ? Pieces.W_ROOK : Pieces.B_ROOK;
         for (CasePosition rookPosition : GameUtils.getPiecesPosition(rook, genericGameHandler.getPiecesLocation())) {
-            if (MoveType.CASTLING.equals(gameConstraintHandler.getMoveType(kingPosition, rookPosition, genericGameHandler))) {
+            if (MoveType.CASTLING.equals(pieceMoveConstraintDelegate.getMoveType(kingPosition, rookPosition, genericGameHandler))) {
                 values.add(rookPosition);
             }
         }
@@ -106,7 +106,7 @@ public class KingHandlerImpl implements KingHandler {
         }
 
         boolean isKingCheck;
-        MoveType moveType = gameConstraintHandler.getMoveType(from, to, genericGameHandler);
+        MoveType moveType = pieceMoveConstraintDelegate.getMoveType(from, to, genericGameHandler);
 
         genericGameHandler.cloneCurrentState();
         if (MoveType.EN_PASSANT.equals(moveType)) {

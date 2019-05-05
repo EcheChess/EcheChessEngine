@@ -22,10 +22,10 @@ import ca.watier.echechess.common.responses.GameScoreResponse;
 import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.common.utils.*;
 import ca.watier.echechess.engine.abstracts.GameBoard;
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
 import ca.watier.echechess.engine.factories.GameConstraintFactory;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
-import ca.watier.echechess.engine.interfaces.GameConstraintHandler;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -40,7 +40,7 @@ import static ca.watier.echechess.common.enums.Side.*;
  */
 public class GenericGameHandler extends GameBoard {
     private static final long serialVersionUID = 1139291295474732218L;
-    private final GameConstraintHandler gameConstraintHandler;
+    private final PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
     private final KingHandler kingHandler;
     private final Set<SpecialGameRules> specialGameRules = new HashSet<>();
     private Player playerWhite;
@@ -51,16 +51,16 @@ public class GenericGameHandler extends GameBoard {
     private List<Player> observerList = new ArrayList<>();
     private GameType gameType;
 
-    public GenericGameHandler(GameConstraintHandler gameConstraintHandler) {
+    public GenericGameHandler(PieceMoveConstraintDelegate pieceMoveConstraintDelegate) {
         super();
-        this.gameConstraintHandler = gameConstraintHandler;
-        this.kingHandler = new KingHandlerImpl(this, gameConstraintHandler);
+        this.pieceMoveConstraintDelegate = pieceMoveConstraintDelegate;
+        this.kingHandler = new KingHandlerImpl(this, pieceMoveConstraintDelegate);
     }
 
     public GenericGameHandler() {
         super();
-        this.gameConstraintHandler = GameConstraintFactory.getDefaultGameConstraint();
-        this.kingHandler = new KingHandlerImpl(this, gameConstraintHandler);
+        this.pieceMoveConstraintDelegate = GameConstraintFactory.getDefaultGameMoveDelegate();
+        this.kingHandler = new KingHandlerImpl(this, pieceMoveConstraintDelegate);
     }
 
     /**
@@ -105,7 +105,7 @@ public class GenericGameHandler extends GameBoard {
 
         Pieces piecesFrom = getPiece(from);
 
-        if (piecesFrom == null || !isPlayerTurn(playerSide) || !piecesFrom.getSide().equals(playerSide)) {
+        if (piecesFrom == null || !isPlayerTurn(playerSide) || !Pieces.isSameSide(piecesFrom, playerSide)) {
             throw new MoveNotAllowedException();
         }
 
@@ -120,7 +120,7 @@ public class GenericGameHandler extends GameBoard {
             return MoveType.PAWN_PROMOTION;
         }
 
-        MoveType moveType = gameConstraintHandler.getMoveType(from, to, this);
+        MoveType moveType = pieceMoveConstraintDelegate.getMoveType(from, to, this);
         KingStatus evaluatedCurrentKingStatus = OK;
         boolean isEatingPiece = piecesTo != null;
 
@@ -307,7 +307,7 @@ public class GenericGameHandler extends GameBoard {
             return false;
         }
 
-        return gameConstraintHandler.isPieceMovableTo(from, to, playerSide, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
+        return pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
     }
 
     /**
@@ -363,7 +363,7 @@ public class GenericGameHandler extends GameBoard {
                 continue;
             }
 
-            MoveType moveType = gameConstraintHandler.getMoveType(from, to, this);
+            MoveType moveType = pieceMoveConstraintDelegate.getMoveType(from, to, this);
             boolean isEnPassant = MoveType.EN_PASSANT.equals(moveType);
 
             if (!kingHandler.isKingCheckAfterMove(from, to, sideToKeep) && isPieceMovableTo(from, to, sideToKeep) || isEnPassant) {
@@ -398,7 +398,7 @@ public class GenericGameHandler extends GameBoard {
                     continue;
                 }
 
-                if (gameConstraintHandler.isPieceMovableTo(key, position, pieceSide, this, MoveMode.IS_KING_CHECK_MODE)) {
+                if (pieceMoveConstraintDelegate.isMoveValid(key, position, this, MoveMode.IS_KING_CHECK_MODE)) {
                     values.put(position, new Pair<>(key, value));
                 }
             }

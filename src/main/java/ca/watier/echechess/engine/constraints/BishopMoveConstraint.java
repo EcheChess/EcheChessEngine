@@ -22,7 +22,7 @@ import ca.watier.echechess.common.enums.DirectionPattern;
 /**
  * Created by yannick on 4/23/2017.
  */
-public class BishopMoveConstraint extends GenericMoveConstraint {
+public class BishopMoveConstraint extends DirectionalMoveConstraint {
     public BishopMoveConstraint() {
         super(DirectionPattern.DIAGONAL);
     }

@@ -1,8 +1,8 @@
 package ca.watier.utils;
 
 import ca.watier.echechess.common.tests.GameTest;
-import ca.watier.echechess.engine.handlers.DefaultGameConstraintHandlerImpl;
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 
 public abstract class EngineGameTest extends GameTest {
-    protected static final DefaultGameConstraintHandlerImpl CONSTRAINT_SERVICE = new DefaultGameConstraintHandlerImpl();
+    protected static final PieceMoveConstraintDelegate CONSTRAINT_SERVICE = new PieceMoveConstraintDelegate();
 }

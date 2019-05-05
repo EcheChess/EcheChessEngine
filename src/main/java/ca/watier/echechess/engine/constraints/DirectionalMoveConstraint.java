@@ -30,12 +30,12 @@ import java.util.Map;
 /**
  * Created by yannick on 4/23/2017.
  */
-public class GenericMoveConstraint implements MoveConstraint {
+public class DirectionalMoveConstraint implements MoveConstraint {
 
     private DirectionPattern pattern;
     private List<Direction> directionList;
 
-    public GenericMoveConstraint(DirectionPattern pattern) {
+    public DirectionalMoveConstraint(DirectionPattern pattern) {
         this.pattern = pattern;
 
         if (pattern == null) {

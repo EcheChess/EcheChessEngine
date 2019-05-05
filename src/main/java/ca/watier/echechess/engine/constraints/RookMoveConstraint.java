@@ -21,7 +21,7 @@ import ca.watier.echechess.common.enums.DirectionPattern;
 /**
  * Created by yannick on 4/23/2017.
  */
-public class RookMoveConstraint extends GenericMoveConstraint {
+public class RookMoveConstraint extends DirectionalMoveConstraint {
     public RookMoveConstraint() {
         super(DirectionPattern.NORMAL);
     }

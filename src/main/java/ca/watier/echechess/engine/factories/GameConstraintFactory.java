@@ -1,16 +1,15 @@
 package ca.watier.echechess.engine.factories;
 
-import ca.watier.echechess.engine.handlers.DefaultGameConstraintHandlerImpl;
-import ca.watier.echechess.engine.interfaces.GameConstraintHandler;
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 
 public final class GameConstraintFactory {
 
-    private static final DefaultGameConstraintHandlerImpl DEFAULT_GAME_CONSTRAINT = new DefaultGameConstraintHandlerImpl();
+    private static final PieceMoveConstraintDelegate DEFAULT_GAME_CONSTRAINT = new PieceMoveConstraintDelegate();
 
     private GameConstraintFactory() {
     }
 
-    public static GameConstraintHandler getDefaultGameConstraint() {
+    public static PieceMoveConstraintDelegate getDefaultGameMoveDelegate() {
         return DEFAULT_GAME_CONSTRAINT;
     }
 }

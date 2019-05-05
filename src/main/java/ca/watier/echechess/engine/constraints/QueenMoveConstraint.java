@@ -21,7 +21,7 @@ import ca.watier.echechess.common.enums.DirectionPattern;
 /**
  * Created by yannick on 4/23/2017.
  */
-public class QueenMoveConstraint extends GenericMoveConstraint {
+public class QueenMoveConstraint extends DirectionalMoveConstraint {
     public QueenMoveConstraint() {
         super(DirectionPattern.ALL);
     }

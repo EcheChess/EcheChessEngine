@@ -28,7 +28,7 @@ public final class FenGameParser {
 
         Matcher matcher = FEN_SECTION_SEPARATOR_MATCHER.matcher(fen);
 
-        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(GameConstraintFactory.getDefaultGameConstraint());
+        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(GameConstraintFactory.getDefaultGameMoveDelegate());
 
         if (matcher.find()) {
             char sideToPlay = StringUtils.trim(matcher.group(0)).charAt(0);
@@ -38,7 +38,6 @@ public final class FenGameParser {
             if (ArrayUtils.isEmpty(sections)) {
                 throw new FenParserException();
             }
-
 
             boolean isWhiteQueenMoveAvail = false;
             boolean isWhiteKingMoveAvail = false;

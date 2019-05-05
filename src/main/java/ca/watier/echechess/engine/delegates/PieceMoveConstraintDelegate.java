@@ -14,13 +14,15 @@
  *    limitations under the License.
  */
 
-package ca.watier.echechess.engine.handlers;
+package ca.watier.echechess.engine.delegates;
 
-import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.MoveMode;
+import ca.watier.echechess.common.enums.MoveType;
+import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.engine.constraints.*;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.NoMoveTypeDefinedException;
-import ca.watier.echechess.engine.interfaces.GameConstraintHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -31,7 +33,7 @@ import java.util.Objects;
  * Created by yannick on 4/26/2017.
  */
 
-public class DefaultGameConstraintHandlerImpl implements GameConstraintHandler, Serializable {
+public class PieceMoveConstraintDelegate implements MoveConstraint, Serializable {
 
     private static final long serialVersionUID = -7763545818654487544L;
 
@@ -43,14 +45,28 @@ public class DefaultGameConstraintHandlerImpl implements GameConstraintHandler, 
     private static final MoveConstraint PAWN = new PawnMoveConstraint();
 
     @Override
+    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
+        if (!ObjectUtils.allNotNull(from, to, gameHandler)) {
+            return false;
+        }
+
+        MoveConstraint moveConstraint = getMoveConstraintFromPiece(from, gameHandler);
+
+        if (Objects.isNull(moveConstraint)) {
+            return false;
+        }
+
+        return moveConstraint.isMoveValid(from, to, gameHandler, moveMode);
+    }
+
+    @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
 
         if (!ObjectUtils.allNotNull(from, to, gameHandler)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 
-        Pieces fromPiece = gameHandler.getPiece(from);
-        MoveConstraint moveConstraint = getMoveConstraint(fromPiece);
+        MoveConstraint moveConstraint = getMoveConstraintFromPiece(from, gameHandler);
 
         if (Objects.isNull(moveConstraint)) {
             return null;
@@ -58,6 +74,11 @@ public class DefaultGameConstraintHandlerImpl implements GameConstraintHandler, 
 
         MoveType moveType = getMoveType(from, to, gameHandler, moveConstraint);
         return ObjectUtils.defaultIfNull(moveType, MoveType.NORMAL_MOVE);
+    }
+
+    private MoveConstraint getMoveConstraintFromPiece(CasePosition from, GenericGameHandler gameHandler) {
+        Pieces fromPiece = gameHandler.getPiece(from);
+        return getMoveConstraint(fromPiece);
     }
 
     private MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveConstraint moveConstraint) {
@@ -95,27 +116,6 @@ public class DefaultGameConstraintHandlerImpl implements GameConstraintHandler, 
                 return PAWN;
             default:
                 return null;
-        }
-    }
-
-    @Override
-    public boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide, GenericGameHandler gameHandler, MoveMode moveMode) {
-        if (!ObjectUtils.allNotNull(from, to, playerSide)) {
-            return false;
-        }
-
-        Pieces fromPiece = gameHandler.getPiece(from);
-
-        if (Side.OBSERVER.equals(playerSide) || !Pieces.isSameSide(fromPiece, playerSide)) {
-            return false;
-        }
-
-        MoveConstraint moveConstraint = getMoveConstraint(fromPiece);
-
-        if (Objects.isNull(moveConstraint)) {
-            return false;
-        } else {
-            return moveConstraint.isMoveValid(from, to, gameHandler, moveMode);
         }
     }
 }
