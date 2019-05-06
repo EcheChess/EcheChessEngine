@@ -16,12 +16,12 @@
 
 package ca.watier;
 
-import ca.watier.echechess.engine.exceptions.ChessException;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
+import ca.watier.echechess.engine.exceptions.ChessException;
 import ca.watier.echechess.engine.utils.PgnGameExtractor;
-import ca.watier.utils.EngineGameTest;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ import java.nio.charset.Charset;
 
 import static org.junit.Assert.fail;
 
-public class PgnGameExtractorTest extends EngineGameTest {
+public class PgnGameExtractorTest {
 
     private static String gamesAsFile;
 
@@ -42,10 +42,17 @@ public class PgnGameExtractorTest extends EngineGameTest {
         }
     }
 
+    private PieceMoveConstraintDelegate moveDelegate;
+
+    @Before
+    public void setUp() {
+        moveDelegate = new PieceMoveConstraintDelegate();
+    }
+
     @Test
     @Ignore("PgnTest.pgnManualTest - Not really unit tests, only used to test the stability of the engine by running games with a string")
     public void pgnManualTest() {
-        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(new PieceMoveConstraintDelegate());
+        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(moveDelegate);
         try {
             pgnGameExtractor.parseSingleGameWithoutHeader(
                     "1. e4 e5 2. Nf3 d6 3. Bc4 Bg4 4. h3 Bxf3 5. Qxf3 Nf6 6. d3 Nc6 7. Be3 Be7\n" +
@@ -64,7 +71,7 @@ public class PgnGameExtractorTest extends EngineGameTest {
 
     @Test
     public void pgnTestFromFile() {
-        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(CONSTRAINT_SERVICE);
+        PgnGameExtractor pgnGameExtractor = new PgnGameExtractor(moveDelegate);
 
         try {
             Assertions.assertThat(pgnGameExtractor.parseMultipleGameWithHeader(gamesAsFile)).isNotEmpty();

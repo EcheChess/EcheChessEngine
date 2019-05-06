@@ -16,28 +16,45 @@
 
 package ca.watier.pieces;
 
+import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.utils.FenGameParser;
-import ca.watier.utils.EngineGameTest;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.MoveType.CAPTURE;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
-import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
-import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static ca.watier.echechess.common.enums.Side.WHITE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by yannick on 5/8/2017.
  */
-public class RookMovesTest extends EngineGameTest {
+@RunWith(MockitoJUnitRunner.class)
+public class RookMovesTest {
+
+    @Spy
+    private PlayerHandlerImpl playerHandler;
+    @Spy
+    private KingHandlerImpl kingHandler;
+
+    @Before
+    public void setUp() {
+        when(playerHandler.isPlayerTurn(any(Side.class))).thenReturn(true);
+    }
 
     @Test
     public void moveTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("r6r/8/8/4p3/3pRp2/4p3/8/r5rR w KQkq");
-        gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r6r/8/8/4p3/3pRp2/4p3/8/r5rR w KQkq", kingHandler, playerHandler);
 
         //Cannot move (blocked in all ways)
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, E8, WHITE));

@@ -23,17 +23,16 @@ import static ca.watier.echechess.common.enums.Side.getOtherPlayerSide;
 public class KingHandlerImpl implements KingHandler {
 
     private GenericGameHandler genericGameHandler;
-    private PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
 
-    public KingHandlerImpl(GenericGameHandler genericGameHandler, PieceMoveConstraintDelegate pieceMoveConstraintDelegate) {
+    public KingHandlerImpl(GenericGameHandler genericGameHandler) {
         this.genericGameHandler = genericGameHandler;
-        this.pieceMoveConstraintDelegate = pieceMoveConstraintDelegate;
+    }
+
+    public KingHandlerImpl() {
     }
 
     @Override
     public boolean isStalemate(Side playerSide, Pieces kingPiece, CasePosition kingPosition) {
-        boolean isStalemate = true;
-
         //Check if we can move the pieces around the king (same color)
         for (CasePosition moveFrom : MathUtils.getAllPositionsAroundPosition(kingPosition)) {
             Pieces currentPiece = genericGameHandler.getPiece(moveFrom);
@@ -41,13 +40,12 @@ public class KingHandlerImpl implements KingHandler {
             if (currentPiece != null && !Pieces.isKing(currentPiece) && Pieces.isSameSide(currentPiece, kingPiece)) {
                 for (CasePosition moveTo : genericGameHandler.getAllAvailableMoves(moveFrom, playerSide)) {
                     if (genericGameHandler.isPieceMovableTo(moveFrom, moveTo, playerSide) && !isKingCheckAfterMove(moveFrom, moveTo, playerSide)) {
-                        isStalemate = false;
-                        break;
+                        return false;
                     }
                 }
             }
         }
-        return isStalemate;
+        return true;
     }
 
     @Override
@@ -83,15 +81,17 @@ public class KingHandlerImpl implements KingHandler {
         List<CasePosition> values = new ArrayList<>();
         List<CasePosition> caseAround = MathUtils.getAllPositionsAroundPosition(kingPosition);
         for (CasePosition position : caseAround) {  //Check if the king can kill something to save himself
-            if (genericGameHandler.isPieceMovableTo(kingPosition, position, playerSide) && !genericGameHandler.isKingCheckAtPosition(position, playerSide)) {
+            if (genericGameHandler.isPieceMovableTo(kingPosition, position, playerSide) && !isKingCheckAtPosition(position, playerSide, genericGameHandler)) {
                 values.add(position);
             }
         }
 
         //Add the position, if the castling is authorized on the rook
         Pieces rook = WHITE.equals(playerSide) ? Pieces.W_ROOK : Pieces.B_ROOK;
+
+        PieceMoveConstraintDelegate moveConstraintDelegate = genericGameHandler.getMoveConstraintDelegate();
         for (CasePosition rookPosition : GameUtils.getPiecesPosition(rook, genericGameHandler.getPiecesLocation())) {
-            if (MoveType.CASTLING.equals(pieceMoveConstraintDelegate.getMoveType(kingPosition, rookPosition, genericGameHandler))) {
+            if (MoveType.CASTLING.equals(moveConstraintDelegate.getMoveType(kingPosition, rookPosition, genericGameHandler))) {
                 values.add(rookPosition);
             }
         }
@@ -106,7 +106,8 @@ public class KingHandlerImpl implements KingHandler {
         }
 
         boolean isKingCheck;
-        MoveType moveType = pieceMoveConstraintDelegate.getMoveType(from, to, genericGameHandler);
+        PieceMoveConstraintDelegate moveConstraintDelegate = genericGameHandler.getMoveConstraintDelegate();
+        MoveType moveType = moveConstraintDelegate.getMoveType(from, to, genericGameHandler);
 
         genericGameHandler.cloneCurrentState();
         if (MoveType.EN_PASSANT.equals(moveType)) {
@@ -119,6 +120,15 @@ public class KingHandlerImpl implements KingHandler {
         return isKingCheck;
     }
 
+    @Override
+    public boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide, GenericGameHandler genericGameHandler) {
+        if (ObjectUtils.hasNull(currentPosition, playerSide)) {
+            return false;
+        }
+
+        return !genericGameHandler.getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), currentPosition).isEmpty();
+    }
+
     /**
      * 1) Check if the king can move / kill to escape.
      * 2) If not, try to liberate a case around the king, by killing / blocking the piece with an ally piece (if only one that can hit this target).
@@ -127,29 +137,23 @@ public class KingHandlerImpl implements KingHandler {
      * @param playerSide
      * @return
      */
+    @Override
     public KingStatus getKingStatus(Side playerSide) {
         if (playerSide == null) {
             return null;
         }
 
-        KingStatus kingStatus = OK;
-
         Pieces kingPiece = Pieces.getKingBySide(playerSide);
         CasePosition kingPosition = GameUtils.getSinglePiecePosition(kingPiece, genericGameHandler.getPiecesLocation());
-
-        if (genericGameHandler.isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
-            return kingStatus;
-        }
-
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition = genericGameHandler.getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), kingPosition);
 
         if (!piecesThatCanHitOriginalPosition.isEmpty()) { //One or more piece can hit the king
-            kingStatus = getKingStatusWhenPiecesCanHitKing(playerSide, kingPosition, piecesThatCanHitOriginalPosition);
+            return getKingStatusWhenPiecesCanHitKing(playerSide, kingPosition, piecesThatCanHitOriginalPosition);
         } else if (getPositionKingCanMove(playerSide).isEmpty()) { //Check if not a stalemate
-            kingStatus = isStalemate(playerSide, kingPiece, kingPosition) ? STALEMATE : kingStatus;
+            return isStalemate(playerSide, kingPiece, kingPosition) ? STALEMATE : OK;
+        } else {
+            return OK;
         }
-
-        return kingStatus;
     }
 
     private boolean isKingCheckWithEnPassantMove(CasePosition from, CasePosition to, Side playerSide) {
@@ -329,5 +333,10 @@ public class KingHandlerImpl implements KingHandler {
 
     private Predicate<CasePosition> getCasePositionPredicateOnSameColumnAndRank(Ranks rank, char column, Side side) {
         return casePosition -> rank.equals(Ranks.getRank(casePosition, side)) && casePosition.isOnSameColumn(column);
+    }
+
+    @Override
+    public void bindToGame(GenericGameHandler genericGameHandler) {
+        this.genericGameHandler = genericGameHandler;
     }
 }

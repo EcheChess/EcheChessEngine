@@ -18,24 +18,33 @@ package ca.watier.pieces;
 
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.utils.FenGameParser;
-import ca.watier.utils.EngineGameTest;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
-import static ca.watier.echechess.common.enums.SpecialGameRules.NO_CHECK_OR_CHECKMATE;
-import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static ca.watier.echechess.common.enums.Side.BLACK;
+import static ca.watier.echechess.common.enums.Side.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by yannick on 5/8/2017.
  */
-public class BishopMovesTest extends EngineGameTest {
+@RunWith(MockitoJUnitRunner.class)
+public class BishopMovesTest {
+
+    @Spy
+    private PlayerHandlerImpl playerHandler;
+    @Spy
+    private KingHandlerImpl kingHandler;
 
     @Test
     public void moveTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("4b1b1/3P4/6P1/5B2/4P1P1/8/4B3/8 w");
-        gameHandler.addSpecialRule(NO_PLAYER_TURN, NO_CHECK_OR_CHECKMATE);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("4b1b1/3P4/6P1/5B2/4P1P1/8/4B3/8 w", kingHandler, playerHandler);
 
         assertThat(gameHandler.getAllAvailableMoves(F5, WHITE)).containsOnly(E6);
         assertThat(gameHandler.getAllAvailableMoves(E2, WHITE)).containsOnly(F1, D1, F3, D3, C4, B5, A6);

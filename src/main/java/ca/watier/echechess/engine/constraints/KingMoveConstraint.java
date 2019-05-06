@@ -22,6 +22,7 @@ import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
+import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.utils.GameUtils;
 
@@ -73,6 +74,8 @@ public class KingMoveConstraint implements MoveConstraint {
         Pieces pieceTo = gameHandler.getPiece(to);
         Map<CasePosition, Pieces> piecesLocation = gameHandler.getPiecesLocation();
 
+        KingHandler kingHandler = gameHandler.getKingHandler();
+
         if (pieceTo == null) {
             return moveType;
         }
@@ -107,8 +110,8 @@ public class KingMoveConstraint implements MoveConstraint {
             boolean isPieceAreNotMoved = !getSafeBoolean(gameHandler.isPieceMoved(from)) && !getSafeBoolean(gameHandler.isPieceMoved(to));
             boolean isNoPieceBetweenKingAndRook = piecesBetweenKingAndRook.isEmpty();
             boolean isNoPieceAttackingBetweenKingAndRook = gameHandler.getPiecesThatCanHitPosition(Side.getOtherPlayerSide(sideFrom), positionWhereKingPass).isEmpty();
-            boolean isKingNotCheckAtCurrentLocation = !gameHandler.isKingCheckAtPosition(from, sideFrom);
-            boolean kingNotCheckAtEndPosition = !gameHandler.isKingCheckAtPosition(kingPosition, sideFrom);
+            boolean isKingNotCheckAtCurrentLocation = !kingHandler.isKingCheckAtPosition(from, sideFrom, gameHandler);
+            boolean kingNotCheckAtEndPosition = !kingHandler.isKingCheckAtPosition(kingPosition, sideFrom, gameHandler);
 
             if (isPieceAreNotMoved && isNoPieceBetweenKingAndRook &&
                     isNoPieceAttackingBetweenKingAndRook && isKingNotCheckAtCurrentLocation &&

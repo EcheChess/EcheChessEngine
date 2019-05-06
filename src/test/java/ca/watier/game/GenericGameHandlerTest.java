@@ -2,30 +2,36 @@ package ca.watier.game;
 
 import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
-import ca.watier.utils.EngineGameTest;
+import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
-import static ca.watier.echechess.common.enums.Side.OBSERVER;
-import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
+import static ca.watier.echechess.common.enums.Side.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class GenericGameHandlerTest extends EngineGameTest {
+@RunWith(MockitoJUnitRunner.class)
+public class GenericGameHandlerTest {
 
     private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
     private Player playerOne, playerTwo;
+
+    @Spy
+    private PlayerHandlerImpl playerHandler;
+    @Spy
+    private KingHandlerImpl kingHandler;
 
     @Before
     public void setUp() {
         playerOne = new Player(UUID.randomUUID().toString());
         playerTwo = new Player(UUID.randomUUID().toString());
 
-
-        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
-        simpleCustomPositionGameHandler.addSpecialRule(NO_PLAYER_TURN);
-
+        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler);
         simpleCustomPositionGameHandler.setPlayerToSide(playerOne, WHITE);
         simpleCustomPositionGameHandler.setPlayerToSide(playerTwo, BLACK);
     }

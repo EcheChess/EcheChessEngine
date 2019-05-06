@@ -20,22 +20,22 @@ import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
-import ca.watier.utils.EngineGameTest;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
-import static ca.watier.echechess.common.enums.SpecialGameRules.NO_PLAYER_TURN;
 
 /**
  * Created by yannick on 5/8/2017.
  */
-public class KnightMovesTest extends EngineGameTest {
+@RunWith(MockitoJUnitRunner.class)
+public class KnightMovesTest {
 
     @Test
     public void moveTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/8/8/4N3/8/8/8 w KQkq");
-        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         Assertions.assertThat(gameHandler.getAllAvailableMoves(E4, Side.WHITE)).containsOnly(C3, C5, D6, F6, G5, G3, D2, F2);
     }
@@ -43,7 +43,6 @@ public class KnightMovesTest extends EngineGameTest {
     @Test
     public void attackTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/3p1k2/2p3p1/4N3/2K3p1/3p1p2/8 w KQkq");
-        gameHandler.addSpecialRule(NO_PLAYER_TURN);
 
         Assertions.assertThat(gameHandler.getAllAvailableMoves(E4, Side.WHITE)).containsOnly(C5, D6, G5, G3, D2, F2);
     }

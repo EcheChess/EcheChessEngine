@@ -21,21 +21,31 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
-import ca.watier.utils.EngineGameTest;
+import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
-public class AllPiecesTest extends EngineGameTest {
+@RunWith(MockitoJUnitRunner.class)
+public class AllPiecesTest {
+
+    @Spy
+    private PlayerHandlerImpl playerHandler;
+    @Spy
+    private KingHandlerImpl kingHandler;
 
 
     private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
 
     @Before
     public void setUp() {
-        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
+        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler);
     }
 
     @Test

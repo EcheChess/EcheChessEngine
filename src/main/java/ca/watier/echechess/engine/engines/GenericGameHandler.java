@@ -26,7 +26,9 @@ import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
 import ca.watier.echechess.engine.factories.GameConstraintFactory;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.KingHandler;
+import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
@@ -42,25 +44,34 @@ public class GenericGameHandler extends GameBoard {
     private static final long serialVersionUID = 1139291295474732218L;
     private final PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
     private final KingHandler kingHandler;
-    private final Set<SpecialGameRules> specialGameRules = new HashSet<>();
-    private Player playerWhite;
-    private Player playerBlack;
+    private final PlayerHandler playerHandler;
     private String uuid;
     private boolean allowOtherToJoin = false;
     private boolean allowObservers = false;
-    private List<Player> observerList = new ArrayList<>();
     private GameType gameType;
 
     public GenericGameHandler(PieceMoveConstraintDelegate pieceMoveConstraintDelegate) {
         super();
         this.pieceMoveConstraintDelegate = pieceMoveConstraintDelegate;
-        this.kingHandler = new KingHandlerImpl(this, pieceMoveConstraintDelegate);
+        this.kingHandler = new KingHandlerImpl(this);
+        this.playerHandler = new PlayerHandlerImpl(this);
+    }
+
+    public GenericGameHandler(KingHandler kingHandler, PlayerHandler playerHandler) {
+        super();
+        this.pieceMoveConstraintDelegate = GameConstraintFactory.getDefaultGameMoveDelegate();
+        this.kingHandler = kingHandler;
+        this.playerHandler = playerHandler;
+
+        kingHandler.bindToGame(this);
+        playerHandler.bindToGame(this);
     }
 
     public GenericGameHandler() {
         super();
         this.pieceMoveConstraintDelegate = GameConstraintFactory.getDefaultGameMoveDelegate();
-        this.kingHandler = new KingHandlerImpl(this, pieceMoveConstraintDelegate);
+        this.kingHandler = new KingHandlerImpl(this);
+        this.playerHandler = new PlayerHandlerImpl(this);
     }
 
     /**
@@ -105,7 +116,7 @@ public class GenericGameHandler extends GameBoard {
 
         Pieces piecesFrom = getPiece(from);
 
-        if (piecesFrom == null || !isPlayerTurn(playerSide) || !Pieces.isSameSide(piecesFrom, playerSide)) {
+        if (piecesFrom == null || !playerHandler.isPlayerTurn(playerSide) || !Pieces.isSameSide(piecesFrom, playerSide)) {
             throw new MoveNotAllowedException();
         }
 
@@ -156,7 +167,7 @@ public class GenericGameHandler extends GameBoard {
         moveHistory.setOtherKingStatus(evaluatedOtherKingStatusAfterMove);
 
         setKingStatusBySide(evaluatedCurrentKingStatus, playerSide);
-        setKingStatusBySide(evaluatedOtherKingStatusAfterMove, Side.getOtherPlayerSide(playerSide));
+        setKingStatusBySide(evaluatedOtherKingStatusAfterMove, getOtherPlayerSide(playerSide));
 
         return moveType;
     }
@@ -226,15 +237,6 @@ public class GenericGameHandler extends GameBoard {
         changeAllowedMoveSide();
     }
 
-    private boolean isPlayerTurn(Side sideFrom) {
-        if (sideFrom == null) {
-            return false;
-        }
-
-        return isGameHaveRule(SpecialGameRules.NO_PLAYER_TURN) || getCurrentAllowedMoveSide().equals(sideFrom);
-    }
-
-
     private void updatePointsForSide(Side side, byte point) {
         if (side == null) {
             return;
@@ -252,20 +254,8 @@ public class GenericGameHandler extends GameBoard {
         }
     }
 
-    public boolean isGameHaveRule(SpecialGameRules rule) {
-        return specialGameRules.contains(rule);
-    }
-
     public GameScoreResponse getGameScore() {
         return new GameScoreResponse(getWhitePlayerPoint(), getBlackPlayerPoint());
-    }
-
-    public boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide) {
-        if (ObjectUtils.hasNull(currentPosition, playerSide) || isGameHaveRule(SpecialGameRules.NO_CHECK_OR_CHECKMATE)) {
-            return false;
-        }
-
-        return !getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), currentPosition).isEmpty();
     }
 
     /**
@@ -332,7 +322,7 @@ public class GenericGameHandler extends GameBoard {
 
         CasePosition[] casePositionWithoutCurrent = ArrayUtils.removeElement(CasePosition.values(), from);
 
-        for (CasePosition position : casePositionWithoutCurrent) { //FIXME: ADD SPECIAL MOVES
+        for (CasePosition position : casePositionWithoutCurrent) {
             if (isPieceMovableTo(from, position, playerSide)) {
                 positions.add(position);
             }
@@ -424,89 +414,11 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public final boolean setPlayerToSide(Player player, Side side) {
-        if (ObjectUtils.hasNull(player, side)) {
-            return false;
-        }
-
-        boolean value;
-
-        switch (side) {
-            case BLACK: {
-                removePlayerFromWhite(player);
-                value = changePlayerToBlack(player);
-                observerList.remove(player);
-                break;
-            }
-            case WHITE: {
-                removePlayerFromBlack(player);
-                value = changePlayerToWhite(player);
-                observerList.remove(player);
-                break;
-            }
-            default: {
-                removePlayerFromWhite(player);
-                removePlayerFromBlack(player);
-                observerList.add(player);
-                value = true;
-                break;
-            }
-        }
-
-        return value;
+        return playerHandler.setPlayerToSide(player, side);
     }
 
-    private void removePlayerFromWhite(Player player) {
-        if (player != null && player.equals(playerWhite)) {
-            playerWhite = null;
-        }
-    }
-
-    private boolean changePlayerToBlack(Player player) {
-        if (playerBlack == null) {
-            playerBlack = player;
-            return true;
-        }
-
-        return false;
-    }
-
-    private void removePlayerFromBlack(Player player) {
-        if (playerBlack == player) {
-            playerBlack = null;
-        }
-    }
-
-    private boolean changePlayerToWhite(Player player) {
-        if (playerWhite == null) {
-            playerWhite = player;
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the side of the player, null if not available
-     *
-     * @param player
-     * @return
-     */
     public final Side getPlayerSide(Player player) {
-        Side side = null;
-
-        if (player == null) {
-            return null;
-        }
-
-        if (player.equals(playerWhite)) {
-            side = WHITE;
-        } else if (player.equals(playerBlack)) {
-            side = BLACK;
-        } else if (observerList.contains(player)) {
-            side = Side.OBSERVER;
-        }
-
-        return side;
+        return playerHandler.getPlayerSide(player);
     }
 
     public GameType getGameType() {
@@ -518,19 +430,15 @@ public class GenericGameHandler extends GameBoard {
     }
 
     public final boolean hasPlayer(Player player) {
-        if (player == null) {
-            return false;
-        }
-
-        return observerList.contains(player) || player.equals(playerBlack) || player.equals(playerWhite);
+        return playerHandler.hasPlayer(player);
     }
 
     public Player getPlayerWhite() {
-        return playerWhite;
+        return playerHandler.getPlayerWhite();
     }
 
     public Player getPlayerBlack() {
-        return playerBlack;
+        return playerHandler.getPlayerBlack();
     }
 
     public boolean isAllowOtherToJoin() {
@@ -557,37 +465,21 @@ public class GenericGameHandler extends GameBoard {
         this.uuid = uuid;
     }
 
-    public void addSpecialRule(SpecialGameRules... rules) {
-        if (ArrayUtils.isEmpty(rules)) {
-            return;
-        }
-
-        specialGameRules.addAll(Arrays.asList(rules));
-    }
-
-    public void removeSpecialRule(SpecialGameRules... rules) {
-        if (ArrayUtils.isEmpty(rules)) {
-            return;
-        }
-
-        specialGameRules.removeAll(Arrays.asList(rules));
-    }
-
-    public List<Player> getObserverList() {
-        return Collections.unmodifiableList(observerList);
-    }
-
-    public Set<SpecialGameRules> getSpecialGameRules() {
-        return Collections.unmodifiableSet(specialGameRules);
-    }
-
     public boolean isGameDone() {
         return KingStatus.CHECKMATE.equals(getEvaluatedKingStatusBySide(BLACK)) ||
                 KingStatus.CHECKMATE.equals(getEvaluatedKingStatusBySide(WHITE)) ||
                 isGameDraw();
     }
 
-    public List<CasePosition> getPositionKingCanMove(Side white) {
-        return kingHandler.getPositionKingCanMove(white);
+    public KingHandler getKingHandler() {
+        return kingHandler;
+    }
+
+    public PlayerHandler getPlayerHandler() {
+        return playerHandler;
+    }
+
+    public PieceMoveConstraintDelegate getMoveConstraintDelegate() {
+        return pieceMoveConstraintDelegate;
     }
 }

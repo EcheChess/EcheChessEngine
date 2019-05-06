@@ -3,6 +3,8 @@ package ca.watier.echechess.engine.utils;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.factories.GameConstraintFactory;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.interfaces.KingHandler;
+import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,14 +23,23 @@ public final class FenGameParser {
     private FenGameParser() {
     }
 
+    public static FenPositionGameHandler parse(String fen, KingHandler kingHandler, PlayerHandler playerHandler) throws FenParserException {
+        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(kingHandler, playerHandler);
+        return parse(fen, fenPositionGameHandler);
+    }
+
     public static FenPositionGameHandler parse(String fen) throws FenParserException {
+        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(GameConstraintFactory.getDefaultGameMoveDelegate());
+        return parse(fen, fenPositionGameHandler);
+    }
+
+
+    private static FenPositionGameHandler parse(String fen, FenPositionGameHandler fenPositionGameHandler) throws FenParserException {
         if (StringUtils.isBlank(fen) || !fen.matches(VALID_FEN_PATTERN)) {
             throw new FenParserException();
         }
 
         Matcher matcher = FEN_SECTION_SEPARATOR_MATCHER.matcher(fen);
-
-        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(GameConstraintFactory.getDefaultGameMoveDelegate());
 
         if (matcher.find()) {
             char sideToPlay = StringUtils.trim(matcher.group(0)).charAt(0);

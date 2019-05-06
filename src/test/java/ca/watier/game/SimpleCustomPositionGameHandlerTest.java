@@ -18,31 +18,47 @@ package ca.watier.game;
 
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.common.enums.SpecialGameRules;
+import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
-import ca.watier.utils.EngineGameTest;
+import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
+import static ca.watier.echechess.common.enums.Side.BLACK;
+import static ca.watier.echechess.common.enums.Side.WHITE;
 import static ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler.THE_NUMBER_OF_PARAMETER_IS_INCORRECT;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by yannick on 6/20/2017.
  */
-public class SimpleCustomPositionGameHandlerTest extends EngineGameTest {
+@RunWith(MockitoJUnitRunner.class)
+public class SimpleCustomPositionGameHandlerTest {
 
     private static final Class<UnsupportedOperationException> UNSUPPORTED_OPERATION_EXCEPTION_CLASS = UnsupportedOperationException.class;
     private SimpleCustomPositionGameHandler customPieceGameHandler;
 
+    @Spy
+    private PlayerHandlerImpl playerHandler;
+
+    @Spy
+    private KingHandlerImpl kingHandler;
+
+
     @Before
     public void setUp() {
-        customPieceGameHandler = new SimpleCustomPositionGameHandler(CONSTRAINT_SERVICE);
+        customPieceGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler);
     }
 
     @Test
@@ -76,8 +92,6 @@ public class SimpleCustomPositionGameHandlerTest extends EngineGameTest {
 
     @Test
     public void isCheckMateStaleMate() {
-        customPieceGameHandler.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
-
         assertThat(customPieceGameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
         assertThat(customPieceGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
@@ -118,7 +132,7 @@ public class SimpleCustomPositionGameHandlerTest extends EngineGameTest {
 
     @Test
     public void isCheckMateCheckmateWithEnPassant() {
-        customPieceGameHandler.addSpecialRule(SpecialGameRules.NO_PLAYER_TURN);
+        when(playerHandler.isPlayerTurn(any(Side.class))).thenReturn(true);
 
         //k7/5p2/4r3/4r1PP/4rPKP/4rPPP/4rrrr/8 w - -
         customPieceGameHandler.setPieces(

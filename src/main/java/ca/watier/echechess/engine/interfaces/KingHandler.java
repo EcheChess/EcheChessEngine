@@ -6,10 +6,11 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.utils.MultiArrayMap;
 import ca.watier.echechess.common.utils.Pair;
+import ca.watier.echechess.engine.engines.GenericGameHandler;
 
 import java.util.List;
 
-public interface KingHandler {
+public interface KingHandler extends GenericHandler {
     KingStatus getKingStatusWhenPiecesCanHitKing(Side playerSide, CasePosition kingPosition, MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition);
 
     boolean isStalemate(Side playerSide, Pieces kingPiece, CasePosition kingPosition);
@@ -19,4 +20,6 @@ public interface KingHandler {
     List<CasePosition> getPositionKingCanMove(Side playerSide);
 
     KingStatus getKingStatus(Side playerSide);
+
+    boolean isKingCheckAtPosition(CasePosition currentPosition, Side playerSide, GenericGameHandler genericGameHandler);
 }
