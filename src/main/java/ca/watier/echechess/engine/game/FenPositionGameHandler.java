@@ -8,6 +8,7 @@ import ca.watier.echechess.common.utils.PositionUtils;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.FenParserException;
+import ca.watier.echechess.engine.interfaces.GamePropertiesHandler;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
@@ -24,8 +25,8 @@ public class FenPositionGameHandler extends GenericGameHandler {
         super(defaultGameConstraintHandler);
     }
 
-    public FenPositionGameHandler(KingHandler kingHandler, PlayerHandler playerHandler) {
-        super(kingHandler, playerHandler);
+    public FenPositionGameHandler(KingHandler kingHandler, PlayerHandler playerHandler, GamePropertiesHandler gamePropertiesHandler) {
+        super(kingHandler, playerHandler, gamePropertiesHandler);
     }
 
     public void init(char sideToPlay,

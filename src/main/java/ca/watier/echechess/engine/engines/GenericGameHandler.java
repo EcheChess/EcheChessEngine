@@ -25,8 +25,11 @@ import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
 import ca.watier.echechess.engine.factories.GameConstraintFactory;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.GameHandler;
+import ca.watier.echechess.engine.interfaces.GamePropertiesHandler;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
@@ -40,28 +43,29 @@ import static ca.watier.echechess.common.enums.Side.*;
 /**
  * Created by yannick on 5/5/2017.
  */
-public class GenericGameHandler extends GameBoard {
+public class GenericGameHandler extends GameBoard implements GameHandler {
     private static final long serialVersionUID = 1139291295474732218L;
+
     private final PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
     private final KingHandler kingHandler;
     private final PlayerHandler playerHandler;
+    private final GamePropertiesHandler gamePropertiesHandler;
     private String uuid;
-    private boolean allowOtherToJoin = false;
-    private boolean allowObservers = false;
-    private GameType gameType;
 
     public GenericGameHandler(PieceMoveConstraintDelegate pieceMoveConstraintDelegate) {
         super();
         this.pieceMoveConstraintDelegate = pieceMoveConstraintDelegate;
         this.kingHandler = new KingHandlerImpl(this);
         this.playerHandler = new PlayerHandlerImpl(this);
+        this.gamePropertiesHandler = new GamePropertiesHandlerImpl();
     }
 
-    public GenericGameHandler(KingHandler kingHandler, PlayerHandler playerHandler) {
+    public GenericGameHandler(KingHandler kingHandler, PlayerHandler playerHandler, GamePropertiesHandler gamePropertiesHandler) {
         super();
         this.pieceMoveConstraintDelegate = GameConstraintFactory.getDefaultGameMoveDelegate();
         this.kingHandler = kingHandler;
         this.playerHandler = playerHandler;
+        this.gamePropertiesHandler = gamePropertiesHandler;
 
         kingHandler.bindToGame(this);
         playerHandler.bindToGame(this);
@@ -72,6 +76,7 @@ public class GenericGameHandler extends GameBoard {
         this.pieceMoveConstraintDelegate = GameConstraintFactory.getDefaultGameMoveDelegate();
         this.kingHandler = new KingHandlerImpl(this);
         this.playerHandler = new PlayerHandlerImpl(this);
+        this.gamePropertiesHandler = new GamePropertiesHandlerImpl();
     }
 
     /**
@@ -82,6 +87,7 @@ public class GenericGameHandler extends GameBoard {
      * @param playerSide
      * @return
      */
+    @Override
     public MoveType movePiece(CasePosition from, CasePosition to, Side playerSide) {
         if (ObjectUtils.hasNull(from, to, playerSide)) {
             return MoveType.MOVE_NOT_ALLOWED;
@@ -254,6 +260,7 @@ public class GenericGameHandler extends GameBoard {
         }
     }
 
+    @Override
     public GameScoreResponse getGameScore() {
         return new GameScoreResponse(getWhitePlayerPoint(), getBlackPlayerPoint());
     }
@@ -264,6 +271,7 @@ public class GenericGameHandler extends GameBoard {
      * @param side
      * @return
      */
+    @Override
     public final Map<CasePosition, Pieces> getPiecesLocation(Side side) {
         Map<CasePosition, Pieces> values = new EnumMap<>(CasePosition.class);
 
@@ -292,6 +300,7 @@ public class GenericGameHandler extends GameBoard {
      * @param playerSide
      * @return
      */
+    @Override
     public final boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide) {
         if (ObjectUtils.hasNull(from, to, playerSide)) {
             return false;
@@ -307,6 +316,7 @@ public class GenericGameHandler extends GameBoard {
      * @param playerSide
      * @return
      */
+    @Override
     public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide) {
         List<CasePosition> positions = new ArrayList<>();
 
@@ -338,6 +348,7 @@ public class GenericGameHandler extends GameBoard {
      * @param sideToKeep
      * @return
      */
+    @Override
     public List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep) {
         List<Pair<CasePosition, Pieces>> values = new ArrayList<>();
 
@@ -371,6 +382,7 @@ public class GenericGameHandler extends GameBoard {
      * @param sideToKeep
      * @return
      */
+    @Override
     public MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> getPiecesThatCanHitPosition(Side sideToKeep, CasePosition... positions) {
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> values = new MultiArrayMap<>();
 
@@ -397,6 +409,7 @@ public class GenericGameHandler extends GameBoard {
         return values;
     }
 
+    @Override
     public boolean isKing(KingStatus kingStatus, Side side) {
         if (Objects.isNull(kingStatus)) {
             return false;
@@ -405,80 +418,88 @@ public class GenericGameHandler extends GameBoard {
         return kingStatus.equals(kingHandler.getKingStatus(side));
     }
 
+    @Override
     public boolean isCheckMate(Side side) {
         return KingStatus.CHECKMATE.equals(kingHandler.getKingStatus(side));
     }
 
+    @Override
     public boolean isCheck(Side side) {
         return KingStatus.CHECK.equals(kingHandler.getKingStatus(side));
     }
 
+    @Override
     public final boolean setPlayerToSide(Player player, Side side) {
         return playerHandler.setPlayerToSide(player, side);
     }
 
+    @Override
     public final Side getPlayerSide(Player player) {
         return playerHandler.getPlayerSide(player);
     }
 
-    public GameType getGameType() {
-        return gameType;
-    }
-
-    public void setGameType(GameType gameType) {
-        this.gameType = gameType;
-    }
-
+    @Override
     public final boolean hasPlayer(Player player) {
         return playerHandler.hasPlayer(player);
     }
 
+    @Override
     public Player getPlayerWhite() {
         return playerHandler.getPlayerWhite();
     }
 
+    @Override
     public Player getPlayerBlack() {
         return playerHandler.getPlayerBlack();
     }
 
+    @Override
     public boolean isAllowOtherToJoin() {
-        return allowOtherToJoin;
+        return gamePropertiesHandler.isAllowOtherToJoin();
     }
 
+    @Override
     public void setAllowOtherToJoin(boolean allowOtherToJoin) {
-        this.allowOtherToJoin = allowOtherToJoin;
+        gamePropertiesHandler.setAllowOtherToJoin(allowOtherToJoin);
     }
 
+    @Override
     public boolean isAllowObservers() {
-        return allowObservers;
+        return gamePropertiesHandler.isAllowObservers();
     }
 
+    @Override
     public void setAllowObservers(boolean allowObservers) {
-        this.allowObservers = allowObservers;
+        gamePropertiesHandler.setAllowObservers(allowObservers);
     }
 
     public String getUuid() {
         return uuid;
     }
 
+    @Override
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
+    @Override
     public boolean isGameDone() {
         return KingStatus.CHECKMATE.equals(getEvaluatedKingStatusBySide(BLACK)) ||
                 KingStatus.CHECKMATE.equals(getEvaluatedKingStatusBySide(WHITE)) ||
                 isGameDraw();
     }
 
+    @Override
     public KingHandler getKingHandler() {
         return kingHandler;
     }
 
+    @Override
     public PlayerHandler getPlayerHandler() {
         return playerHandler;
     }
 
+    @Override
     public PieceMoveConstraintDelegate getMoveConstraintDelegate() {
         return pieceMoveConstraintDelegate;
     }

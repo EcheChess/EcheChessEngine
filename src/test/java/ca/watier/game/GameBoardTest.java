@@ -18,6 +18,7 @@ package ca.watier.game;
 
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import org.junit.Before;
@@ -44,13 +45,15 @@ public class GameBoardTest {
     private PlayerHandlerImpl playerHandler;
     @Spy
     private KingHandlerImpl kingHandler;
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
 
     private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
 
     @Before
     public void setUp() {
         when(playerHandler.isPlayerTurn(any(Side.class))).thenReturn(true);
-        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler);
+        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
     }
 
     @Test

@@ -3,6 +3,7 @@ package ca.watier.echechess.engine.utils;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.factories.GameConstraintFactory;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.interfaces.GamePropertiesHandler;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
@@ -23,8 +24,8 @@ public final class FenGameParser {
     private FenGameParser() {
     }
 
-    public static FenPositionGameHandler parse(String fen, KingHandler kingHandler, PlayerHandler playerHandler) throws FenParserException {
-        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(kingHandler, playerHandler);
+    public static FenPositionGameHandler parse(String fen, KingHandler kingHandler, PlayerHandler playerHandler, GamePropertiesHandler gamePropertiesHandler) throws FenParserException {
+        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
         return parse(fen, fenPositionGameHandler);
     }
 

@@ -20,6 +20,7 @@ import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import org.junit.Assert;
@@ -55,10 +56,13 @@ public class SimpleCustomPositionGameHandlerTest {
     @Spy
     private KingHandlerImpl kingHandler;
 
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
+
 
     @Before
     public void setUp() {
-        customPieceGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler);
+        customPieceGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
     }
 
     @Test

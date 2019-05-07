@@ -21,6 +21,7 @@ import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.KingHandler;
@@ -50,6 +51,8 @@ public class CheckAndCheckMateTest {
     private PlayerHandlerImpl playerHandler;
     @Spy
     private KingHandlerImpl kingHandler;
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
 
 
     /**
@@ -57,7 +60,7 @@ public class CheckAndCheckMateTest {
      */
     @Test
     public void checkFromMixShortAndLongRangeWithPawn_multipleExitTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/8/1q1ppp2/3pKp2/3ppp2/8/8 w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/8/1q1ppp2/3pKp2/3ppp2/8/8 w", kingHandler, playerHandler, gamePropertiesHandler);
         KingHandler kingHandler = gameHandler.getKingHandler();
 
         Assertions.assertThat(gameHandler.isCheck(WHITE)).isTrue();
@@ -70,7 +73,7 @@ public class CheckAndCheckMateTest {
      */
     @Test
     public void checkFromMixShortAndLongRangeWithPawn_oneExitTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("7k/8/8/1q1ppp1q/3pKp2/3ppp2/8/8 w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("7k/8/8/1q1ppp1q/3pKp2/3ppp2/8/8 w", kingHandler, playerHandler,gamePropertiesHandler);
         KingHandler kingHandler = gameHandler.getKingHandler();
 
         Assertions.assertThat(gameHandler.isCheck(WHITE)).isTrue();
@@ -85,10 +88,10 @@ public class CheckAndCheckMateTest {
      */
     @Test
     public void checkmateFromLongRange_horizontal_Test() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("7k/8/8/8/8/8/3PPP2/4K2r w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("7k/8/8/8/8/8/3PPP2/4K2r w", kingHandler, playerHandler,gamePropertiesHandler);
         Assertions.assertThat(gameHandler.isCheckMate(WHITE)).isTrue();
 
-        FenPositionGameHandler gameHandler2 = FenGameParser.parse("7k/8/8/8/8/8/3PPP2/r3K3 w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler2 = FenGameParser.parse("7k/8/8/8/8/8/3PPP2/r3K3 w", kingHandler, playerHandler,gamePropertiesHandler);
         Assertions.assertThat(gameHandler2.isCheckMate(WHITE)).isTrue();
     }
 
@@ -100,16 +103,16 @@ public class CheckAndCheckMateTest {
      */
     @Test
     public void checkmateFromLongRange_vertical_Test() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("r6k/8/8/1P6/KP6/1P6/8/8 w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r6k/8/8/1P6/KP6/1P6/8/8 w", kingHandler, playerHandler,gamePropertiesHandler);
         Assertions.assertThat(gameHandler.isCheckMate(WHITE)).isTrue();
 
-        FenPositionGameHandler gameHandler2 = FenGameParser.parse("7k/8/8/1P6/KP6/1P6/8/r7 w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler2 = FenGameParser.parse("7k/8/8/1P6/KP6/1P6/8/r7 w", kingHandler, playerHandler,gamePropertiesHandler);
         Assertions.assertThat(gameHandler2.isCheckMate(WHITE)).isTrue();
     }
 
     @Test
     public void longRangeBlocked_Test() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("b5k1/7b/8/3PPP2/r2pKP1r/3ppp2/8/b3r2b w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("b5k1/7b/8/3PPP2/r2pKP1r/3ppp2/8/b3r2b w", kingHandler, playerHandler,gamePropertiesHandler);
         Assertions.assertThat(gameHandler.isKing(OK, WHITE)).isTrue();
     }
 

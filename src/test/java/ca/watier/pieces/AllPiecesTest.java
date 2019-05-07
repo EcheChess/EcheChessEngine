@@ -21,6 +21,7 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import org.assertj.core.api.Assertions;
@@ -39,13 +40,15 @@ public class AllPiecesTest {
     private PlayerHandlerImpl playerHandler;
     @Spy
     private KingHandlerImpl kingHandler;
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
 
 
     private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
 
     @Before
     public void setUp() {
-        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler);
+        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
     }
 
     @Test

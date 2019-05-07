@@ -2,6 +2,7 @@ package ca.watier.game;
 
 import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import org.junit.Before;
@@ -25,13 +26,15 @@ public class GenericGameHandlerTest {
     private PlayerHandlerImpl playerHandler;
     @Spy
     private KingHandlerImpl kingHandler;
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
 
     @Before
     public void setUp() {
         playerOne = new Player(UUID.randomUUID().toString());
         playerTwo = new Player(UUID.randomUUID().toString());
 
-        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler);
+        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
         simpleCustomPositionGameHandler.setPlayerToSide(playerOne, WHITE);
         simpleCustomPositionGameHandler.setPlayerToSide(playerTwo, BLACK);
     }

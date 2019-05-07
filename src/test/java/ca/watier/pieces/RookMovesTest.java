@@ -19,6 +19,7 @@ package ca.watier.pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.utils.FenGameParser;
@@ -46,6 +47,8 @@ public class RookMovesTest {
     private PlayerHandlerImpl playerHandler;
     @Spy
     private KingHandlerImpl kingHandler;
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
 
     @Before
     public void setUp() {
@@ -54,7 +57,7 @@ public class RookMovesTest {
 
     @Test
     public void moveTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("r6r/8/8/4p3/3pRp2/4p3/8/r5rR w KQkq", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r6r/8/8/4p3/3pRp2/4p3/8/r5rR w KQkq", kingHandler, playerHandler, gamePropertiesHandler);
 
         //Cannot move (blocked in all ways)
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, E8, WHITE));

@@ -20,6 +20,7 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.utils.FenGameParser;
@@ -48,8 +49,10 @@ public class KingMovesTest {
 
     @Spy
     private PlayerHandlerImpl playerHandler;
-    @Mock
+    @Spy
     private KingHandlerImpl kingHandler;
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
 
 
     @Before
@@ -59,7 +62,7 @@ public class KingMovesTest {
 
     @Test
     public void validPathCastlingTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/8/8/8/8/8/8/R3K2R w KQkq", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/8/8/8/8/8/8/R3K2R w KQkq", kingHandler, playerHandler, gamePropertiesHandler);
 
         Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
@@ -81,7 +84,7 @@ public class KingMovesTest {
 
     @Test
     public void attackedQueenSidePathCastlingTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/1r2pppp/8/8/8/8/1r2PPPP/R3K2R w KQkq", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/1r2pppp/8/8/8/8/1r2PPPP/R3K2R w KQkq", kingHandler, playerHandler, gamePropertiesHandler);
 
         Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side, blocked the previous castling by the rook on D1
@@ -122,7 +125,7 @@ public class KingMovesTest {
 
     @Test
     public void blockingPieceQueenSidePathCastlingTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("r2pk2r/4pppp/8/8/8/8/4PPPP/R2PK2R w KQkq", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r2pk2r/4pppp/8/8/8/8/4PPPP/R2PK2R w KQkq", kingHandler, playerHandler, gamePropertiesHandler);
 
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
@@ -138,7 +141,7 @@ public class KingMovesTest {
 
     @Test
     public void movedPiecesQueenSidePathCastlingTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/4pppp/8/8/8/8/4PPPP/R3K2R w KQkq", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/4pppp/8/8/8/8/4PPPP/R3K2R w KQkq", kingHandler, playerHandler, gamePropertiesHandler);
 
         //Move the white king
         gameHandler.movePiece(E1, D2, WHITE);

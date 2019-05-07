@@ -18,6 +18,7 @@ package ca.watier.pieces;
 
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.utils.FenGameParser;
@@ -41,10 +42,12 @@ public class BishopMovesTest {
     private PlayerHandlerImpl playerHandler;
     @Spy
     private KingHandlerImpl kingHandler;
+    @Spy
+    private GamePropertiesHandlerImpl gamePropertiesHandler;
 
     @Test
     public void moveTest() throws FenParserException {
-        FenPositionGameHandler gameHandler = FenGameParser.parse("4b1b1/3P4/6P1/5B2/4P1P1/8/4B3/8 w", kingHandler, playerHandler);
+        FenPositionGameHandler gameHandler = FenGameParser.parse("4b1b1/3P4/6P1/5B2/4P1P1/8/4B3/8 w", kingHandler, playerHandler, gamePropertiesHandler);
 
         assertThat(gameHandler.getAllAvailableMoves(F5, WHITE)).containsOnly(E6);
         assertThat(gameHandler.getAllAvailableMoves(E2, WHITE)).containsOnly(F1, D1, F3, D3, C4, B5, A6);
