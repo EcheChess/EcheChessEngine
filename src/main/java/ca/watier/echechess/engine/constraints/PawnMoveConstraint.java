@@ -147,7 +147,7 @@ public class PawnMoveConstraint implements MoveConstraint {
         boolean isFrontMove = direction.equals(directionFromPosition);
         boolean isNbOfCaseIsOne = nbCaseBetweenPositions == 1;
         boolean isSpecialMove = isSpecialMove(from, to, gameHandler, pieceFrom, nbCaseBetweenPositions, otherPiecesBetweenTarget);
-        boolean isMovable = (isSpecialMove || isNbOfCaseIsOne) && isFrontMove;
+        boolean isMovable = (isNbOfCaseIsOne && isFrontMove) || isSpecialMove;
 
         if (directionFromPosition == null) {
             return false;
@@ -185,10 +185,15 @@ public class PawnMoveConstraint implements MoveConstraint {
             return false;
         }
 
+        Side side = pieceFrom.getSide();
         Direction directionFromPosition = MathUtils.getDirectionFromPosition(from, to);
-        boolean isNorthOfSouth = Direction.NORTH.equals(directionFromPosition) || Direction.SOUTH.equals(directionFromPosition);
 
-        return isNorthOfSouth && GameUtils.isDefaultPosition(from, pieceFrom, gameHandler) && nbCaseBetweenPositions == 2;
+        if ((Side.BLACK.equals(side) && !Direction.SOUTH.equals(directionFromPosition)) ||
+                (Side.WHITE.equals(side) && !Direction.NORTH.equals(directionFromPosition))) {
+            return false;
+        }
+
+        return GameUtils.isDefaultPosition(from, pieceFrom, gameHandler) && nbCaseBetweenPositions == 2;
     }
 
     @Override

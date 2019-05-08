@@ -86,11 +86,11 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     }
 
     public final Map<CasePosition, Pieces> getPiecesLocation() {
-        return Collections.unmodifiableMap(positionPiecesMap);
+        return Map.copyOf(positionPiecesMap);
     }
 
     public Map<CasePosition, Pieces> getDefaultPositions() {
-        return Collections.unmodifiableMap(DEFAULT_POSITIONS);
+        return Map.copyOf(DEFAULT_POSITIONS);
     }
 
     public int getBlackTurnNumber() {
@@ -107,16 +107,16 @@ public abstract class GameBoardData implements Cloneable, Serializable {
 
 
     public Map<CasePosition, Boolean> getIsPiecesMovedMap() {
-        return Collections.unmodifiableMap(isPiecesMovedMap);
+        return Map.copyOf(isPiecesMovedMap);
     }
 
 
     public Map<CasePosition, Boolean> getIsPawnUsedSpecialMoveMap() {
-        return Collections.unmodifiableMap(isPawnUsedSpecialMoveMap);
+        return Map.copyOf(isPawnUsedSpecialMoveMap);
     }
 
     public Map<CasePosition, Integer> getTurnNumberPieceMap() {
-        return Collections.unmodifiableMap(turnNumberPieceMap);
+        return Map.copyOf(turnNumberPieceMap);
     }
 
     /**
