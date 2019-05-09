@@ -44,7 +44,7 @@ public class KingMoveConstraint implements MoveConstraint {
 
         boolean checkHit = true;
         if (MoveMode.NORMAL_OR_ATTACK_MOVE.equals(moveMode)) {
-            checkHit = hittingPiece == null || !sideFrom.equals(hittingPiece.getSide()) && !Pieces.isKing(hittingPiece);
+            checkHit = (hittingPiece == null || !Pieces.isSameSide(hittingPiece, sideFrom) && !Pieces.isKing(hittingPiece));
         }
 
         return (BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to)) == 1) && checkHit;
@@ -68,7 +68,6 @@ public class KingMoveConstraint implements MoveConstraint {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 
-        MoveType moveType = MoveType.NORMAL_MOVE;
         Pieces pieceFrom = gameHandler.getPiece(from);
         Side sideFrom = pieceFrom.getSide();
         Pieces pieceTo = gameHandler.getPiece(to);
@@ -77,50 +76,57 @@ public class KingMoveConstraint implements MoveConstraint {
         KingHandler kingHandler = gameHandler.getKingHandler();
 
         if (pieceTo == null) {
-            return moveType;
+            return MoveType.NORMAL_MOVE;
         }
 
         if (isCastlingPieces(pieceFrom, pieceTo)) {
-            List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
-
-            CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, sideFrom).invoke();
-            boolean queenSideCastling = castlingPositionHelper.isQueenSide();
-
-            boolean isQueenSideAvail = false;
-            boolean isKingSideAvail = false;
-
-            switch (sideFrom) {
-                case BLACK:
-                    isKingSideAvail = gameHandler.isBlackKingCastlingAvailable();
-                    isQueenSideAvail = gameHandler.isBlackQueenCastlingAvailable();
-                    break;
-                case WHITE:
-                    isKingSideAvail = gameHandler.isWhiteKingCastlingAvailable();
-                    isQueenSideAvail = gameHandler.isWhiteQueenCastlingAvailable();
-                    break;
-            }
-
-            if ((queenSideCastling && !isQueenSideAvail) || (!queenSideCastling && !isKingSideAvail)) {
-                return MoveType.MOVE_NOT_ALLOWED;
-            }
-
-            CasePosition kingPosition = castlingPositionHelper.getKingPosition();
-            CasePosition positionWhereKingPass = castlingPositionHelper.getRookPosition();
-
-            boolean isPieceAreNotMoved = !getSafeBoolean(gameHandler.isPieceMoved(from)) && !getSafeBoolean(gameHandler.isPieceMoved(to));
-            boolean isNoPieceBetweenKingAndRook = piecesBetweenKingAndRook.isEmpty();
-            boolean isNoPieceAttackingBetweenKingAndRook = gameHandler.getPiecesThatCanHitPosition(Side.getOtherPlayerSide(sideFrom), positionWhereKingPass).isEmpty();
-            boolean isKingNotCheckAtCurrentLocation = !kingHandler.isKingCheckAtPosition(from, sideFrom, gameHandler);
-            boolean kingNotCheckAtEndPosition = !kingHandler.isKingCheckAtPosition(kingPosition, sideFrom, gameHandler);
-
-            if (isPieceAreNotMoved && isNoPieceBetweenKingAndRook &&
-                    isNoPieceAttackingBetweenKingAndRook && isKingNotCheckAtCurrentLocation &&
-                    kingNotCheckAtEndPosition) {
-                moveType = MoveType.CASTLING;
-            }
+            return handleCastling(from, to, sideFrom, piecesLocation, gameHandler, kingHandler);
         }
 
-        return moveType;
+        return MoveType.NORMAL_MOVE;
+    }
+
+
+    private MoveType handleCastling(CasePosition from, CasePosition to, Side sideFrom, Map<CasePosition, Pieces> piecesLocation, GenericGameHandler gameHandler, KingHandler kingHandler) {
+        List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
+
+        CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, sideFrom).invoke();
+        boolean queenSideCastling = castlingPositionHelper.isQueenSide();
+
+        boolean isQueenSideAvail = false;
+        boolean isKingSideAvail = false;
+
+        switch (sideFrom) {
+            case BLACK:
+                isKingSideAvail = gameHandler.isBlackKingCastlingAvailable();
+                isQueenSideAvail = gameHandler.isBlackQueenCastlingAvailable();
+                break;
+            case WHITE:
+                isKingSideAvail = gameHandler.isWhiteKingCastlingAvailable();
+                isQueenSideAvail = gameHandler.isWhiteQueenCastlingAvailable();
+                break;
+        }
+
+        if ((queenSideCastling && !isQueenSideAvail) || (!queenSideCastling && !isKingSideAvail)) {
+            return MoveType.MOVE_NOT_ALLOWED;
+        }
+
+        CasePosition kingPosition = castlingPositionHelper.getKingPosition();
+        CasePosition positionWhereKingPass = castlingPositionHelper.getRookPosition();
+
+        boolean isPieceAreNotMoved = !getSafeBoolean(gameHandler.isPieceMoved(from)) && !getSafeBoolean(gameHandler.isPieceMoved(to));
+        boolean isNoPieceBetweenKingAndRook = piecesBetweenKingAndRook.isEmpty();
+        boolean isNoPieceAttackingBetweenKingAndRook = gameHandler.getPiecesThatCanHitPosition(Side.getOtherPlayerSide(sideFrom), positionWhereKingPass).isEmpty();
+        boolean isKingNotCheckAtCurrentLocation = !kingHandler.isKingCheckAtPosition(from, sideFrom, gameHandler);
+        boolean kingNotCheckAtEndPosition = !kingHandler.isKingCheckAtPosition(kingPosition, sideFrom, gameHandler);
+
+        if (isPieceAreNotMoved && isNoPieceBetweenKingAndRook &&
+                isNoPieceAttackingBetweenKingAndRook && isKingNotCheckAtCurrentLocation &&
+                kingNotCheckAtEndPosition) {
+            return MoveType.CASTLING;
+        }
+
+        return MoveType.NORMAL_MOVE;
     }
 
     private boolean isCastlingPieces(Pieces pieceFrom, Pieces pieceTo) {

@@ -105,6 +105,6 @@ public class DirectionalMoveConstraint implements MoveConstraint {
     }
 
     private boolean isValidTarget(Pieces pieceTo, Side sideFrom) {
-        return pieceTo == null || !sideFrom.equals(pieceTo.getSide()) && !Pieces.isKing(pieceTo);
+        return pieceTo == null || !Pieces.isSameSide(pieceTo, sideFrom) && !Pieces.isKing(pieceTo);
     }
 }
