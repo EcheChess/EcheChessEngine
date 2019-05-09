@@ -118,29 +118,33 @@ public abstract class GameBoard extends GameBoardData {
         }
     }
 
-    public final void upgradePiece(CasePosition to, Pieces pieces, Side playerSide) {
+    public final boolean upgradePiece(CasePosition to, Pieces pieces, Side playerSide) {
 
         if (ObjectUtils.hasNull(to, pieces, playerSide)) {
-            return;
+            return false;
         }
 
-        for (Pair<CasePosition, CasePosition> pair : getPawnPromotionBySide(playerSide)) {
-            CasePosition toValue = pair.getSecondValue();
+        Pair<CasePosition, CasePosition> pair = null;
+        for (Pair<CasePosition, CasePosition> casePositionCasePositionPair : getPawnPromotionBySide(playerSide)) {
+            CasePosition toValue = casePositionCasePositionPair.getSecondValue();
 
             if (to.equals(toValue)) {
-                upgradePiece(to, pieces, playerSide, pair);
+                pair = casePositionCasePositionPair;
                 break;
             }
         }
-    }
 
-    private void upgradePiece(CasePosition to, Pieces pieces, Side playerSide, Pair<CasePosition, CasePosition> pair) {
-        removePawnPromotion(pair, playerSide);
-        CasePosition currentPawnFromPosition = pair.getFirstValue();
+        boolean isPresent = pair != null;
+        if (isPresent) {
+            removePawnPromotion(pair, playerSide);
+            CasePosition currentPawnFromPosition = pair.getFirstValue();
 
-        removePiece(currentPawnFromPosition); //remove the pawn
-        setPiecePositionWithoutMoveState(pieces, to); // add the wanted piece
-        setGamePaused(false);
+            removePiece(currentPawnFromPosition); //remove the pawn
+            setPiecePositionWithoutMoveState(pieces, to); // add the wanted piece
+            setGamePaused(false);
+        }
+
+        return isPresent;
     }
 
     public void cloneCurrentState() {
