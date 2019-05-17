@@ -36,10 +36,14 @@ public class KingHandlerImpl implements KingHandler {
         //Check if we can move the pieces around the king (same color)
         for (CasePosition moveFrom : MathUtils.getAllPositionsAroundPosition(kingPosition)) {
             Pieces currentPiece = genericGameHandler.getPiece(moveFrom);
+            PieceMoveConstraintDelegate moveConstraintDelegate = genericGameHandler.getMoveConstraintDelegate();
 
             if (currentPiece != null && !Pieces.isKing(currentPiece) && Pieces.isSameSide(currentPiece, kingPiece)) {
                 for (CasePosition moveTo : genericGameHandler.getAllAvailableMoves(moveFrom, playerSide)) {
-                    if (genericGameHandler.isPieceMovableTo(moveFrom, moveTo, playerSide) && !isKingCheckAfterMove(moveFrom, moveTo, playerSide)) {
+
+                    boolean moveValid = moveConstraintDelegate.isMoveValid(moveFrom, moveTo, genericGameHandler, MoveMode.NORMAL_OR_ATTACK_MOVE);
+
+                    if (moveValid && !isKingCheckAfterMove(moveFrom, moveTo)) {
                         return false;
                     }
                 }
@@ -80,8 +84,11 @@ public class KingHandlerImpl implements KingHandler {
 
         List<CasePosition> values = new ArrayList<>();
         List<CasePosition> caseAround = MathUtils.getAllPositionsAroundPosition(kingPosition);
+        PieceMoveConstraintDelegate moveConstraintDelegate = genericGameHandler.getMoveConstraintDelegate();
+
         for (CasePosition position : caseAround) {  //Check if the king can kill something to save himself
-            if (genericGameHandler.isPieceMovableTo(kingPosition, position, playerSide) && !isKingCheckAtPosition(position, playerSide, genericGameHandler)) {
+            boolean moveValid = moveConstraintDelegate.isMoveValid(kingPosition, position, genericGameHandler, MoveMode.NORMAL_OR_ATTACK_MOVE);
+            if (moveValid && !isKingCheckAtPosition(position, playerSide, genericGameHandler)) {
                 values.add(position);
             }
         }
@@ -89,7 +96,6 @@ public class KingHandlerImpl implements KingHandler {
         //Add the position, if the castling is authorized on the rook
         Pieces rook = WHITE.equals(playerSide) ? Pieces.W_ROOK : Pieces.B_ROOK;
 
-        PieceMoveConstraintDelegate moveConstraintDelegate = genericGameHandler.getMoveConstraintDelegate();
         for (CasePosition rookPosition : GameUtils.getPiecesPosition(rook, genericGameHandler.getPiecesLocation())) {
             if (MoveType.CASTLING.equals(moveConstraintDelegate.getMoveType(kingPosition, rookPosition, genericGameHandler))) {
                 values.add(rookPosition);
@@ -100,8 +106,8 @@ public class KingHandlerImpl implements KingHandler {
     }
 
     @Override
-    public boolean isKingCheckAfterMove(CasePosition from, CasePosition to, Side playerSide) {
-        if (ObjectUtils.hasNull(from, to, playerSide)) {
+    public boolean isKingCheckAfterMove(CasePosition from, CasePosition to) {
+        if (ObjectUtils.hasNull(from, to)) {
             return false;
         }
 
@@ -111,9 +117,9 @@ public class KingHandlerImpl implements KingHandler {
 
         genericGameHandler.cloneCurrentState();
         if (MoveType.EN_PASSANT.equals(moveType)) {
-            isKingCheck = isKingCheckWithEnPassantMove(from, to, playerSide);
+            isKingCheck = isKingCheckWithEnPassantMove(from, to);
         } else {
-            isKingCheck = isKingCheckWithOtherMove(from, to, playerSide, moveType);
+            isKingCheck = isKingCheckWithOtherMove(from, to, moveType);
         }
         genericGameHandler.restoreLastState();
 
@@ -156,9 +162,13 @@ public class KingHandlerImpl implements KingHandler {
         }
     }
 
-    private boolean isKingCheckWithEnPassantMove(CasePosition from, CasePosition to, Side playerSide) {
-        CasePosition enPassantEnemyPawnPosition = PawnMoveConstraint.getEnemyPawnPositionFromEnPassant(to, getOtherPlayerSide(playerSide));
+    private boolean isKingCheckWithEnPassantMove(CasePosition from, CasePosition to) {
+
         Pieces currentPiece = genericGameHandler.getPiece(from);
+        Side side = currentPiece.getSide();
+        Side otherPlayerSide = getOtherPlayerSide(side);
+
+        CasePosition enPassantEnemyPawnPosition = PawnMoveConstraint.getEnemyPawnPositionFromEnPassant(to, otherPlayerSide);
 
         //Copy the values
         Boolean isPawnUsedSpecialMove = genericGameHandler.isPawnUsedSpecialMove(from);
@@ -184,15 +194,18 @@ public class KingHandlerImpl implements KingHandler {
         genericGameHandler.setPiecesGameState(isPawnUsedSpecialMoveMap, turnNumberPieceMap, isPiecesMovedMap);
 
         Map<CasePosition, Pieces> piecesLocation = genericGameHandler.getPiecesLocation();
-        CasePosition singlePiecePosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), piecesLocation);
+        CasePosition singlePiecePosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(side), piecesLocation);
         MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> piecesThatCanHitOriginalPosition =
-                genericGameHandler.getPiecesThatCanHitPosition(getOtherPlayerSide(playerSide), singlePiecePosition);
+                genericGameHandler.getPiecesThatCanHitPosition(otherPlayerSide, singlePiecePosition);
         return !piecesThatCanHitOriginalPosition.isEmpty();
     }
 
-    private boolean isKingCheckWithOtherMove(CasePosition from, CasePosition to, Side playerSide, MoveType moveType) {
+    private boolean isKingCheckWithOtherMove(CasePosition from, CasePosition to, MoveType moveType) {
         boolean isKingCheck;
+
         Pieces currentPiece = genericGameHandler.getPiece(from);
+        Side playerSide = currentPiece.getSide();
+
         Pieces pieceEaten = genericGameHandler.getPiece(to);
 
         genericGameHandler.removePieceFromBoard(from);
@@ -250,14 +263,15 @@ public class KingHandlerImpl implements KingHandler {
             if (Pieces.isKnight(enemyPiece)) { //We cannot block a knight
                 return false;
             }
+            PieceMoveConstraintDelegate moveConstraintDelegate = genericGameHandler.getMoveConstraintDelegate();
 
             for (CasePosition to : MathUtils.getPositionsBetweenTwoPosition(enemyPosition, kingPosition)) { //For each position between the king and the enemy, we try to block it
                 for (CasePosition from : genericGameHandler.getPiecesLocation(playerSide).keySet()) { //Try to find if one of our piece can block the target
                     if (Pieces.isKing(genericGameHandler.getPiece(from))) {
                         continue;
                     }
-
-                    if (genericGameHandler.isPieceMovableTo(from, to, playerSide) && !isKingCheckAfterMove(from, to, playerSide)) {
+                    boolean moveValid = moveConstraintDelegate.isMoveValid(from, to, genericGameHandler, MoveMode.NORMAL_OR_ATTACK_MOVE);
+                    if (moveValid && !isKingCheckAfterMove(from, to)) {
                         return true;
                     }
                 }
@@ -287,6 +301,7 @@ public class KingHandlerImpl implements KingHandler {
             int toRow = to.getRow();
             int toColPos = to.getColPos();
             boolean isColumnNearEachOther = (Math.abs(fromColPos - toColPos) == 1);
+            PieceMoveConstraintDelegate moveConstraintDelegate = genericGameHandler.getMoveConstraintDelegate();
 
             //This is the only case, where the piece is not directly the end target (En passant).
             if (Pieces.isPawn(currentPiece) &&
@@ -305,9 +320,9 @@ public class KingHandlerImpl implements KingHandler {
                 CasePosition enPassantEnemyPawnPosition =
                         PawnMoveConstraint.getEnPassantPositionFromEnemyPawn(to, Side.getOtherPlayerSide(playerSide));
 
-                isCheck &= isKingCheckAfterMove(from, enPassantEnemyPawnPosition, playerSide);
-            } else if (genericGameHandler.isPieceMovableTo(from, to, playerSide) && !isKingCheckAfterMove(from, to, playerSide)) {
-                isCheck &= isKingCheckAfterMove(from, to, playerSide); //One or more piece is able to kill the enemy
+                isCheck &= isKingCheckAfterMove(from, enPassantEnemyPawnPosition);
+            } else if (moveConstraintDelegate.isMoveValid(from, to, genericGameHandler, MoveMode.NORMAL_OR_ATTACK_MOVE) && !isKingCheckAfterMove(from, to)) {
+                isCheck &= isKingCheckAfterMove(from, to); //One or more piece is able to kill the enemy
             }
         }
 

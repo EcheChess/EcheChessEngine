@@ -142,7 +142,7 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
         boolean isEatingPiece = piecesTo != null;
 
         if (MoveType.NORMAL_MOVE.equals(moveType) || MoveType.PAWN_HOP.equals(moveType)) {
-            if (!isPieceMovableTo(from, to, playerSide)) {
+            if (!pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE)) {
                 throw new MoveNotAllowedException();
             }
             cloneCurrentState();
@@ -293,23 +293,6 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
 
 
     /**
-     * Check if the piece can be moved to the selected position
-     *
-     * @param from
-     * @param to
-     * @param playerSide
-     * @return
-     */
-    @Override
-    public final boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide) {
-        if (ObjectUtils.hasNull(from, to, playerSide)) {
-            return false;
-        }
-
-        return pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
-    }
-
-    /**
      * Return a List containing all the moves for the selected piece
      *
      * @param from
@@ -332,9 +315,9 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
 
         CasePosition[] casePositionWithoutCurrent = ArrayUtils.removeElement(CasePosition.values(), from);
 
-        for (CasePosition position : casePositionWithoutCurrent) {
-            if (isPieceMovableTo(from, position, playerSide)) {
-                positions.add(position);
+        for (CasePosition to : casePositionWithoutCurrent) {
+            if (pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE)) {
+                positions.add(to);
             }
         }
 
@@ -364,10 +347,10 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
                 continue;
             }
 
-            MoveType moveType = pieceMoveConstraintDelegate.getMoveType(from, to, this);
-            boolean isEnPassant = MoveType.EN_PASSANT.equals(moveType);
+            boolean moveValid = pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
+            boolean kingCheckAfterMove = !kingHandler.isKingCheckAfterMove(from, to);
 
-            if (!kingHandler.isKingCheckAfterMove(from, to, sideToKeep) && isPieceMovableTo(from, to, sideToKeep) || isEnPassant) {
+            if (kingCheckAfterMove && moveValid) {
                 values.add(new Pair<>(from, piecesFrom));
             }
         }

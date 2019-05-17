@@ -21,6 +21,7 @@ import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
@@ -77,21 +78,30 @@ public class KingMoveConstraint implements MoveConstraint {
 
         if (pieceTo == null) {
             return MoveType.NORMAL_MOVE;
-        }
-
-        if (isCastlingPieces(pieceFrom, pieceTo)) {
+        } else if (isCastlingPieces(pieceFrom, pieceTo)) {
             return handleCastling(from, to, sideFrom, piecesLocation, gameHandler, kingHandler);
+        } else {
+            return MoveType.NORMAL_MOVE;
         }
-
-        return MoveType.NORMAL_MOVE;
     }
 
 
     private MoveType handleCastling(CasePosition from, CasePosition to, Side sideFrom, Map<CasePosition, Pieces> piecesLocation, GenericGameHandler gameHandler, KingHandler kingHandler) {
-        List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
 
         CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, sideFrom).invoke();
+
+        if (isCastlingAvailable(gameHandler, castlingPositionHelper, sideFrom)) {
+            return MoveType.MOVE_NOT_ALLOWED;
+        } else if (isCastlingValid(gameHandler, piecesLocation, castlingPositionHelper, kingHandler, from, sideFrom, to)) {
+            return MoveType.CASTLING;
+        } else {
+            return MoveType.NORMAL_MOVE;
+        }
+    }
+
+    private boolean isCastlingAvailable(GameBoardData gameHandler, CastlingPositionHelper castlingPositionHelper, Side sideFrom) {
         boolean queenSideCastling = castlingPositionHelper.isQueenSide();
+        boolean kingSideCastling = !queenSideCastling;
 
         boolean isQueenSideAvail = false;
         boolean isKingSideAvail = false;
@@ -107,10 +117,19 @@ public class KingMoveConstraint implements MoveConstraint {
                 break;
         }
 
-        if ((queenSideCastling && !isQueenSideAvail) || (!queenSideCastling && !isKingSideAvail)) {
-            return MoveType.MOVE_NOT_ALLOWED;
-        }
+        return (queenSideCastling && !isQueenSideAvail) || (kingSideCastling && !isKingSideAvail);
+    }
 
+    private boolean isCastlingValid(GenericGameHandler gameHandler,
+                                    Map<CasePosition, Pieces> piecesLocation,
+                                    CastlingPositionHelper castlingPositionHelper,
+                                    KingHandler kingHandler,
+                                    CasePosition from,
+                                    Side sideFrom,
+                                    CasePosition to) {
+
+
+        List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
         CasePosition kingPosition = castlingPositionHelper.getKingPosition();
         CasePosition positionWhereKingPass = castlingPositionHelper.getRookPosition();
 
@@ -120,13 +139,9 @@ public class KingMoveConstraint implements MoveConstraint {
         boolean isKingNotCheckAtCurrentLocation = !kingHandler.isKingCheckAtPosition(from, sideFrom, gameHandler);
         boolean kingNotCheckAtEndPosition = !kingHandler.isKingCheckAtPosition(kingPosition, sideFrom, gameHandler);
 
-        if (isPieceAreNotMoved && isNoPieceBetweenKingAndRook &&
+        return isPieceAreNotMoved && isNoPieceBetweenKingAndRook &&
                 isNoPieceAttackingBetweenKingAndRook && isKingNotCheckAtCurrentLocation &&
-                kingNotCheckAtEndPosition) {
-            return MoveType.CASTLING;
-        }
-
-        return MoveType.NORMAL_MOVE;
+                kingNotCheckAtEndPosition;
     }
 
     private boolean isCastlingPieces(Pieces pieceFrom, Pieces pieceTo) {

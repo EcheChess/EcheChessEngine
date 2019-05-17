@@ -15,7 +15,7 @@ public interface KingHandler extends GenericHandler {
 
     boolean isStalemate(Side playerSide, Pieces kingPiece, CasePosition kingPosition);
 
-    boolean isKingCheckAfterMove(CasePosition from, CasePosition to, Side playerSide);
+    boolean isKingCheckAfterMove(CasePosition from, CasePosition to);
 
     List<CasePosition> getPositionKingCanMove(Side playerSide);
 

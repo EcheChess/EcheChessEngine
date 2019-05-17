@@ -16,11 +16,14 @@
 
 package ca.watier.game;
 
+import ca.watier.echechess.common.enums.MoveType;
 import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
+import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.GameHandler;
+import ca.watier.echechess.engine.interfaces.GenericHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,72 +51,72 @@ public class GameBoardTest {
     @Spy
     private GamePropertiesHandlerImpl gamePropertiesHandler;
 
-    private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
+    private GenericGameHandler genericHandler;
 
     @Before
     public void setUp() {
+        genericHandler = new GenericGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
         when(playerHandler.isPlayerTurn(any(Side.class))).thenReturn(true);
-        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
     }
 
     @Test
     public void getBlackTurnNumber() {
-        assertThat(simpleCustomPositionGameHandler.getBlackTurnNumber()).isZero();
-        simpleCustomPositionGameHandler.movePiece(H7, H6, BLACK);
-        assertThat(simpleCustomPositionGameHandler.getBlackTurnNumber()).isEqualTo(1);
-        simpleCustomPositionGameHandler.movePiece(H6, H5, BLACK);
-        simpleCustomPositionGameHandler.movePiece(H5, H4, BLACK);
-        assertThat(simpleCustomPositionGameHandler.getBlackTurnNumber()).isEqualTo(3);
+        assertThat(genericHandler.getBlackTurnNumber()).isZero();
+        genericHandler.movePiece(H7, H6, BLACK);
+        assertThat(genericHandler.getBlackTurnNumber()).isEqualTo(1);
+        genericHandler.movePiece(H6, H5, BLACK);
+        genericHandler.movePiece(H5, H4, BLACK);
+        assertThat(genericHandler.getBlackTurnNumber()).isEqualTo(3);
     }
 
     @Test
     public void getWhiteTurnNumber() {
-        assertThat(simpleCustomPositionGameHandler.getWhiteTurnNumber()).isZero();
-        simpleCustomPositionGameHandler.movePiece(H2, H3, WHITE);
-        assertThat(simpleCustomPositionGameHandler.getWhiteTurnNumber()).isEqualTo(1);
-        simpleCustomPositionGameHandler.movePiece(H3, H4, WHITE);
-        simpleCustomPositionGameHandler.movePiece(H4, H5, WHITE);
-        assertThat(simpleCustomPositionGameHandler.getWhiteTurnNumber()).isEqualTo(3);
+        assertThat(genericHandler.getWhiteTurnNumber()).isZero();
+        genericHandler.movePiece(H2, H3, WHITE);
+        assertThat(genericHandler.getWhiteTurnNumber()).isEqualTo(1);
+        genericHandler.movePiece(H3, H4, WHITE);
+        genericHandler.movePiece(H4, H5, WHITE);
+        assertThat(genericHandler.getWhiteTurnNumber()).isEqualTo(3);
     }
 
     @Test
     public void isPieceMoved() {
-        assertFalse(simpleCustomPositionGameHandler.isPieceMoved(G1));
+        assertFalse(genericHandler.isPieceMoved(G1));
 
-        simpleCustomPositionGameHandler.movePiece(G1, F3, WHITE);
+        genericHandler.movePiece(G1, F3, WHITE);
 
-        assertTrue(simpleCustomPositionGameHandler.isPieceMoved(F3));
-        assertNull(simpleCustomPositionGameHandler.isPieceMoved(G1));
+        assertTrue(genericHandler.isPieceMoved(F3));
+        assertNull(genericHandler.isPieceMoved(G1));
     }
 
     @Test
     public void isPawnUsedSpecialMove() {
-        assertFalse(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(H2));
-        simpleCustomPositionGameHandler.movePiece(H2, H4, WHITE);
-        assertTrue(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(H4));
+        assertFalse(genericHandler.isPawnUsedSpecialMove(H2));
+        genericHandler.movePiece(H2, H4, WHITE);
+        assertTrue(genericHandler.isPawnUsedSpecialMove(H4));
 
-        assertFalse(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(G2));
-        simpleCustomPositionGameHandler.movePiece(G2, G3, WHITE);
-        assertFalse(simpleCustomPositionGameHandler.isPawnUsedSpecialMove(G3));
+        assertFalse(genericHandler.isPawnUsedSpecialMove(G2));
+        genericHandler.movePiece(G2, G3, WHITE);
+        assertFalse(genericHandler.isPawnUsedSpecialMove(G3));
 
     }
 
     @Test
     public void getDefaultPositions() {
-        assertThat(simpleCustomPositionGameHandler.getDefaultPositions()).isEqualTo(simpleCustomPositionGameHandler.getPiecesLocation());
-        simpleCustomPositionGameHandler.movePiece(G2, G3, WHITE);
-        assertThat(simpleCustomPositionGameHandler.getDefaultPositions()).isNotEqualTo(simpleCustomPositionGameHandler.getPiecesLocation());
+        assertThat(genericHandler.getDefaultPositions()).isEqualTo(genericHandler.getPiecesLocation());
+        genericHandler.movePiece(G2, G3, WHITE);
+        assertThat(genericHandler.getDefaultPositions()).isNotEqualTo(genericHandler.getPiecesLocation());
     }
 
 
     @Test
     public void getTurnNumberPiece() {
-        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G2)).isZero();
-        simpleCustomPositionGameHandler.movePiece(G2, G3, WHITE);
-        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G3)).isZero();
-        simpleCustomPositionGameHandler.movePiece(G3, G4, WHITE);
-        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G3)).isNull();
-        assertThat(simpleCustomPositionGameHandler.getPieceTurn(G4)).isEqualTo(1);
+        assertThat(genericHandler.getPieceTurn(G2)).isZero();
+        genericHandler.movePiece(G2, G3, WHITE);
+        assertThat(genericHandler.getPieceTurn(G3)).isZero();
+        genericHandler.movePiece(G3, G4, WHITE);
+        assertThat(genericHandler.getPieceTurn(G3)).isNull();
+        assertThat(genericHandler.getPieceTurn(G4)).isEqualTo(1);
     }
 
 

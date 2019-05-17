@@ -1,7 +1,7 @@
 package ca.watier.game;
 
 import ca.watier.echechess.common.sessions.Player;
-import ca.watier.echechess.engine.game.SimpleCustomPositionGameHandler;
+import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class GenericGameHandlerTest {
 
-    private SimpleCustomPositionGameHandler simpleCustomPositionGameHandler;
+    private GenericGameHandler genericGameHandler;
     private Player playerOne, playerTwo;
 
     @Spy
@@ -34,24 +34,24 @@ public class GenericGameHandlerTest {
         playerOne = new Player(UUID.randomUUID().toString());
         playerTwo = new Player(UUID.randomUUID().toString());
 
-        simpleCustomPositionGameHandler = new SimpleCustomPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
-        simpleCustomPositionGameHandler.setPlayerToSide(playerOne, WHITE);
-        simpleCustomPositionGameHandler.setPlayerToSide(playerTwo, BLACK);
+        genericGameHandler = new GenericGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler.setPlayerToSide(playerOne, WHITE);
+        genericGameHandler.setPlayerToSide(playerTwo, BLACK);
     }
 
     @Test
     public void changePlayerSide() {
         //The player are already set
-        assertThat(simpleCustomPositionGameHandler.hasPlayer(playerOne)).isTrue(); //White
-        assertThat(simpleCustomPositionGameHandler.hasPlayer(playerTwo)).isTrue(); //Black
+        assertThat(genericGameHandler.hasPlayer(playerOne)).isTrue(); //White
+        assertThat(genericGameHandler.hasPlayer(playerTwo)).isTrue(); //Black
 
-        assertThat(simpleCustomPositionGameHandler.setPlayerToSide(playerOne, WHITE)).isFalse();
-        assertThat(simpleCustomPositionGameHandler.setPlayerToSide(playerOne, OBSERVER)).isTrue(); //The player white to observe
-        assertThat(simpleCustomPositionGameHandler.getPlayerSide(playerOne)).isEqualByComparingTo(OBSERVER);
+        assertThat(genericGameHandler.setPlayerToSide(playerOne, WHITE)).isFalse();
+        assertThat(genericGameHandler.setPlayerToSide(playerOne, OBSERVER)).isTrue(); //The player white to observe
+        assertThat(genericGameHandler.getPlayerSide(playerOne)).isEqualByComparingTo(OBSERVER);
 
-        assertThat(simpleCustomPositionGameHandler.setPlayerToSide(playerTwo, WHITE)).isTrue(); //Change the black to white
-        assertThat(simpleCustomPositionGameHandler.getPlayerSide(playerTwo)).isEqualByComparingTo(WHITE);
-        assertThat(simpleCustomPositionGameHandler.setPlayerToSide(playerOne, BLACK)).isTrue(); //Change the observer to black
-        assertThat(simpleCustomPositionGameHandler.getPlayerSide(playerOne)).isEqualByComparingTo(BLACK);
+        assertThat(genericGameHandler.setPlayerToSide(playerTwo, WHITE)).isTrue(); //Change the black to white
+        assertThat(genericGameHandler.getPlayerSide(playerTwo)).isEqualByComparingTo(WHITE);
+        assertThat(genericGameHandler.setPlayerToSide(playerOne, BLACK)).isTrue(); //Change the observer to black
+        assertThat(genericGameHandler.getPlayerSide(playerOne)).isEqualByComparingTo(BLACK);
     }
 }

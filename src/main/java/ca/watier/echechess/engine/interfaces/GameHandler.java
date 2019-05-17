@@ -17,8 +17,6 @@ public interface GameHandler {
 
     Map<CasePosition, Pieces> getPiecesLocation(Side side);
 
-    boolean isPieceMovableTo(CasePosition from, CasePosition to, Side playerSide);
-
     List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide);
 
     List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep);
