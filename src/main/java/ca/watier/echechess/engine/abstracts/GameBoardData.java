@@ -110,7 +110,6 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         return Map.copyOf(isPiecesMovedMap);
     }
 
-
     public Map<CasePosition, Boolean> getIsPawnUsedSpecialMoveMap() {
         return Map.copyOf(isPawnUsedSpecialMoveMap);
     }

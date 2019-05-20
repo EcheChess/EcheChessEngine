@@ -24,6 +24,7 @@ import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.MoveType.*;
 import static ca.watier.echechess.common.enums.Pieces.B_PAWN;
 import static ca.watier.echechess.common.enums.Pieces.W_PAWN;
@@ -64,7 +66,6 @@ public class PawnMovesTest {
         assertThat(gameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
     }
 
-
     /**
      * In this test, the white king should not be checked by the pawn
      */
@@ -73,6 +74,29 @@ public class PawnMovesTest {
         FenPositionGameHandler gameHandler = FenGameParser.parse("1k6/1p6/1K6/8/8/8/8/8 w KQkq", kingHandler, playerHandler, gamePropertiesHandler);
 
         assertThat(gameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
+    }
+
+    @Test
+    public void pawn_front_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/p7/p7/K7/8/8/8/8 w KQkq");
+        KingHandler kingHandler = gameHandler.getKingHandler();
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B4);
+        assertThat(gameHandler.isKing(OK, WHITE)).isTrue();
+
+        gameHandler.removePieceFromBoard(A6); //remove the pawn blocking
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B4, B5);
+        assertThat(gameHandler.isKing(OK, WHITE)).isTrue();
+    }
+
+    @Test
+    public void pawn_diagonal_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/1p6/2K5/8/8/8/8/8 w KQkq");
+        KingHandler kingHandler = gameHandler.getKingHandler();
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(B7, C5, C7, D7, B6, D6, B5, D5);
+        assertThat(gameHandler.isCheck(WHITE)).isTrue();
     }
 
 

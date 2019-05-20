@@ -316,7 +316,9 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
         CasePosition[] casePositionWithoutCurrent = ArrayUtils.removeElement(CasePosition.values(), from);
 
         for (CasePosition to : casePositionWithoutCurrent) {
-            if (pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE)) {
+            boolean moveValid = pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
+
+            if (moveValid && !kingHandler.isKingCheckAfterMove(from, to)) {
                 positions.add(to);
             }
         }
@@ -348,9 +350,8 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
             }
 
             boolean moveValid = pieceMoveConstraintDelegate.isMoveValid(from, to, this, MoveMode.NORMAL_OR_ATTACK_MOVE);
-            boolean kingCheckAfterMove = !kingHandler.isKingCheckAfterMove(from, to);
 
-            if (kingCheckAfterMove && moveValid) {
+            if (moveValid && !kingHandler.isKingCheckAfterMove(from, to)) {
                 values.add(new Pair<>(from, piecesFrom));
             }
         }

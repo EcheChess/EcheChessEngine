@@ -22,6 +22,7 @@ import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,9 +32,11 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.MoveType.CAPTURE;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.Side.WHITE;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -78,4 +81,19 @@ public class RookMovesTest {
         Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, F3, WHITE));
 
     }
+
+    @Test
+    public void rook_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("r7/p7/8/K7/8/8/8/8 w KQkq");
+        KingHandler kingHandler = gameHandler.getKingHandler();
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(A4, A6, B5, B4);
+        assertThat(gameHandler.isKing(OK, WHITE)).isTrue();
+
+        gameHandler.removePieceFromBoard(A7); //remove the pawn blocking
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(B6, B5, B4);
+        assertThat(gameHandler.isCheck(WHITE)).isTrue();
+    }
+
 }

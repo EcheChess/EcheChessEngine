@@ -23,6 +23,7 @@ import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
 import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.junit.Assert;
 import org.junit.Before;
@@ -137,6 +138,18 @@ public class KingMovesTest {
         Assert.assertEquals(Pieces.B_KING, gameHandler.getPiece(G8));
         Assert.assertEquals(Pieces.B_ROOK, gameHandler.getPiece(F8));
     }
+
+
+    @Test
+    public void king_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/2k5/3K4/8/8/8/8 w KQkq");
+        KingHandler kingHandler = gameHandler.getKingHandler();
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(C4, D4, E4, E5, E6);
+        assertThat(gameHandler.isCheck(WHITE)).isTrue();
+    }
+
+
 
 
     @Test

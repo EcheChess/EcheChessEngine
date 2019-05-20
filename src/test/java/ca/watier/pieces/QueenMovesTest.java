@@ -18,6 +18,7 @@ package ca.watier.pieces;
 
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
+import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -25,8 +26,10 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
+import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.Side.WHITE;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -49,6 +52,21 @@ public class QueenMovesTest {
         assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, G6, WHITE));
         assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C6, WHITE));
         assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E4, C2, WHITE));
+    }
+
+
+    @Test
+    public void queen_Test() throws FenParserException {
+        FenPositionGameHandler gameHandler = FenGameParser.parse("8/1q6/2P5/3K4/8/8/8/8 w KQkq");
+        KingHandler kingHandler = gameHandler.getKingHandler();
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(D6, E6, C5, C4, D4, E4, E5);
+        assertThat(gameHandler.isKing(OK, WHITE)).isTrue();
+
+        gameHandler.removePieceFromBoard(C6); //remove the pawn blocking
+
+        assertThat(kingHandler.getPositionKingCanMove(WHITE)).containsOnly(D6, E6, C5, C4, D4, E5);
+        assertThat(gameHandler.isCheck(WHITE)).isTrue();
     }
 
 
