@@ -1,10 +1,11 @@
 package ca.watier.echechess.engine.utils;
 
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.exceptions.FenParserException;
-import ca.watier.echechess.engine.factories.GameConstraintFactory;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
-import ca.watier.echechess.engine.interfaces.GamePropertiesHandler;
-import ca.watier.echechess.engine.interfaces.KingHandler;
+import ca.watier.echechess.engine.handlers.GameEventEvaluatorHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,13 +25,17 @@ public final class FenGameParser {
     private FenGameParser() {
     }
 
-    public static FenPositionGameHandler parse(String fen, KingHandler kingHandler, PlayerHandler playerHandler, GamePropertiesHandler gamePropertiesHandler) throws FenParserException {
-        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
+    public static FenPositionGameHandler parse(String fen, PieceMoveConstraintDelegate pieceDelegate, PlayerHandler playerHandler, GameEventEvaluatorHandler gameEventEvaluatorHandler) throws FenParserException {
+        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(pieceDelegate, playerHandler, gameEventEvaluatorHandler);
         return parse(fen, fenPositionGameHandler);
     }
 
     public static FenPositionGameHandler parse(String fen) throws FenParserException {
-        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(GameConstraintFactory.getDefaultGameMoveDelegate());
+        PieceMoveConstraintDelegate defaultGameMoveDelegate = new PieceMoveConstraintDelegate();
+        PlayerHandler playerHandler = new PlayerHandlerImpl();
+        GameEventEvaluatorHandler gameEventEvaluatorHandler = new GameEventEvaluatorHandlerImpl();
+
+        FenPositionGameHandler fenPositionGameHandler = new FenPositionGameHandler(defaultGameMoveDelegate, playerHandler, gameEventEvaluatorHandler);
         return parse(fen, fenPositionGameHandler);
     }
 

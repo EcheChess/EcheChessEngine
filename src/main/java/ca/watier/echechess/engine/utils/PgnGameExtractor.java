@@ -24,6 +24,12 @@ import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.*;
+import ca.watier.echechess.engine.handlers.GameEventEvaluatorHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
+import ca.watier.echechess.engine.interfaces.PlayerHandler;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -45,14 +51,18 @@ public class PgnGameExtractor {
 
     private final List<GenericGameHandler> handlerList = new ArrayList<>();
     private final PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
+    private final PlayerHandler playerHandler;
+    private final GameEventEvaluatorHandler gameEventEvaluatorHandler;
 
     private GenericGameHandler gameHandler;
     private Side currentSide = WHITE;
     private Side otherSide = BLACK;
+    private String currentGame;
 
-
-    public PgnGameExtractor(PieceMoveConstraintDelegate pieceMoveConstraintDelegate) {
-        this.pieceMoveConstraintDelegate = pieceMoveConstraintDelegate;
+    public PgnGameExtractor() {
+        this.pieceMoveConstraintDelegate = new PieceMoveConstraintDelegate();
+        this.playerHandler = new PlayerHandlerImpl();
+        this.gameEventEvaluatorHandler = new GameEventEvaluatorHandlerImpl();
     }
 
     public static String[] getRawHeadersAndGames(String rawText) {
@@ -79,6 +89,8 @@ public class PgnGameExtractor {
     }
 
     private void parseGame(String rawCurrentGame) throws ChessException {
+        this.currentGame = rawCurrentGame;
+
         String currentGame = getGame(rawCurrentGame);
         String[] tokens = currentGame.split("\\s+\\d+\\.");
 
@@ -87,20 +99,21 @@ public class PgnGameExtractor {
         }
 
         resetSide();
-        gameHandler = new GenericGameHandler(pieceMoveConstraintDelegate);
+        gameHandler = new GenericGameHandler(pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         handlerList.add(gameHandler);
 
-        for (String currentToken : tokens) {
-            currentToken = currentToken.trim();
+        for (int currentTokenSet = 1; currentTokenSet < (tokens.length + 1); currentTokenSet++) {
+            String currentToken = tokens[currentTokenSet - 1];
+            currentToken = StringUtils.trim(currentToken);
 
-            for (String action : currentToken.split(" ")) {
-                action = action.trim();
+            for (String action : StringUtils.split(currentToken, " ")) {
+                action = StringUtils.trim(action);
 
-                if (action.isEmpty()) {
+                if (StringUtils.isEmpty(action)) {
                     continue;
                 }
 
-                parseAction(action, currentGame);
+                parseAction(action);
             }
         }
     }
@@ -110,7 +123,7 @@ public class PgnGameExtractor {
         otherSide = BLACK;
     }
 
-    private void parseAction(String action, String currentGame) throws ChessException {
+    private void parseAction(String action) throws ChessException {
         PgnEndGameToken endGameTokenByAction = PgnEndGameToken.getEndGameTokenByAction(action);
         if (PgnEndGameToken.isGameEnded(endGameTokenByAction)) {
             try {
@@ -208,7 +221,7 @@ public class PgnGameExtractor {
 
     private void validateCheck() throws InvalidCheckException {
         if (!gameHandler.isCheck(otherSide)) {
-            throw new InvalidCheckException("The other player king is not check!");
+            throw new InvalidCheckException(String.format("The other player king is not check for the game [%s]", currentGame));
         } else {
             LOGGER.debug("{} is CHECK", otherSide);
         }
@@ -216,7 +229,7 @@ public class PgnGameExtractor {
 
     private void validateCheckMate() throws InvalidCheckMateException {
         if (!gameHandler.isCheckMate(otherSide)) {
-            throw new InvalidCheckMateException("The other player king is not checkmate!");
+            throw new InvalidCheckMateException(String.format("The other player king is not checkmate for the game [%s]", currentGame));
         } else {
             LOGGER.debug("{} is CHECKMATE", otherSide);
         }
@@ -243,9 +256,12 @@ public class PgnGameExtractor {
         List<Pair<CasePosition, Pieces>> piecesThatCanHitPosition = gameHandler.getAllPiecesThatCanMoveTo(to, currentSide);
         List<CasePosition> similarPieceThatHitTarget = getSimilarPiecesPositionThatCanHitSameTarget(piecesThatCanHitPosition, pgnPieceFound.getPieceBySide(currentSide));
 
-        CasePosition from = (!similarPieceThatHitTarget.isEmpty() ?
-                getFromPositionWhenMultipleTargetCanHit(action, casePositions, similarPieceThatHitTarget) :
-                getPositionWhenOneTargetCanHit(piecesThatCanHitPosition, pgnPieceFound));
+        CasePosition from;
+        if (CollectionUtils.isNotEmpty(similarPieceThatHitTarget)) {
+            from = getFromPositionWhenMultipleTargetCanHit(action, casePositions, similarPieceThatHitTarget);
+        } else {
+            from = getPositionWhenOneTargetCanHit(piecesThatCanHitPosition, pgnPieceFound);
+        }
 
         LOGGER.debug("MOVE {} to {} ({}) | action -> {}", from, to, currentSide, action);
         MoveType moveType = gameHandler.movePiece(from, to, currentSide);
@@ -255,7 +271,7 @@ public class PgnGameExtractor {
             Pieces pieceBySide = pieceFromAction.getPieceBySide(currentSide);
             gameHandler.upgradePiece(to, pieceBySide, currentSide);
         } else if (!(MoveType.NORMAL_MOVE.equals(moveType) || MoveType.CAPTURE.equals(moveType) || MoveType.EN_PASSANT.equals(moveType) || MoveType.PAWN_HOP.equals(moveType))) {  //Issue with the move / case
-            throw new InvalidMoveException(String.format("Unable to move at the selected position %s for the current color %s ! (%s)", to, currentSide, action));
+            throw new InvalidMoveException(String.format("Unable to move at the selected position %s for the current color %s ! (%s) and current game %s", to, currentSide, action, currentGame));
         }
     }
 

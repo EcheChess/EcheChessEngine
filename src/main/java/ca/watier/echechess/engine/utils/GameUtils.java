@@ -22,11 +22,11 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
+import ca.watier.echechess.engine.models.DistancePiecePositionModel;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by yannick on 4/23/2017.
@@ -218,7 +218,7 @@ public class GameUtils implements BaseUtils {
             return false;
         }
 
-        return !getPiecesBetweenPosition(from, to, pieces).isEmpty();
+        return CollectionUtils.isNotEmpty(getPiecesBetweenPosition(from, to, pieces));
     }
 
     /**
@@ -229,11 +229,11 @@ public class GameUtils implements BaseUtils {
      * @param pieces
      * @return
      */
-    public static List<CasePosition> getPiecesBetweenPosition(CasePosition from, CasePosition to, Map<CasePosition, Pieces> pieces) {
+    public static Set<DistancePiecePositionModel> getPiecesBetweenPosition(CasePosition from, CasePosition to, Map<CasePosition, Pieces> pieces) {
 
-        List<CasePosition> positions = new ArrayList<>();
+        Set<DistancePiecePositionModel> positions = new TreeSet<>();
 
-        if (from == null || to == null || pieces == null) {
+        if (!ObjectUtils.allNotNull(from, to, pieces)) {
             return positions;
         }
 
@@ -242,15 +242,15 @@ public class GameUtils implements BaseUtils {
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : pieces.entrySet()) {
 
-            CasePosition key = casePositionPiecesEntry.getKey();
+            CasePosition position = casePositionPiecesEntry.getKey();
+            Pieces piece = casePositionPiecesEntry.getValue();
+            if (piece != null && position != from && position != to) {
 
-            if (casePositionPiecesEntry.getValue() != null && key != from && key != to) {
+                int distanceToOther = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, position));
+                Direction directionToOther = MathUtils.getDirectionFromPosition(from, position);
 
-                int distanceToOther = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, key));
-                Direction directionToOther = MathUtils.getDirectionFromPosition(from, key);
-
-                if (MathUtils.isPositionInLine(from, to, key) && distanceFromDestination > distanceToOther && directionToOther == directionToDestination) {
-                    positions.add(key);
+                if (MathUtils.isPositionInLine(from, to, position) && distanceFromDestination > distanceToOther && directionToOther == directionToDestination) {
+                    positions.add(new DistancePiecePositionModel(distanceToOther, piece, position));
                 }
             }
         }

@@ -3,7 +3,6 @@ package ca.watier.echechess.engine.interfaces;
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.responses.GameScoreResponse;
 import ca.watier.echechess.common.sessions.Player;
-import ca.watier.echechess.common.utils.MultiArrayMap;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 
@@ -21,8 +20,6 @@ public interface GameHandler {
 
     List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep);
 
-    MultiArrayMap<CasePosition, Pair<CasePosition, Pieces>> getPiecesThatCanHitPosition(Side sideToKeep, CasePosition... positions);
-
     boolean isKing(KingStatus kingStatus, Side side);
 
     boolean isCheckMate(Side side);
@@ -39,21 +36,11 @@ public interface GameHandler {
 
     Player getPlayerBlack();
 
-    boolean isAllowOtherToJoin();
-
-    void setAllowOtherToJoin(boolean allowOtherToJoin);
-
-    boolean isAllowObservers();
-
-    void setAllowObservers(boolean allowObservers);
-
     String getUuid();
 
     void setUuid(String uuid);
 
     boolean isGameDone();
-
-    KingHandler getKingHandler();
 
     PlayerHandler getPlayerHandler();
 

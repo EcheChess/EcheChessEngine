@@ -1,10 +1,11 @@
 package ca.watier.game;
 
 import ca.watier.echechess.common.sessions.Player;
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
-import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
-import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.StandardKingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,16 +26,17 @@ public class GenericGameHandlerTest {
     @Spy
     private PlayerHandlerImpl playerHandler;
     @Spy
-    private KingHandlerImpl kingHandler;
+    private PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
     @Spy
-    private GamePropertiesHandlerImpl gamePropertiesHandler;
+    private GameEventEvaluatorHandler gameEventEvaluatorHandler;
+
 
     @Before
     public void setUp() {
         playerOne = new Player(UUID.randomUUID().toString());
         playerTwo = new Player(UUID.randomUUID().toString());
 
-        genericGameHandler = new GenericGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler = new GenericGameHandler(pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         genericGameHandler.setPlayerToSide(playerOne, WHITE);
         genericGameHandler.setPlayerToSide(playerTwo, BLACK);
     }

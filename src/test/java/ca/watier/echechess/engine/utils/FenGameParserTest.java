@@ -3,6 +3,7 @@ package ca.watier.echechess.engine.utils;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import org.junit.Test;
@@ -61,12 +62,15 @@ public class FenGameParserTest {
         // then
         Map<CasePosition, Pieces> piecesLocationBlack = game.getPiecesLocation(Side.BLACK);
         Map<CasePosition, Pieces> piecesLocationWhite = game.getPiecesLocation(Side.WHITE);
-        Side currentAllowedMoveSide = game.getCurrentAllowedMoveSide();
 
-        assertTrue(game.isWhiteKingCastlingAvailable());
-        assertTrue(game.isWhiteQueenCastlingAvailable());
-        assertTrue(game.isBlackKingCastlingAvailable());
-        assertTrue(game.isBlackQueenCastlingAvailable());
+        GameBoardData cloneOfCurrentDataState = game.getCloneOfCurrentDataState();
+
+        Side currentAllowedMoveSide = cloneOfCurrentDataState.getCurrentAllowedMoveSide();
+
+        assertTrue(cloneOfCurrentDataState.isWhiteKingCastlingAvailable());
+        assertTrue(cloneOfCurrentDataState.isWhiteQueenCastlingAvailable());
+        assertTrue(cloneOfCurrentDataState.isBlackKingCastlingAvailable());
+        assertTrue(cloneOfCurrentDataState.isBlackQueenCastlingAvailable());
 
         assertEquals(blackPositions, piecesLocationBlack);
         assertEquals(whitePositions, piecesLocationWhite);
@@ -116,13 +120,17 @@ public class FenGameParserTest {
         FenPositionGameHandler game = FenGameParser.parse("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR b Qq");
         Map<CasePosition, Pieces> piecesLocationBlack = game.getPiecesLocation(Side.BLACK);
         Map<CasePosition, Pieces> piecesLocationWhite = game.getPiecesLocation(Side.WHITE);
-        Side currentAllowedMoveSide = game.getCurrentAllowedMoveSide();
+
+        GameBoardData cloneOfCurrentDataState = game.getCloneOfCurrentDataState();
+
+
+        Side currentAllowedMoveSide = cloneOfCurrentDataState.getCurrentAllowedMoveSide();
 
         // then
-        assertFalse(game.isWhiteKingCastlingAvailable());
-        assertTrue(game.isWhiteQueenCastlingAvailable());
-        assertFalse(game.isBlackKingCastlingAvailable());
-        assertTrue(game.isBlackQueenCastlingAvailable());
+        assertFalse(cloneOfCurrentDataState.isWhiteKingCastlingAvailable());
+        assertTrue(cloneOfCurrentDataState.isWhiteQueenCastlingAvailable());
+        assertFalse(cloneOfCurrentDataState.isBlackKingCastlingAvailable());
+        assertTrue(cloneOfCurrentDataState.isBlackQueenCastlingAvailable());
 
         assertEquals(blackPositions, piecesLocationBlack);
         assertEquals(whitePositions, piecesLocationWhite);
@@ -177,13 +185,16 @@ public class FenGameParserTest {
         FenPositionGameHandler game = FenGameParser.parse("r1bqkb1r/ppppp1pp/2n2n2/5p2/3P4/N2Q3N/PPP1PPPP/R1B1KB1R W");
         Map<CasePosition, Pieces> piecesLocationBlack = game.getPiecesLocation(Side.BLACK);
         Map<CasePosition, Pieces> piecesLocationWhite = game.getPiecesLocation(Side.WHITE);
-        Side currentAllowedMoveSide = game.getCurrentAllowedMoveSide();
+
+        GameBoardData cloneOfCurrentDataState = game.getCloneOfCurrentDataState();
+
+        Side currentAllowedMoveSide = cloneOfCurrentDataState.getCurrentAllowedMoveSide();
 
         // then
-        assertFalse(game.isWhiteKingCastlingAvailable());
-        assertFalse(game.isWhiteQueenCastlingAvailable());
-        assertFalse(game.isBlackKingCastlingAvailable());
-        assertFalse(game.isBlackQueenCastlingAvailable());
+        assertFalse(cloneOfCurrentDataState.isWhiteKingCastlingAvailable());
+        assertFalse(cloneOfCurrentDataState.isWhiteQueenCastlingAvailable());
+        assertFalse(cloneOfCurrentDataState.isBlackKingCastlingAvailable());
+        assertFalse(cloneOfCurrentDataState.isBlackQueenCastlingAvailable());
 
         assertEquals(blackPositions, piecesLocationBlack);
         assertEquals(whitePositions, piecesLocationWhite);

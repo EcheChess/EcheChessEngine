@@ -17,25 +17,19 @@
 package ca.watier.echechess.engine.interfaces;
 
 import ca.watier.echechess.common.enums.CasePosition;
-import ca.watier.echechess.common.enums.MoveMode;
 import ca.watier.echechess.common.enums.MoveType;
-import ca.watier.echechess.engine.engines.GenericGameHandler;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.exceptions.NoMoveTypeDefinedException;
+import ca.watier.echechess.engine.models.enums.MoveStatus;
 
 /**
  * Created by yannick on 4/23/2017.
  */
 public interface MoveConstraint {
-    /**
-     * @param from
-     * @param to
-     * @param gameHandler
-     * @param moveMode    - Gives the full move of the piece, ignoring the other pieces
-     * @return
-     */
-    boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode);
 
-    default MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) throws NoMoveTypeDefinedException {
+    MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData);
+
+    default MoveType getMoveType(CasePosition from, CasePosition to, GameBoardData gameBoardData) throws NoMoveTypeDefinedException {
         throw new NoMoveTypeDefinedException();
     }
 }

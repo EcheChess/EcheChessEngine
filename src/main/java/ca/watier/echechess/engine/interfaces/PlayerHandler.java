@@ -5,7 +5,7 @@ import ca.watier.echechess.common.sessions.Player;
 
 import java.util.List;
 
-public interface PlayerHandler extends GenericHandler {
+public interface PlayerHandler {
     void removePlayerFromWhite(Player player);
 
     boolean changePlayerToBlack(Player player);
@@ -31,6 +31,4 @@ public interface PlayerHandler extends GenericHandler {
     Player getPlayerBlack();
 
     List<Player> getObserverList();
-
-    boolean isPlayerTurn(Side sideFrom);
 }
