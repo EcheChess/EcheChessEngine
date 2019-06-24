@@ -299,7 +299,8 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
 
         for (CasePosition to : casePositionWithoutCurrent) {
 
-            if (MoveStatus.isMoveValid(pieceDelegate.getMoveStatus(from, to, getCloneOfCurrentDataState()))) {
+            MoveStatus moveStatus = pieceDelegate.getMoveStatus(from, to, getCloneOfCurrentDataState());
+            if (MoveStatus.isMoveValid(moveStatus)) {
                 positions.add(to);
             }
         }

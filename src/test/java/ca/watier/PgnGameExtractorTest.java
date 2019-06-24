@@ -16,18 +16,13 @@
 
 package ca.watier;
 
-import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.exceptions.ChessException;
-import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
-import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.utils.PgnGameExtractor;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
@@ -51,7 +46,7 @@ public class PgnGameExtractorTest {
 
 
     @Test
-//    @Ignore("PgnTest.pgnManualTest - Not really unit tests, only used to test the stability of the engine by running games with a string")
+    @Ignore("PgnGameExtractorTest#pgnManualTest - Not really unit tests, only used to test the stability of the engine by running games with a string")
     public void pgnManualTest() {
         PgnGameExtractor pgnGameExtractor = new PgnGameExtractor();
         try {

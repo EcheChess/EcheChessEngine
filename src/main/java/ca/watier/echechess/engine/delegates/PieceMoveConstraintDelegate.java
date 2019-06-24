@@ -71,7 +71,7 @@ public class PieceMoveConstraintDelegate implements MoveConstraint, Serializable
 
         if (MoveStatus.isAttack(moveStatus)) {
             return handleAttack(from, to, gameBoardData, moveStatus);
-        } else if(MoveStatus.isMove(moveStatus)) {
+        } else if (MoveStatus.isMove(moveStatus)) {
             return handleMove(from, to, gameBoardData, moveStatus);
         } else {
             return moveStatus;

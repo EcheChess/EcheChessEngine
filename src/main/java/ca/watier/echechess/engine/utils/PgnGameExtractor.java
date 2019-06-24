@@ -257,10 +257,10 @@ public class PgnGameExtractor {
         List<CasePosition> similarPieceThatHitTarget = getSimilarPiecesPositionThatCanHitSameTarget(piecesThatCanHitPosition, pgnPieceFound.getPieceBySide(currentSide));
 
         CasePosition from;
-        if (CollectionUtils.isNotEmpty(similarPieceThatHitTarget)) {
-            from = getFromPositionWhenMultipleTargetCanHit(action, casePositions, similarPieceThatHitTarget);
-        } else {
+        if (CollectionUtils.isEmpty(similarPieceThatHitTarget)) {
             from = getPositionWhenOneTargetCanHit(piecesThatCanHitPosition, pgnPieceFound);
+        } else {
+            from = getFromPositionWhenMultipleTargetCanHit(action, casePositions, similarPieceThatHitTarget);
         }
 
         LOGGER.debug("MOVE {} to {} ({}) | action -> {}", from, to, currentSide, action);

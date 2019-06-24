@@ -164,7 +164,7 @@ public class StandardKingHandlerImpl implements KingHandler {
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : piecesLocation.entrySet()) {
             CasePosition from = casePositionPiecesEntry.getKey();
 
-            if (canMoveAndKingNotCheck(from, to, gameBoardData)) {
+            if (canMove(from, to, gameBoardData)) {
                 positions.add(from);
             }
         }
@@ -172,14 +172,13 @@ public class StandardKingHandlerImpl implements KingHandler {
         return positions;
     }
 
-    private boolean canMoveAndKingNotCheck(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
+    private boolean canMove(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
         MoveStatus moveStatus = moveConstraintDelegate.getMoveStatus(from, to, gameBoardData);
 
         if (MoveStatus.KING_ATTACK_KING.equals(moveStatus) || MoveStatus.CAN_PROTECT_FRIENDLY.equals(moveStatus)) {
             return true;
         } else {
-            return MoveStatus.isMoveValid(moveStatus)
-                    && !isKingCheckAfterMove(from, to, gameBoardData);
+            return MoveStatus.isMoveValid(moveStatus);
         }
     }
 
@@ -283,8 +282,6 @@ public class StandardKingHandlerImpl implements KingHandler {
 
         Pieces enemyPiece = gameBoardData.getPiece(to);
 
-        CasePosition checkTo = null;
-
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : gameBoardData.getPiecesLocation(playerSide).entrySet()) {
             CasePosition from = casePositionPiecesEntry.getKey();
 
@@ -308,8 +305,8 @@ public class StandardKingHandlerImpl implements KingHandler {
                     continue;
                 }
 
-                CasePosition checkFrom = PawnMoveConstraint.getEnPassantPositionFromEnemyPawn(to, Side.getOtherPlayerSide(playerSide));
-                isCheck &= isKingCheckAfterMove(checkFrom, to, gameBoardData);
+                CasePosition checkTo = PawnMoveConstraint.getEnPassantPositionFromEnemyPawn(to, Side.getOtherPlayerSide(playerSide));
+                isCheck &= isKingCheckAfterMove(from, checkTo, gameBoardData);
             } else if (isValidMove(to, gameBoardData, from)) {
                 isCheck &= isKingCheckAfterMove(from, to, gameBoardData);
             }

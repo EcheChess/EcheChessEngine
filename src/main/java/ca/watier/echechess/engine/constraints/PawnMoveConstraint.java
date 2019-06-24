@@ -55,12 +55,13 @@ public class PawnMoveConstraint implements MoveConstraint {
         }
 
         CasePosition enemyPawnPosition = getEnemyPawnPositionFromEnPassant(to, Side.getOtherPlayerSide(currentSide));
+        Pieces enemyPawnPiece = gameBoardData.getPiece(enemyPawnPosition);
 
-        if (enemyPawnPosition == null) {
+        if (enemyPawnPosition == null || Pieces.isSameSide(enemyPawnPiece, currentSide)) {
             return false;
         }
 
-        return isEnPassant(from, to, gameBoardData, currentSide, enemyPawnPosition, gameBoardData.getPiece(enemyPawnPosition));
+        return isEnPassant(from, to, gameBoardData, currentSide, enemyPawnPosition, enemyPawnPiece);
     }
 
     /**
@@ -161,7 +162,7 @@ public class PawnMoveConstraint implements MoveConstraint {
 
 
         if (isAttackMove) {
-            return handleAttackMode(pieceTo);
+            return handleAttackMode(from, pieceFrom, to, pieceTo, gameBoardData, sideFrom);
         } else if (isNormalMove) {
             return handleNormalMove(pieceTo);
         } else {
@@ -177,11 +178,19 @@ public class PawnMoveConstraint implements MoveConstraint {
         }
     }
 
-    private MoveStatus handleAttackMode(Pieces pieceTo) {
+    private MoveStatus handleAttackMode(CasePosition from, Pieces pieceFrom, CasePosition to, Pieces pieceTo, GameBoardData gameBoardData, Side sideFrom) {
         if (Objects.isNull(pieceTo)) {
-            return MoveStatus.INVALID_ATTACK;
+            if (isEnPassant(from, to, gameBoardData, sideFrom)) {
+                return MoveStatus.VALID_ATTACK;
+            } else {
+                return MoveStatus.INVALID_ATTACK;
+            }
         } else if (Pieces.isKing(pieceTo)) {
-            return MoveStatus.ENEMY_KING_PARTIAL_CHECK;
+            if (Pieces.isSameSide(pieceFrom, pieceTo)) {
+                return MoveStatus.CAN_PROTECT_FRIENDLY;
+            } else {
+                return MoveStatus.ENEMY_KING_PARTIAL_CHECK;
+            }
         } else {
             return MoveStatus.VALID_ATTACK;
         }

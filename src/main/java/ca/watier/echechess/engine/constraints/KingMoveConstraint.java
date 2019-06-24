@@ -185,11 +185,7 @@ public class KingMoveConstraint implements MoveConstraint {
                 gameBoardData
         );
 
-        if (CollectionUtils.isNotEmpty(positionsThatCanHitEndPosition)) {
-            return false;
-        }
-
-        return true;
+        return !CollectionUtils.isNotEmpty(positionsThatCanHitEndPosition);
     }
 
     private boolean isCastlingPieces(Pieces pieceFrom, Pieces pieceTo) {
