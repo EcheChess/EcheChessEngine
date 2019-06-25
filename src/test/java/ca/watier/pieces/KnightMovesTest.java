@@ -47,7 +47,7 @@ public class KnightMovesTest {
     public void attackTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/3p1k2/2p3p1/4N3/2K3p1/3p1p2/8 w KQkq");
 
-        assertThat(gameHandler.getAllAvailableMoves(E4, Side.WHITE)).containsOnly(C5, D6, G5, G3, D2, F2);
+        assertThat(gameHandler.getAllAvailableMoves(E4, Side.WHITE)).containsOnly(C5, D6, G5, G3, D2, F2, F6);
     }
 
     //FIXME: TO MOCK
@@ -73,7 +73,7 @@ public class KnightMovesTest {
     public void cantKillKingButCheckTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/8/3k4/5N2/8/8/8 w");
 
-        assertThat(gameHandler.getAllAvailableMoves(F4, WHITE)).containsExactlyInAnyOrder(E6, D3, E2, G2, H3, H5, G6);
+        assertThat(gameHandler.getAllAvailableMoves(F4, WHITE)).containsExactlyInAnyOrder(E6, D3, E2, G2, H3, H5, G6, D5);
         assertThat(gameHandler.isCheck(BLACK)).isTrue();
         assertThat(gameHandler.isCheckMate(BLACK)).isFalse();
     }
@@ -82,7 +82,7 @@ public class KnightMovesTest {
     public void cantKillKingButCheckMateTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/2pp4/2pkr3/2pppN2/8/8/8 w");
 
-        assertThat(gameHandler.getAllAvailableMoves(F4, WHITE)).containsExactlyInAnyOrder(E6, D3, E2, G2, H3, H5, G6);
+        assertThat(gameHandler.getAllAvailableMoves(F4, WHITE)).containsExactlyInAnyOrder(E6, D3, E2, G2, H3, H5, G6, D5);
 
         assertThat(gameHandler.isCheck(BLACK)).isFalse();
         assertThat(gameHandler.isCheckMate(BLACK)).isTrue();

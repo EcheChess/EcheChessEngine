@@ -170,24 +170,33 @@ public class PawnMovesTest {
 
     @Test
     public void pawnHopAndNormalWhiteSideBlackKingCheckMate1() throws FenParserException {
+
+        // given
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/1ppp4/1pkp4/1p6/1P2P3/3P4/4K3 w KQkq", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
+
+        // when
         when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
-
-
         assertThat(gameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
-        gameHandler.movePiece(D2, D4, WHITE);
+        assertThat(gameHandler.movePiece(D2, D4, WHITE)).isEqualByComparingTo(PAWN_HOP);
+
+        // then
         assertThat(gameHandler.isCheckMate(BLACK)).isTrue();
     }
 
     @Test
     public void pawnHopAndCheck_enPassantAndOk() throws FenParserException {
+
+        // given
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/4R3/kp6/p1p4R/8/1P6/RR5K w KQkq", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
-        assertThat(gameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
-        gameHandler.movePiece(B2, B4, WHITE);
+        // when
+        when(gameEventEvaluatorHandler.isPlayerTurn(any(), any())).thenReturn(true);
 
-        //Checked because of the pawn, can be killed with the en passant move (A4 & C4)
-        assertThat(gameHandler.isCheck(BLACK)).isTrue();
+        assertThat(gameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
+        assertThat(gameHandler.movePiece(B2, B4, WHITE)).isEqualByComparingTo(PAWN_HOP);
+
+        // then
+        assertThat(gameHandler.isCheck(BLACK)).isTrue(); //Checked because of the pawn, can be killed with the en passant move (A4 & C4)
     }
 
 

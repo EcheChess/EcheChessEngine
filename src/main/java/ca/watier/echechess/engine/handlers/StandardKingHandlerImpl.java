@@ -52,10 +52,15 @@ public class StandardKingHandlerImpl implements KingHandler {
         CasePosition kingPosition = GameUtils.getSinglePiecePosition(kingPiece, gameBoardData.getPiecesLocation());
         List<CasePosition> piecesThatCanHitOriginalPosition = getPositionsThatCanMoveOrAttackPosition(kingPosition, getOtherPlayerSide(playerSide), gameBoardData);
 
+
         if (CollectionUtils.isNotEmpty(piecesThatCanHitOriginalPosition)) { //One or more piece can hit the king
             return getKingStatusWhenPiecesCanHitKing(playerSide, kingPosition, piecesThatCanHitOriginalPosition, gameBoardData);
-        } else if (getPositionKingCanMove(playerSide, gameBoardData).isEmpty()) { //Check if not a stalemate
-            return isStalemate(playerSide, gameBoardData) ? STALEMATE : OK;
+        } else if (CollectionUtils.isEmpty(getPositionKingCanMove(playerSide, gameBoardData))) { //Check if not a stalemate
+            if (isStalemate(playerSide, gameBoardData)) {
+                return STALEMATE;
+            } else {
+                return OK;
+            }
         } else {
             return OK;
         }
@@ -350,7 +355,34 @@ public class StandardKingHandlerImpl implements KingHandler {
     }
 
     private boolean isStalemate(Side playerSide, GameBoardData gameBoardData) {
-        return CollectionUtils.isEmpty(getPositionKingCanMove(playerSide, gameBoardData));
+        Map<CasePosition, Pieces> piecesLocation = gameBoardData.getPiecesLocation(playerSide);
+
+        boolean kingCantMove = CollectionUtils.isEmpty(getPositionKingCanMove(playerSide, gameBoardData));
+
+        return kingCantMove && !isAnyOtherExceptKingCanMove(playerSide, gameBoardData, piecesLocation);
+    }
+
+    private boolean isAnyOtherExceptKingCanMove(Side playerSide, GameBoardData gameBoardData, Map<CasePosition, Pieces> piecesLocation) {
+        if (piecesLocation.size() == 1) { // king is alone
+            return false;
+        } else {
+            for (Map.Entry<CasePosition, Pieces> entry : piecesLocation.entrySet()) {
+                CasePosition from = entry.getKey();
+                Pieces value = entry.getValue();
+
+                if (Pieces.isKing(value)) {
+                    continue;
+                }
+
+                List<CasePosition> allAvailableMoves = moveConstraintDelegate.getAllAvailableMoves(from, playerSide, gameBoardData);
+
+                if (CollectionUtils.isNotEmpty(allAvailableMoves)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private KingStatus getKingStatusWhenPiecesCanHitKing(Side playerSide, CasePosition kingPosition, List<CasePosition> piecesThatCanHitOriginalPosition, GameBoardData gameBoardData) {

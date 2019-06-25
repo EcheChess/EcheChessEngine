@@ -23,7 +23,6 @@ import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
-import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
@@ -32,9 +31,11 @@ import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.interfaces.GameHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.Side.*;
@@ -125,7 +126,7 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
         boolean isEatingPiece = piecesTo != null;
 
         if (MoveType.NORMAL_MOVE.equals(moveType) || MoveType.PAWN_HOP.equals(moveType)) {
-            MoveStatus moveStatus = pieceDelegate.getMoveStatus(from, to, getCloneOfCurrentDataState());
+            MoveStatus moveStatus = getMoveStatus(from, to, getCloneOfCurrentDataState());
 
             switch (moveStatus) {
                 case INVALID_MOVE:
@@ -273,69 +274,14 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
         return values;
     }
 
-
-    /**
-     * Return a List containing all the moves for the selected piece
-     *
-     * @param from
-     * @param playerSide
-     * @return
-     */
     @Override
     public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide) {
-        List<CasePosition> positions = new ArrayList<>();
-
-        if (ObjectUtils.hasNull(from, playerSide)) {
-            return positions;
-        }
-
-        Pieces pieces = getPiece(from);
-
-        if (pieces == null || !Pieces.isSameSide(pieces, playerSide)) {
-            return positions;
-        }
-
-        CasePosition[] casePositionWithoutCurrent = ArrayUtils.removeElement(CasePosition.values(), from);
-
-        for (CasePosition to : casePositionWithoutCurrent) {
-
-            MoveStatus moveStatus = pieceDelegate.getMoveStatus(from, to, getCloneOfCurrentDataState());
-            if (MoveStatus.isMoveValid(moveStatus)) {
-                positions.add(to);
-            }
-        }
-
-        return positions;
+        return pieceDelegate.getAllAvailableMoves(from, playerSide, getCloneOfCurrentDataState());
     }
 
-    /**
-     * Return a list of @{@link Pieces} that can moves to the selected position
-     *
-     * @param to
-     * @param sideToKeep
-     * @return
-     */
     @Override
-    public List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep) {
-        List<Pair<CasePosition, Pieces>> values = new ArrayList<>();
-
-        if (ObjectUtils.hasNull(to, sideToKeep)) {
-            return values;
-        }
-
-        GameBoardData cloneOfCurrentDataState = getCloneOfCurrentDataState();
-
-        for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : getPiecesLocation(sideToKeep).entrySet()) {
-            CasePosition from = casePositionPiecesEntry.getKey();
-            Pieces piecesFrom = casePositionPiecesEntry.getValue();
-
-            MoveStatus moveStatus = pieceDelegate.getMoveStatus(from, to, cloneOfCurrentDataState);
-            if (MoveStatus.isMoveValid(moveStatus)) {
-                values.add(new Pair<>(from, piecesFrom));
-            }
-        }
-
-        return values;
+    public MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData cloneOfCurrentDataState) {
+        return pieceDelegate.getMoveStatus(from, to, cloneOfCurrentDataState);
     }
 
     @Override

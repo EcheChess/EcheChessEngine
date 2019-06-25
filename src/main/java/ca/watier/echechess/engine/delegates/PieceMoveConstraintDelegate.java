@@ -24,9 +24,12 @@ import ca.watier.echechess.engine.handlers.StandardKingHandlerImpl;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -160,5 +163,31 @@ public class PieceMoveConstraintDelegate implements MoveConstraint, Serializable
             default:
                 return null;
         }
+    }
+
+    public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide, GameBoardData cloneOfCurrentDataState) {
+        List<CasePosition> positions = new ArrayList<>();
+
+        if (ca.watier.echechess.common.utils.ObjectUtils.hasNull(from, playerSide)) {
+            return positions;
+        }
+
+        Pieces pieces = cloneOfCurrentDataState.getPiece(from);
+
+        if (pieces == null || !Pieces.isSameSide(pieces, playerSide)) {
+            return positions;
+        }
+
+        CasePosition[] casePositionWithoutCurrent = ArrayUtils.removeElement(CasePosition.values(), from);
+
+        for (CasePosition to : casePositionWithoutCurrent) {
+
+            MoveStatus moveStatus = getMoveStatus(from, to, cloneOfCurrentDataState);
+            if (MoveStatus.isMoveValid(moveStatus)) {
+                positions.add(to);
+            }
+        }
+
+        return positions;
     }
 }

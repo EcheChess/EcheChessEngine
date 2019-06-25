@@ -99,7 +99,7 @@ public class BishopMovesTest {
     public void cantKillKingButCheckTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/8/8/8/5k2/8/7B w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
-        assertThat(gameHandler.getAllAvailableMoves(H1, WHITE)).containsOnly(G2);
+        assertThat(gameHandler.getAllAvailableMoves(H1, WHITE)).containsOnly(G2, F3);
         assertThat(gameHandler.isCheck(BLACK)).isTrue();
         assertThat(gameHandler.isCheckMate(BLACK)).isFalse();
     }
@@ -109,7 +109,7 @@ public class BishopMovesTest {
         FenPositionGameHandler gameHandler = FenGameParser.parse("k7/8/3B4/3B4/3B4/8/8/8 w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
         assertThat(gameHandler.getAllAvailableMoves(D4, WHITE)).containsExactlyInAnyOrder(C5, A7, B6, E3, F2, G1, C3, B2, A1, E5, F6, G7, H8);
-        assertThat(gameHandler.getAllAvailableMoves(D5, WHITE)).containsExactlyInAnyOrder(C6, B7, E4, F3, G2, H1, C4, B3, A2, E6, F7, G8); //King: A8
+        assertThat(gameHandler.getAllAvailableMoves(D5, WHITE)).containsExactlyInAnyOrder(C6, B7, E4, F3, G2, H1, C4, B3, A2, E6, F7, G8, A8); //King: A8
         assertThat(gameHandler.getAllAvailableMoves(D6, WHITE)).containsExactlyInAnyOrder(C7, B8, E5, F4, G3, H2, C5, B4, A3, E7, F8);
 
         assertThat(gameHandler.isCheck(BLACK)).isFalse();

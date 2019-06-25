@@ -92,18 +92,12 @@ public class StaleMateTest {
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isTrue();
 
-        genericGameHandler = FenGameParser.parse("r1pkp3/3P4/3K4/8/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);;
+        genericGameHandler = FenGameParser.parse("7k/8/7K/6R1/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);;
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
-
-        genericGameHandler = FenGameParser.parse("2pk4/3P4/3K4/8/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
-        assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
-
 
         /*
             Not STALEMATE
          */
-
-
         genericGameHandler = FenGameParser.parse("8/2R5/1R6/3k4/1R6/8/8/7K b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
@@ -111,15 +105,5 @@ public class StaleMateTest {
         assertThat(genericGameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
-    }
-
-    @Test
-    public void isCheckMateCheckmateWithEnPassant() throws FenParserException {
-        when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
-
-        genericGameHandler = FenGameParser.parse("k7/5p2/4r3/4r1PP/4rPKP/4rPPP/4rrrr/8 w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
-        assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isTrue();
-        genericGameHandler.movePiece(F7, F5, BLACK); //Pawn hop
-        assertThat(genericGameHandler.isKing(KingStatus.CHECK, WHITE)).isTrue(); //Check by the pawn (can kill it by "en passant")
     }
 }

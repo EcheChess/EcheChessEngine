@@ -3,8 +3,9 @@ package ca.watier.echechess.engine.interfaces;
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.responses.GameScoreResponse;
 import ca.watier.echechess.common.sessions.Player;
-import ca.watier.echechess.common.utils.Pair;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
+import ca.watier.echechess.engine.models.enums.MoveStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public interface GameHandler {
 
     List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide);
 
-    List<Pair<CasePosition, Pieces>> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep);
+    MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData);
 
     boolean isKing(KingStatus kingStatus, Side side);
 

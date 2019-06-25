@@ -31,12 +31,14 @@ import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.MapAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
+import java.util.Map;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.Side.BLACK;
@@ -56,34 +58,12 @@ public class AllPiecesTest {
     private GameEventEvaluatorHandler gameEventEvaluatorHandler;
 
     @Test
-    public void whiteTest() {
-        GenericGameHandler gameHandler = new GenericGameHandler(pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
-        List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = gameHandler.getAllPiecesThatCanMoveTo(CasePosition.F3, Side.WHITE);
-
-        ListAssert<Pair<CasePosition, Pieces>> pairListAssert = assertThat(allPiecesThatCanMoveTo);
-
-        pairListAssert.hasSize(2);
-        pairListAssert.containsExactlyInAnyOrder(new Pair<>(CasePosition.F2, Pieces.W_PAWN), new Pair<>(CasePosition.G1, Pieces.W_KNIGHT));
-    }
-
-    @Test
-    public void blackTest() {
-        GenericGameHandler gameHandler = new GenericGameHandler(pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
-        List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = gameHandler.getAllPiecesThatCanMoveTo(C6, BLACK);
-
-        ListAssert<Pair<CasePosition, Pieces>> pairListAssert = assertThat(allPiecesThatCanMoveTo);
-
-        pairListAssert.hasSize(2);
-        pairListAssert.containsExactlyInAnyOrder(new Pair<>(CasePosition.B8, Pieces.B_KNIGHT), new Pair<>(CasePosition.C7, Pieces.B_PAWN));
-    }
-
-    @Test
     public void cannotKillKingTest() throws FenParserException {
         when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
 
         FenPositionGameHandler gameHandler = FenGameParser.parse("1nq4k/3p4/2K5/8/b1r5/8/8/8 w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
-        List<Pair<CasePosition, Pieces>> allPiecesThatCanMoveTo = gameHandler.getAllPiecesThatCanMoveTo(C6, BLACK);
+        List<CasePosition> allPiecesThatCanMoveTo = gameHandler.getAllAvailableMoves(C6, BLACK);
         assertThat(allPiecesThatCanMoveTo).isEmpty();
 
         assertThat(gameHandler.movePiece(A4, C6, BLACK)).isEqualByComparingTo(MoveType.MOVE_NOT_ALLOWED);
