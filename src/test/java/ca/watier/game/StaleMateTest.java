@@ -19,11 +19,13 @@ package ca.watier.game;
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.FenParserException;
-import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
-import ca.watier.echechess.engine.handlers.KingHandlerImpl;
+import ca.watier.echechess.engine.handlers.StandardKingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
+import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,17 +51,15 @@ public class StaleMateTest {
 
     @Spy
     private PlayerHandlerImpl playerHandler;
-
     @Spy
-    private KingHandlerImpl kingHandler;
-
+    private PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
     @Spy
-    private GamePropertiesHandlerImpl gamePropertiesHandler;
+    private GameEventEvaluatorHandler gameEventEvaluatorHandler;
 
 
     @Test
     public void movePieceRevertWhenCheck() throws FenParserException {
-        genericGameHandler = FenGameParser.parse("4k3/2P1r3/8/8/8/8/2p1R3/4K3 w", kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler = FenGameParser.parse("4k3/2P1r3/8/8/8/8/2p1R3/4K3 w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
         //Cannot move the rook, the king is check
         Assert.assertEquals(MOVE_NOT_ALLOWED, genericGameHandler.movePiece(E2, C2, WHITE));
@@ -76,48 +76,34 @@ public class StaleMateTest {
         /*
             STALEMATE
         */
-        genericGameHandler = FenGameParser.parse("8/2R1R3/1R6/3k4/1R6/8/8/7K b", kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler = FenGameParser.parse("8/2R1R3/1R6/3k4/1R6/8/8/7K b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isFalse();
 
-        genericGameHandler = FenGameParser.parse("3k4/3P4/3K4/8/8/8/8/8 b", kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler = FenGameParser.parse("3k4/3P4/3K4/8/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isFalse();
 
-        genericGameHandler = FenGameParser.parse("R1pk4/3P4/3K4/8/8/8/8/8 b", kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler = FenGameParser.parse("R1pk4/3P4/3K4/8/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isFalse();
 
-        genericGameHandler = FenGameParser.parse("2PKP3/2PPP3/8/8/8/8/2ppp3/2pkp3 w", kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler = FenGameParser.parse("2PKP3/2PPP3/8/8/8/8/2ppp3/2pkp3 w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isTrue();
 
+        genericGameHandler = FenGameParser.parse("7k/8/7K/6R1/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);;
+        assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
 
         /*
             Not STALEMATE
          */
-        genericGameHandler = FenGameParser.parse("r1pkp3/3P4/3K4/8/8/8/8/8 b", kingHandler, playerHandler, gamePropertiesHandler);;
+        genericGameHandler = FenGameParser.parse("8/2R5/1R6/3k4/1R6/8/8/7K b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
-        genericGameHandler = FenGameParser.parse("8/2R5/1R6/3k4/1R6/8/8/7K b", kingHandler, playerHandler, gamePropertiesHandler);
-        assertThat(genericGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
-
-        genericGameHandler = FenGameParser.parse("2pk4/3P4/3K4/8/8/8/8/8 b", kingHandler, playerHandler, gamePropertiesHandler);
-        assertThat(genericGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
-
-        genericGameHandler = FenGameParser.parse("2PK4/2PPP3/8/8/8/8/2ppp3/2pk4 w", kingHandler, playerHandler, gamePropertiesHandler);
+        genericGameHandler = FenGameParser.parse("2PK4/2PPP3/8/8/8/8/2ppp3/2pk4 w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.OK, BLACK)).isTrue();
 
-    }
-
-    @Test
-    public void isCheckMateCheckmateWithEnPassant() throws FenParserException {
-        when(playerHandler.isPlayerTurn(any(Side.class))).thenReturn(true);
-
-        genericGameHandler = FenGameParser.parse("k7/5p2/4r3/4r1PP/4rPKP/4rPPP/4rrrr/8 w", kingHandler, playerHandler, gamePropertiesHandler);
-        assertThat(genericGameHandler.isKing(KingStatus.OK, WHITE)).isTrue();
-        genericGameHandler.movePiece(F7, F5, BLACK); //Pawn hop
-        assertThat(genericGameHandler.isKing(KingStatus.CHECK, WHITE)).isTrue(); //Check by the pawn (can kill it by "en passant")
     }
 }

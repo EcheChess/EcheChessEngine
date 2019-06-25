@@ -8,8 +8,7 @@ import ca.watier.echechess.common.utils.PositionUtils;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.FenParserException;
-import ca.watier.echechess.engine.interfaces.GamePropertiesHandler;
-import ca.watier.echechess.engine.interfaces.KingHandler;
+import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.CharUtils;
@@ -21,12 +20,8 @@ public class FenPositionGameHandler extends GenericGameHandler {
     private static final String NO_PIECES_ON_ROW = "8";
     private static final long serialVersionUID = 9073722042994714192L;
 
-    public FenPositionGameHandler(PieceMoveConstraintDelegate defaultGameConstraintHandler) {
-        super(defaultGameConstraintHandler);
-    }
-
-    public FenPositionGameHandler(KingHandler kingHandler, PlayerHandler playerHandler, GamePropertiesHandler gamePropertiesHandler) {
-        super(kingHandler, playerHandler, gamePropertiesHandler);
+    public FenPositionGameHandler(PieceMoveConstraintDelegate pieceDelegate, PlayerHandler playerHandler, GameEventEvaluatorHandler gameEventEvaluatorHandler) {
+        super(pieceDelegate, playerHandler, gameEventEvaluatorHandler);
     }
 
     public void init(char sideToPlay,
@@ -45,20 +40,16 @@ public class FenPositionGameHandler extends GenericGameHandler {
         setCurrentAllowedMoveSide(getSide(sideToPlay));
     }
 
-    private Side getSide(char sideToPlay) throws FenParserException {
-        Side side;
 
+    private Side getSide(char sideToPlay) throws FenParserException {
         switch (sideToPlay) {
             case 'W':
-                side = Side.WHITE;
-                break;
+                return Side.WHITE;
             case 'B':
-                side = Side.BLACK;
-                break;
+                return Side.BLACK;
             default:
                 throw new FenParserException();
         }
-        return side;
     }
 
     public void setPieces(String[] rows) throws FenParserException {

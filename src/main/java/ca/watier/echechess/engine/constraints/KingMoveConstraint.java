@@ -16,39 +16,60 @@
 
 package ca.watier.echechess.engine.constraints;
 
-import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.MoveType;
+import ca.watier.echechess.common.enums.Pieces;
+import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
-import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
+import ca.watier.echechess.engine.models.DistancePiecePositionModel;
+import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
-
-import static ca.watier.echechess.common.interfaces.BaseUtils.getSafeBoolean;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created by yannick on 4/23/2017.
  */
 public class KingMoveConstraint implements MoveConstraint {
 
-    @Override
-    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
-        Pieces hittingPiece = gameHandler.getPiece(to);
-        Pieces pieceFrom = gameHandler.getPiece(from);
-        Side sideFrom = pieceFrom.getSide();
+    private KingHandler kingHandler;
 
-        boolean checkHit = true;
-        if (MoveMode.NORMAL_OR_ATTACK_MOVE.equals(moveMode)) {
-            checkHit = (hittingPiece == null || !Pieces.isSameSide(hittingPiece, sideFrom) && !Pieces.isKing(hittingPiece));
+    public KingMoveConstraint(KingHandler kingHandler) {
+        this.kingHandler = kingHandler;
+    }
+
+    @Override
+    public MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
+        Pieces fromPiece = gameBoardData.getPiece(from);
+        Pieces toPiece = gameBoardData.getPiece(to);
+
+        if (BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to)) != 1) {
+            return MoveStatus.getInvalidMoveStatusBasedOnTarget(toPiece);
         }
 
-        return (BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to)) == 1) && checkHit;
+        boolean isSameSideAsTarget = Pieces.isSameSide(fromPiece, toPiece);
+
+        if (!isSameSideAsTarget && Pieces.isKing(toPiece) && Pieces.isKing(fromPiece)) {
+            return MoveStatus.KING_ATTACK_KING;
+        } else if (!isSameSideAsTarget && Pieces.isKing(toPiece)) {
+            return MoveStatus.VALID_ATTACK;
+        } else if (isSameSideAsTarget) {
+            return MoveStatus.CAN_PROTECT_FRIENDLY;
+        } else if (Objects.isNull(toPiece)) {
+            return MoveStatus.VALID_MOVE;
+        } else {
+            return MoveStatus.VALID_ATTACK;
+        }
     }
 
 
@@ -64,29 +85,31 @@ public class KingMoveConstraint implements MoveConstraint {
            The king does not end up in check. (True of any legal move.)
     */
     @Override
-    public MoveType getMoveType(CasePosition from, CasePosition to, GenericGameHandler gameHandler) {
-        if (ObjectUtils.hasNull(from, to, gameHandler)) {
+    public MoveType getMoveType(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
+        if (ObjectUtils.hasNull(from, to, gameBoardData)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 
-        Pieces pieceFrom = gameHandler.getPiece(from);
+        Pieces pieceFrom = gameBoardData.getPiece(from);
         Side sideFrom = pieceFrom.getSide();
-        Pieces pieceTo = gameHandler.getPiece(to);
-        Map<CasePosition, Pieces> piecesLocation = gameHandler.getPiecesLocation();
-
-        KingHandler kingHandler = gameHandler.getKingHandler();
+        Pieces pieceTo = gameBoardData.getPiece(to);
+        Map<CasePosition, Pieces> piecesLocation = gameBoardData.getPiecesLocation();
 
         if (pieceTo == null) {
             return MoveType.NORMAL_MOVE;
         } else if (isCastlingPieces(pieceFrom, pieceTo)) {
-            return handleCastling(from, to, sideFrom, piecesLocation, gameHandler, kingHandler);
+            try {
+                return handleCastling(from, to, sideFrom, piecesLocation, gameBoardData, kingHandler);
+            } catch (CloneNotSupportedException e) {
+                return MoveType.MOVE_NOT_ALLOWED;
+            }
         } else {
             return MoveType.NORMAL_MOVE;
         }
     }
 
 
-    private MoveType handleCastling(CasePosition from, CasePosition to, Side sideFrom, Map<CasePosition, Pieces> piecesLocation, GenericGameHandler gameHandler, KingHandler kingHandler) {
+    private MoveType handleCastling(CasePosition from, CasePosition to, Side sideFrom, Map<CasePosition, Pieces> piecesLocation, GameBoardData gameHandler, KingHandler kingHandler) throws CloneNotSupportedException {
 
         CastlingPositionHelper castlingPositionHelper = new CastlingPositionHelper(from, to, sideFrom).invoke();
 
@@ -120,28 +143,49 @@ public class KingMoveConstraint implements MoveConstraint {
         return (queenSideCastling && !isQueenSideAvail) || (kingSideCastling && !isKingSideAvail);
     }
 
-    private boolean isCastlingValid(GenericGameHandler gameHandler,
+    private boolean isCastlingValid(GameBoardData gameBoardData,
                                     Map<CasePosition, Pieces> piecesLocation,
                                     CastlingPositionHelper castlingPositionHelper,
                                     KingHandler kingHandler,
                                     CasePosition from,
                                     Side sideFrom,
-                                    CasePosition to) {
+                                    CasePosition to) throws CloneNotSupportedException {
 
 
-        List<CasePosition> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
+        Set<DistancePiecePositionModel> piecesBetweenKingAndRook = GameUtils.getPiecesBetweenPosition(from, to, piecesLocation);
         CasePosition kingPosition = castlingPositionHelper.getKingPosition();
         CasePosition positionWhereKingPass = castlingPositionHelper.getRookPosition();
 
-        boolean isPieceAreNotMoved = !getSafeBoolean(gameHandler.isPieceMoved(from)) && !getSafeBoolean(gameHandler.isPieceMoved(to));
-        boolean isNoPieceBetweenKingAndRook = piecesBetweenKingAndRook.isEmpty();
-        boolean isNoPieceAttackingBetweenKingAndRook = gameHandler.getPiecesThatCanHitPosition(Side.getOtherPlayerSide(sideFrom), positionWhereKingPass).isEmpty();
-        boolean isKingNotCheckAtCurrentLocation = !kingHandler.isKingCheckAtPosition(from, sideFrom, gameHandler);
-        boolean kingNotCheckAtEndPosition = !kingHandler.isKingCheckAtPosition(kingPosition, sideFrom, gameHandler);
+        Side otherPlayerSide = Side.getOtherPlayerSide(sideFrom);
 
-        return isPieceAreNotMoved && isNoPieceBetweenKingAndRook &&
-                isNoPieceAttackingBetweenKingAndRook && isKingNotCheckAtCurrentLocation &&
-                kingNotCheckAtEndPosition;
+        boolean isPieceAreNotMoved = !gameBoardData.isPieceMoved(from) && !gameBoardData.isPieceMoved(to);
+        boolean isNoPieceBetweenKingAndRook = CollectionUtils.isEmpty(piecesBetweenKingAndRook);
+        boolean isNoPieceAttackingBetweenKingAndRook = CollectionUtils.isEmpty(kingHandler.getPositionsThatCanMoveOrAttackPosition(positionWhereKingPass, otherPlayerSide, gameBoardData.clone()));
+
+
+        if (!isPieceAreNotMoved || !isNoPieceBetweenKingAndRook || !isNoPieceAttackingBetweenKingAndRook) {
+            return false;
+        }
+
+
+        List<CasePosition> positionsThatCanHitCurrentLocation = kingHandler.getPositionsThatCanMoveOrAttackPosition(
+                from,
+                otherPlayerSide,
+                gameBoardData
+        );
+
+        if (CollectionUtils.isNotEmpty(positionsThatCanHitCurrentLocation)) {
+            return false;
+        }
+
+
+        List<CasePosition> positionsThatCanHitEndPosition = kingHandler.getPositionsThatCanMoveOrAttackPosition(
+                kingPosition,
+                otherPlayerSide,
+                gameBoardData
+        );
+
+        return !CollectionUtils.isNotEmpty(positionsThatCanHitEndPosition);
     }
 
     private boolean isCastlingPieces(Pieces pieceFrom, Pieces pieceTo) {

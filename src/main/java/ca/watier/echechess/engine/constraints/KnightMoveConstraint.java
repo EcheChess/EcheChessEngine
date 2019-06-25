@@ -16,11 +16,14 @@
 
 package ca.watier.echechess.engine.constraints;
 
-import ca.watier.echechess.common.enums.*;
+import ca.watier.echechess.common.enums.CasePosition;
+import ca.watier.echechess.common.enums.Direction;
+import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
-import ca.watier.echechess.engine.engines.GenericGameHandler;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
+import ca.watier.echechess.engine.models.enums.MoveStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -34,27 +37,26 @@ public class KnightMoveConstraint implements MoveConstraint {
     private static final List<Direction> DEFAULT_RADIUS_FINDER_POSITION = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
     @Override
-    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
+    public MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
 
-        if (ObjectUtils.hasNull(from, to, gameHandler)) {
-            return false;
+        if (ObjectUtils.hasNull(from, to, gameBoardData) || !isTargetValidPosition(from, to)) {
+            return MoveStatus.getInvalidMoveStatusBasedOnTarget(to);
         }
 
-        Map<CasePosition, Pieces> positionPiecesMap = gameHandler.getPiecesLocation();
-        Pieces hittingPiece = positionPiecesMap.get(to);
-        Pieces pieceFrom = positionPiecesMap.get(from);
-        Side sideFrom = pieceFrom.getSide();
+        Map<CasePosition, Pieces> positionPiecesMap = gameBoardData.getPiecesLocation();
+        Pieces pieceTo = positionPiecesMap.get(to);
+        Pieces pieceFom = positionPiecesMap.get(from);
 
-        boolean canAttack = true;
-
-        if (MoveMode.NORMAL_OR_ATTACK_MOVE.equals(moveMode) && hittingPiece != null) {
-            canAttack = !sideFrom.equals(hittingPiece.getSide()) && !Pieces.isKing(hittingPiece);
+        if (Pieces.isSameSide(pieceTo, pieceFom)) {
+            return MoveStatus.INVALID_ATTACK;
+        } else if (Pieces.isKing(pieceTo)) {
+            return MoveStatus.ENEMY_KING_PARTIAL_CHECK;
+        } else {
+            return MoveStatus.getValidMoveStatusBasedOnTarget(to);
         }
-
-        return canAttack && isTargetValid(from, to);
     }
 
-    private boolean isTargetValid(CasePosition from, CasePosition to) {
+    private boolean isTargetValidPosition(CasePosition from, CasePosition to) {
         return MathUtils.isPositionOnCirclePerimeter(from, to, from.getX() + KNIGHT_RADIUS_EQUATION, from.getY()) &&
                 !DEFAULT_RADIUS_FINDER_POSITION.contains(MathUtils.getDirectionFromPosition(from, to));
     }

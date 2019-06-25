@@ -20,28 +20,29 @@ import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
+import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.common.utils.Pair;
+import org.apache.commons.lang3.exception.CloneFailedException;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yannick on 6/29/2017.
  */
-public abstract class GameBoard extends GameBoardData {
+public abstract class GameBoard implements Serializable {
 
     private static final long serialVersionUID = 807194077405321185L;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GameBoard.class);
-    private static final byte MAX_ELEMENT_HISTORY = 64;
-
-    private Deque<GameBoardData> historyStack;
+    private GameBoardData gameBoardData;
 
     public GameBoard() {
         super();
-        historyStack = new ArrayDeque<>(MAX_ELEMENT_HISTORY);
+        gameBoardData = new GameBoardData();
     }
 
     protected final void addPawnPromotion(CasePosition from, CasePosition to, Side side) {
@@ -49,7 +50,7 @@ public abstract class GameBoard extends GameBoardData {
             return;
         }
 
-        addPawnPromotionToMap(side, new Pair<>(from, to));
+        gameBoardData.addPawnPromotionToMap(side, new Pair<>(from, to));
     }
 
     /**
@@ -59,7 +60,7 @@ public abstract class GameBoard extends GameBoardData {
      * @return
      */
     public final Pieces getPiece(CasePosition position) {
-        return getPieceFromPosition(position);
+        return gameBoardData.getPieceFromPosition(position);
     }
 
     /**
@@ -74,13 +75,13 @@ public abstract class GameBoard extends GameBoardData {
             return;
         }
 
-        removePiece(from);
-        setPiecePositionWithoutMoveState(piece, to);
-        changeMovedStateOfPiece(piece, from, to);
+        gameBoardData.removePiece(from);
+        gameBoardData.setPiecePositionWithoutMoveState(piece, to);
+        gameBoardData.changeMovedStateOfPiece(piece, from, to);
         changePawnSpecialMove(piece, from, to);
         updatePlayerTurnValue(piece.getSide());
-        changePieceTurnNumber(from, to);
-        incrementTotalMove();
+        gameBoardData.changePieceTurnNumber(from, to);
+        gameBoardData.incrementTotalMove();
     }
 
     /**
@@ -92,10 +93,10 @@ public abstract class GameBoard extends GameBoardData {
      */
     protected void changePawnSpecialMove(Pieces piece, CasePosition from, CasePosition to) {
         if (Pieces.isPawn(piece)) {
-            boolean isValid = BaseUtils.getSafeBoolean(isPawnUsedSpecialMove(from)) || MathUtils.getDistanceBetweenPositions(from, to) == 2;
+            boolean isValid = BaseUtils.getSafeBoolean(gameBoardData.isPawnUsedSpecialMove(from)) || MathUtils.getDistanceBetweenPositions(from, to) == 2;
 
-            addPawnUsedSpecialMove(to, isValid);
-            removePawnUsedSpecialMove(from);
+            gameBoardData.addPawnUsedSpecialMove(to, isValid);
+            gameBoardData.removePawnUsedSpecialMove(from);
         }
     }
 
@@ -107,10 +108,10 @@ public abstract class GameBoard extends GameBoardData {
     protected void updatePlayerTurnValue(Side side) {
         switch (side) {
             case WHITE:
-                incrementWhiteTurnNumber();
+                gameBoardData.incrementWhiteTurnNumber();
                 break;
             case BLACK:
-                incrementBlackTurnNumber();
+                gameBoardData.incrementBlackTurnNumber();
                 break;
             case OBSERVER:
             default:
@@ -125,7 +126,7 @@ public abstract class GameBoard extends GameBoardData {
         }
 
         Pair<CasePosition, CasePosition> pair = null;
-        for (Pair<CasePosition, CasePosition> casePositionCasePositionPair : getPawnPromotionBySide(playerSide)) {
+        for (Pair<CasePosition, CasePosition> casePositionCasePositionPair : gameBoardData.getPawnPromotionBySide(playerSide)) {
             CasePosition toValue = casePositionCasePositionPair.getSecondValue();
 
             if (to.equals(toValue)) {
@@ -136,30 +137,91 @@ public abstract class GameBoard extends GameBoardData {
 
         boolean isPresent = pair != null;
         if (isPresent) {
-            removePawnPromotion(pair, playerSide);
+            gameBoardData.removePawnPromotion(pair, playerSide);
             CasePosition currentPawnFromPosition = pair.getFirstValue();
 
-            removePiece(currentPawnFromPosition); //remove the pawn
-            setPiecePositionWithoutMoveState(pieces, to); // add the wanted piece
-            setGamePaused(false);
+            gameBoardData.removePiece(currentPawnFromPosition); //remove the pawn
+            gameBoardData.setPiecePositionWithoutMoveState(pieces, to); // add the wanted piece
+            gameBoardData.setGamePaused(false);
         }
 
         return isPresent;
     }
 
-    public void cloneCurrentState() {
+    public final Map<CasePosition, Pieces> getPiecesLocation() {
+        return gameBoardData.getPiecesLocation();
+    }
+
+    protected void addHistory(MoveHistory moveHistory) {
+        gameBoardData.addHistory(moveHistory);
+    }
+
+    protected void setGamePaused(boolean paused) {
+        gameBoardData.setGamePaused(paused);
+    }
+
+    protected void changeAllowedMoveSide() {
+        gameBoardData.changeAllowedMoveSide();
+    }
+
+    protected void removePieceFromBoard(CasePosition position) {
+        gameBoardData.removePieceFromBoard(position);
+    }
+
+    protected void setPositionPiecesMap(Map<CasePosition, Pieces> positions) {
+        gameBoardData.setPositionPiecesMap(positions);
+    }
+
+    protected void setCurrentAllowedMoveSide(Side side) {
+        gameBoardData.setCurrentAllowedMoveSide(side);
+    }
+
+    protected void setWhiteKingCastlingAvailable(boolean casting) {
+        gameBoardData.setWhiteKingCastlingAvailable(casting);
+    }
+
+    protected void setBlackKingCastlingAvailable(boolean casting) {
+        gameBoardData.setBlackKingCastlingAvailable(casting);
+    }
+
+    protected void setWhiteQueenCastlingAvailable(boolean casting) {
+        gameBoardData.setWhiteQueenCastlingAvailable(casting);
+    }
+
+    protected void setBlackQueenCastlingAvailable(boolean casting) {
+        gameBoardData.setBlackQueenCastlingAvailable(casting);
+    }
+
+    protected void addWhitePlayerPoint(byte point) {
+        gameBoardData.addWhitePlayerPoint(point);
+    }
+
+    protected void addBlackPlayerPoint(byte point) {
+        gameBoardData.addBlackPlayerPoint(point);
+    }
+
+    protected short getBlackPlayerPoint() {
+        return gameBoardData.getBlackPlayerPoint();
+    }
+
+    protected short getWhitePlayerPoint() {
+        return gameBoardData.getWhitePlayerPoint();
+    }
+
+    public GameBoardData getCloneOfCurrentDataState() {
         try {
-            historyStack.push(this.clone());
-        } catch (CloneNotSupportedException e) {
-            LOGGER.error(e.getMessage(), e);
+            return org.apache.commons.lang3.ObjectUtils.cloneIfPossible(gameBoardData);
+        } catch (CloneFailedException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            return gameBoardData;
         }
     }
 
-    public void restoreLastState() {
-        restore(historyStack.pop());
+    public boolean isGameDraw() {
+        return gameBoardData.isGameDraw();
     }
 
-    public void removeLastState() {
-        historyStack.pop();
+    public List<MoveHistory> getMoveHistory() {
+        return gameBoardData.getMoveHistory();
     }
 }

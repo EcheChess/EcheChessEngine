@@ -19,13 +19,14 @@ package ca.watier.echechess.engine.constraints;
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
-import ca.watier.echechess.engine.engines.GenericGameHandler;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
+import ca.watier.echechess.engine.models.DistancePiecePositionModel;
+import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by yannick on 4/23/2017.
@@ -46,65 +47,71 @@ public class DirectionalMoveConstraint implements MoveConstraint {
     }
 
     @Override
-    public boolean isMoveValid(CasePosition from, CasePosition to, GenericGameHandler gameHandler, MoveMode moveMode) {
+    public MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
         if (ObjectUtils.hasNull(from, to, pattern)) {
-            return false;
+            return MoveStatus.getInvalidMoveStatusBasedOnTarget(from);
         }
 
-        Map<CasePosition, Pieces> positionPiecesMap = gameHandler.getPiecesLocation();
+        Map<CasePosition, Pieces> positionPiecesMap = gameBoardData.getPiecesLocation();
         Pieces pieceTo = positionPiecesMap.get(to);
         Pieces pieceFrom = positionPiecesMap.get(from);
-        Side sideFrom = pieceFrom.getSide();
 
         Direction directionFromPosition = MathUtils.getDirectionFromPosition(from, to);
 
         if (!directionList.contains(directionFromPosition)) {
-            return false;
+            return MoveStatus.getInvalidMoveStatusBasedOnTarget(pieceTo);
         }
 
-        return isMoveValid(from, to, moveMode, positionPiecesMap, pieceTo, sideFrom, directionFromPosition);
+        return isMoveValid(from, to, pieceFrom, pieceTo, directionFromPosition, positionPiecesMap);
     }
 
-    private boolean isMoveValid(CasePosition from, CasePosition to, MoveMode moveMode, Map<CasePosition, Pieces> positionPiecesMap,
-                                Pieces pieceTo, Side sideFrom, Direction directionFromPosition) {
+    private MoveStatus isMoveValid(CasePosition from, CasePosition to, Pieces pieceFrom, Pieces pieceTo, Direction directionFromPosition, Map<CasePosition, Pieces> piecesMap) {
 
         if (!MathUtils.isPositionInLine(from, MathUtils.getNearestPositionFromDirection(from, directionFromPosition), to)) {
-            return false;
+            return MoveStatus.getInvalidMoveStatusBasedOnTarget(pieceTo);
         }
 
-        switch (moveMode) {
-            case NORMAL_OR_ATTACK_MOVE:
-                return whenNormalOrAttackMode(from, to, positionPiecesMap, pieceTo, sideFrom);
-            case IS_KING_CHECK_MODE:
-                return whenIsKingCheckMode(from, to, positionPiecesMap, sideFrom);
-            default:
-                return false;
+        Set<DistancePiecePositionModel> piecesBetweenPosition = GameUtils.getPiecesBetweenPosition(from, to, piecesMap);
+
+        Side sideFrom = pieceFrom.getSide();
+
+        if (Pieces.isKing(pieceTo)) {
+            return handleKingTarget(piecesBetweenPosition, pieceFrom, pieceTo);
+        } else {
+            return handleOtherTarget(sideFrom, pieceTo, piecesBetweenPosition);
         }
     }
 
-    private boolean whenNormalOrAttackMode(CasePosition from, CasePosition to, Map<CasePosition, Pieces> positionPiecesMap, Pieces pieceTo, Side sideFrom) {
-        return !GameUtils.isOtherPiecesBetweenTarget(from, to, positionPiecesMap) &&
-                isValidTarget(pieceTo, sideFrom);
-    }
+    //[FROM] [ANY] [ANY] [KING]
+    private MoveStatus handleKingTarget(Set<DistancePiecePositionModel> piecesBetweenPosition, Pieces pieceFrom, Pieces pieceTo) {
+        boolean isSameSide = Pieces.isSameSide(pieceTo, pieceFrom);
 
-    private boolean whenIsKingCheckMode(CasePosition from, CasePosition to, Map<CasePosition, Pieces> positionPiecesMap, Side sideFrom) {
-        /*
-            1) If a king between position and not covered, return true
-            2) If other piece between position, return false
-        */
-        boolean isKingDirectOnTheAttackingPiece = false;
-
-        List<CasePosition> piecesBetweenPosition = GameUtils.getPiecesBetweenPosition(from, to, positionPiecesMap);
-        CasePosition kingPosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(Side.getOtherPlayerSide(sideFrom)), positionPiecesMap);
-
-        if (piecesBetweenPosition.contains(kingPosition)) { //If the king is on the path, check if he's covered by another piece
-            isKingDirectOnTheAttackingPiece = GameUtils.getPiecesBetweenPosition(from, kingPosition, positionPiecesMap).isEmpty();
+        if (CollectionUtils.isEmpty(piecesBetweenPosition)) {
+            if (isSameSide) {
+                return MoveStatus.CAN_PROTECT_FRIENDLY;
+            } else {
+                return MoveStatus.ENEMY_KING_PARTIAL_CHECK;
+            }
         }
 
-        return piecesBetweenPosition.isEmpty() || isKingDirectOnTheAttackingPiece;
+        return MoveStatus.INVALID_ATTACK;
     }
 
-    private boolean isValidTarget(Pieces pieceTo, Side sideFrom) {
-        return pieceTo == null || !Pieces.isSameSide(pieceTo, sideFrom) && !Pieces.isKing(pieceTo);
+    //[FROM] [ANY] [ANY] [ANY]
+    private MoveStatus handleOtherTarget(Side sideFrom, Pieces pieceTo, Set<DistancePiecePositionModel> piecesBetweenPosition) {
+
+        boolean isTarget = Objects.nonNull(pieceTo);
+        boolean isPiecesBetween = CollectionUtils.isNotEmpty(piecesBetweenPosition);
+
+        if (isPiecesBetween) {
+            return MoveStatus.INVALID_ATTACK;
+        } else if (isTarget) {
+            if (Pieces.isSameSide(pieceTo, sideFrom)) {
+                return MoveStatus.CAN_PROTECT_FRIENDLY;
+            } else {
+                return MoveStatus.VALID_ATTACK;
+            }
+        }
+        return MoveStatus.VALID_MOVE;
     }
 }

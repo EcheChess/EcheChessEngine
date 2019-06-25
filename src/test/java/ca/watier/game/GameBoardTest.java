@@ -16,17 +16,16 @@
 
 package ca.watier.game;
 
-import ca.watier.echechess.common.enums.MoveType;
 import ca.watier.echechess.common.enums.Side;
+import ca.watier.echechess.engine.abstracts.GameBoardData;
+import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
-import ca.watier.echechess.engine.handlers.GamePropertiesHandlerImpl;
-import ca.watier.echechess.engine.handlers.KingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
-import ca.watier.echechess.engine.interfaces.GameHandler;
-import ca.watier.echechess.engine.interfaces.GenericHandler;
+import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -34,7 +33,6 @@ import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -47,77 +45,47 @@ public class GameBoardTest {
     @Spy
     private PlayerHandlerImpl playerHandler;
     @Spy
-    private KingHandlerImpl kingHandler;
+    private PieceMoveConstraintDelegate pieceMoveConstraintDelegate;
     @Spy
-    private GamePropertiesHandlerImpl gamePropertiesHandler;
+    private GameEventEvaluatorHandler gameEventEvaluatorHandler;
 
+
+    @InjectMocks
     private GenericGameHandler genericHandler;
 
     @Before
     public void setUp() {
-        genericHandler = new GenericGameHandler(kingHandler, playerHandler, gamePropertiesHandler);
-        when(playerHandler.isPlayerTurn(any(Side.class))).thenReturn(true);
+        genericHandler = new GenericGameHandler(pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
+        when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
     }
 
     @Test
     public void getBlackTurnNumber() {
-        assertThat(genericHandler.getBlackTurnNumber()).isZero();
+        assertThat(genericHandler.getCloneOfCurrentDataState().getBlackTurnNumber()).isZero();
         genericHandler.movePiece(H7, H6, BLACK);
-        assertThat(genericHandler.getBlackTurnNumber()).isEqualTo(1);
+        assertThat(genericHandler.getCloneOfCurrentDataState().getBlackTurnNumber()).isEqualTo(1);
         genericHandler.movePiece(H6, H5, BLACK);
         genericHandler.movePiece(H5, H4, BLACK);
-        assertThat(genericHandler.getBlackTurnNumber()).isEqualTo(3);
+        assertThat(genericHandler.getCloneOfCurrentDataState().getBlackTurnNumber()).isEqualTo(3);
     }
 
     @Test
     public void getWhiteTurnNumber() {
-        assertThat(genericHandler.getWhiteTurnNumber()).isZero();
+        assertThat(genericHandler.getCloneOfCurrentDataState().getWhiteTurnNumber()).isZero();
         genericHandler.movePiece(H2, H3, WHITE);
-        assertThat(genericHandler.getWhiteTurnNumber()).isEqualTo(1);
+        assertThat(genericHandler.getCloneOfCurrentDataState().getWhiteTurnNumber()).isEqualTo(1);
         genericHandler.movePiece(H3, H4, WHITE);
         genericHandler.movePiece(H4, H5, WHITE);
-        assertThat(genericHandler.getWhiteTurnNumber()).isEqualTo(3);
+        assertThat(genericHandler.getCloneOfCurrentDataState().getWhiteTurnNumber()).isEqualTo(3);
     }
-
-    @Test
-    public void isPieceMoved() {
-        assertFalse(genericHandler.isPieceMoved(G1));
-
-        genericHandler.movePiece(G1, F3, WHITE);
-
-        assertTrue(genericHandler.isPieceMoved(F3));
-        assertNull(genericHandler.isPieceMoved(G1));
-    }
-
-    @Test
-    public void isPawnUsedSpecialMove() {
-        assertFalse(genericHandler.isPawnUsedSpecialMove(H2));
-        genericHandler.movePiece(H2, H4, WHITE);
-        assertTrue(genericHandler.isPawnUsedSpecialMove(H4));
-
-        assertFalse(genericHandler.isPawnUsedSpecialMove(G2));
-        genericHandler.movePiece(G2, G3, WHITE);
-        assertFalse(genericHandler.isPawnUsedSpecialMove(G3));
-
-    }
-
-    @Test
-    public void getDefaultPositions() {
-        assertThat(genericHandler.getDefaultPositions()).isEqualTo(genericHandler.getPiecesLocation());
-        genericHandler.movePiece(G2, G3, WHITE);
-        assertThat(genericHandler.getDefaultPositions()).isNotEqualTo(genericHandler.getPiecesLocation());
-    }
-
 
     @Test
     public void getTurnNumberPiece() {
-        assertThat(genericHandler.getPieceTurn(G2)).isZero();
+        assertThat(genericHandler.getCloneOfCurrentDataState().getPieceTurn(G2)).isZero();
         genericHandler.movePiece(G2, G3, WHITE);
-        assertThat(genericHandler.getPieceTurn(G3)).isZero();
+        assertThat(genericHandler.getCloneOfCurrentDataState().getPieceTurn(G3)).isZero();
         genericHandler.movePiece(G3, G4, WHITE);
-        assertThat(genericHandler.getPieceTurn(G3)).isNull();
-        assertThat(genericHandler.getPieceTurn(G4)).isEqualTo(1);
+        assertThat(genericHandler.getCloneOfCurrentDataState().getPieceTurn(G3)).isNull();
+        assertThat(genericHandler.getCloneOfCurrentDataState().getPieceTurn(G4)).isEqualTo(1);
     }
-
-
 }

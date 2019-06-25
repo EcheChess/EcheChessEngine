@@ -3,7 +3,6 @@ package ca.watier.echechess.engine.handlers;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.common.utils.ObjectUtils;
-import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 
 import java.util.ArrayList;
@@ -12,17 +11,9 @@ import java.util.List;
 import static ca.watier.echechess.common.enums.Side.*;
 
 public class PlayerHandlerImpl implements PlayerHandler {
+    private final List<Player> observerList = new ArrayList<>();
     private Player playerWhite;
     private Player playerBlack;
-    private List<Player> observerList = new ArrayList<>();
-    private GenericGameHandler genericGameHandler;
-
-    public PlayerHandlerImpl(GenericGameHandler genericGameHandler) {
-        this.genericGameHandler = genericGameHandler;
-    }
-
-    public PlayerHandlerImpl() {
-    }
 
     @Override
     public void removePlayerFromWhite(Player player) {
@@ -130,20 +121,5 @@ public class PlayerHandlerImpl implements PlayerHandler {
     @Override
     public List<Player> getObserverList() {
         return observerList;
-    }
-
-    @Override
-    public boolean isPlayerTurn(Side sideFrom) {
-        if (sideFrom == null) {
-            return false;
-        }
-
-        Side currentAllowedMoveSide = genericGameHandler.getCurrentAllowedMoveSide();
-        return currentAllowedMoveSide.equals(sideFrom);
-    }
-
-    @Override
-    public void bindToGame(GenericGameHandler genericGameHandler) {
-        this.genericGameHandler = genericGameHandler;
     }
 }

@@ -1,27 +1,26 @@
 package ca.watier.echechess.engine.abstracts;
 
 import ca.watier.echechess.common.enums.CasePosition;
-import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.common.utils.Pair;
-import ca.watier.echechess.engine.pojos.KingStatusHolderPojo;
 import ca.watier.echechess.engine.utils.GameUtils;
 import com.google.common.collect.ArrayListMultimap;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.io.Serializable;
 import java.util.*;
 
 import static ca.watier.echechess.common.enums.Side.WHITE;
 
-public abstract class GameBoardData implements Cloneable, Serializable {
+public class GameBoardData implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -5242416504518941779L;
     //The default position of the board
-    private final Map<CasePosition, Pieces> DEFAULT_POSITIONS;
+    private final Map<CasePosition, Pieces> defaultPositions;
     //The pieces position on the board
     private Map<CasePosition, Pieces> positionPiecesMap;
     //Used to check if the piece have moved
@@ -45,17 +44,17 @@ public abstract class GameBoardData implements Cloneable, Serializable {
     private boolean isBlackQueenCastlingAvailable;
     private boolean isBlackKingCastlingAvailable;
     private List<MoveHistory> moveHistoryList;
-    private KingStatusHolderPojo kingHolder;
     private Side currentAllowedMoveSide;
+    private boolean allowOtherToJoin;
+    private boolean allowObservers;
 
     public GameBoardData() {
         pawnPromotionMap = ArrayListMultimap.create();
-        DEFAULT_POSITIONS = GameUtils.getDefaultGame();
+        defaultPositions = GameUtils.getDefaultGame();
         positionPiecesMap = GameUtils.getDefaultGame();
         isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
         isPawnUsedSpecialMoveMap = GameUtils.initPawnMap(positionPiecesMap);
         turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);
-        kingHolder = new KingStatusHolderPojo();
         moveHistoryList = new ArrayList<>();
         blackPlayerPoint = 0;
         whitePlayerPoint = 0;
@@ -67,6 +66,8 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         isWhiteKingCastlingAvailable = true;
         isBlackQueenCastlingAvailable = true;
         isBlackKingCastlingAvailable = true;
+        allowOtherToJoin = false;
+        allowObservers = false;
     }
 
     protected List<Pair<CasePosition, CasePosition>> getPawnPromotionBySide(Side playerSide) {
@@ -89,8 +90,34 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         return Map.copyOf(positionPiecesMap);
     }
 
+
+    /**
+     * Gets the pieces / CasePosition based on a side
+     *
+     * @param side
+     * @return
+     */
+    public final Map<CasePosition, Pieces> getPiecesLocation(Side side) {
+        Map<CasePosition, Pieces> values = new EnumMap<>(CasePosition.class);
+
+        if (side == null) {
+            return values;
+        }
+
+        for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : positionPiecesMap.entrySet()) {
+            CasePosition key = casePositionPiecesEntry.getKey();
+            Pieces value = casePositionPiecesEntry.getValue();
+
+            if (side.equals(value.getSide())) {
+                values.put(key, value);
+            }
+        }
+
+        return values;
+    }
+
     public Map<CasePosition, Pieces> getDefaultPositions() {
-        return Map.copyOf(DEFAULT_POSITIONS);
+        return Map.copyOf(defaultPositions);
     }
 
     public int getBlackTurnNumber() {
@@ -168,8 +195,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
             return;
         }
 
-        boolean isValid = BaseUtils.getSafeBoolean(isPieceMoved(from)) || GameUtils.isDefaultPosition(from, piece, this);
-        isPiecesMovedMap.put(to, isValid);
+        isPiecesMovedMap.put(to, true);
         isPiecesMovedMap.remove(from);
     }
 
@@ -179,12 +205,12 @@ public abstract class GameBoardData implements Cloneable, Serializable {
      * @param position
      * @return
      */
-    public final Boolean isPieceMoved(CasePosition position) {
+    public final boolean isPieceMoved(CasePosition position) {
         if (position == null) {
             return false;
         }
 
-        return isPiecesMovedMap.get(position);
+        return BooleanUtils.toBoolean(isPiecesMovedMap.get(position));
     }
 
 
@@ -199,7 +225,7 @@ public abstract class GameBoardData implements Cloneable, Serializable {
             return false;
         }
 
-        return BaseUtils.getSafeBoolean(isPawnUsedSpecialMoveMap.get(position));
+        return BooleanUtils.toBoolean(isPawnUsedSpecialMoveMap.get(position));
     }
 
     protected void addPawnUsedSpecialMove(CasePosition to, boolean isValid) {
@@ -286,8 +312,8 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         }
 
         this.positionPiecesMap = positionPiecesMap;
-        this.DEFAULT_POSITIONS.clear();
-        this.DEFAULT_POSITIONS.putAll(positionPiecesMap);
+        this.defaultPositions.clear();
+        this.defaultPositions.putAll(positionPiecesMap);
         this.isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
         this.turnNumberPieceMap = GameUtils.initTurnMap(positionPiecesMap);
     }
@@ -308,24 +334,8 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         return isGameDraw;
     }
 
-    protected void restore(GameBoardData gameBoardData) {
-        this.positionPiecesMap = gameBoardData.positionPiecesMap;
-        this.isPiecesMovedMap = gameBoardData.isPiecesMovedMap;
-        this.isPawnUsedSpecialMoveMap = gameBoardData.isPawnUsedSpecialMoveMap;
-        this.turnNumberPieceMap = gameBoardData.turnNumberPieceMap;
-        this.pawnPromotionMap = gameBoardData.pawnPromotionMap;
-    }
-
-    protected void setKingStatusBySide(KingStatus kingStatus, Side side) {
-        kingHolder.setKingStatusBySide(kingStatus, side);
-    }
-
-    public KingStatus getEvaluatedKingStatusBySide(Side side) {
-        return kingHolder.getKingStatusBySide(side);
-    }
-
     @Override
-    protected GameBoardData clone() throws CloneNotSupportedException {
+    public GameBoardData clone() throws CloneNotSupportedException {
         GameBoardData cloned = (GameBoardData) super.clone();
         cloned.positionPiecesMap = new EnumMap<>(this.positionPiecesMap);
         cloned.isPiecesMovedMap = new EnumMap<>(this.isPiecesMovedMap);
@@ -337,7 +347,6 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         cloned.whiteTurnNumber = this.whiteTurnNumber;
         cloned.isGameDraw = this.isGameDraw;
         cloned.isGamePaused = this.isGamePaused;
-        cloned.kingHolder = this.kingHolder;
         cloned.moveHistoryList = new ArrayList<>(this.moveHistoryList);
         cloned.blackPlayerPoint = this.blackPlayerPoint;
         cloned.whitePlayerPoint = this.whitePlayerPoint;
@@ -346,6 +355,8 @@ public abstract class GameBoardData implements Cloneable, Serializable {
         cloned.isWhiteKingCastlingAvailable = this.isWhiteKingCastlingAvailable;
         cloned.isBlackQueenCastlingAvailable = this.isBlackQueenCastlingAvailable;
         cloned.isBlackKingCastlingAvailable = this.isBlackKingCastlingAvailable;
+        cloned.allowOtherToJoin = this.allowOtherToJoin;
+        cloned.allowObservers = this.allowObservers;
 
         return cloned;
     }
@@ -408,5 +419,25 @@ public abstract class GameBoardData implements Cloneable, Serializable {
 
     protected final void setBlackKingCastlingAvailable(boolean blackKingCastlingAvailable) {
         isBlackKingCastlingAvailable = blackKingCastlingAvailable;
+    }
+
+    public boolean isAllowOtherToJoin() {
+        return allowOtherToJoin;
+    }
+
+    public void setAllowOtherToJoin(boolean allowOtherToJoin) {
+        this.allowOtherToJoin = allowOtherToJoin;
+    }
+
+    public boolean isAllowObservers() {
+        return allowObservers;
+    }
+
+    public void setAllowObservers(boolean allowObservers) {
+        this.allowObservers = allowObservers;
+    }
+
+    public Pieces getPiece(CasePosition position) {
+        return positionPiecesMap.get(position);
     }
 }
