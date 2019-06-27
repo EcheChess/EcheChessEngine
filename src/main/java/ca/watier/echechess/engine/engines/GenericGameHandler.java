@@ -27,6 +27,8 @@ import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.exceptions.MoveNotAllowedException;
+import ca.watier.echechess.engine.handlers.GameEventEvaluatorHandlerImpl;
+import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.interfaces.GameHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
@@ -46,6 +48,9 @@ import static ca.watier.echechess.common.enums.Side.*;
  */
 public class GenericGameHandler extends GameBoard implements GameHandler {
     private static final long serialVersionUID = 1139291295474732218L;
+    public static final KingStatus CHECKMATE = KingStatus.CHECKMATE;
+    public static final KingStatus CHECK = KingStatus.CHECK;
+    public static final KingStatus STALEMATE = KingStatus.STALEMATE;
 
     private final GameEventEvaluatorHandler gameEventEvaluatorHandler;
     private final PieceMoveConstraintDelegate pieceDelegate;
@@ -57,6 +62,13 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
         this.gameEventEvaluatorHandler = gameEventEvaluatorHandler;
         this.pieceDelegate = pieceDelegate;
         this.playerHandler = playerHandler;
+    }
+
+    public static GenericGameHandler newStandardHandlerFromConstraintDelegate(PieceMoveConstraintDelegate pieceMoveConstraintDelegate) {
+        PlayerHandler playerHandler = new PlayerHandlerImpl();
+        GameEventEvaluatorHandler gameEventEvaluatorHandler = new GameEventEvaluatorHandlerImpl();
+
+        return new GenericGameHandler(pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
     }
 
     /**
@@ -295,12 +307,12 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
 
     @Override
     public boolean isCheckMate(Side side) {
-        return KingStatus.CHECKMATE.equals(pieceDelegate.getKingStatus(side, getCloneOfCurrentDataState()));
+        return CHECKMATE.equals(pieceDelegate.getKingStatus(side, getCloneOfCurrentDataState()));
     }
 
     @Override
     public boolean isCheck(Side side) {
-        return KingStatus.CHECK.equals(pieceDelegate.getKingStatus(side, getCloneOfCurrentDataState()));
+        return CHECK.equals(pieceDelegate.getKingStatus(side, getCloneOfCurrentDataState()));
     }
 
     @Override
@@ -338,10 +350,17 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
     }
 
     @Override
-    public boolean isGameDone() {
-        return KingStatus.CHECKMATE.equals(pieceDelegate.getKingStatus(BLACK, getCloneOfCurrentDataState())) ||
-                KingStatus.CHECKMATE.equals(pieceDelegate.getKingStatus(WHITE, getCloneOfCurrentDataState())) ||
+    public boolean isGameEnded() {
+        GameBoardData cloneOfCurrentDataState = getCloneOfCurrentDataState();
+
+        return CHECKMATE.equals(pieceDelegate.getKingStatus(BLACK, cloneOfCurrentDataState)) ||
+                CHECKMATE.equals(pieceDelegate.getKingStatus(WHITE, cloneOfCurrentDataState)) ||
                 isGameDraw();
+    }
+
+    @Override
+    public boolean isGameStalemate() {
+        return isKing(STALEMATE, WHITE) && isKing(STALEMATE, BLACK);
     }
 
     @Override

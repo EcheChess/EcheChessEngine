@@ -177,12 +177,12 @@ public class PgnGameExtractor {
     private void validateGameEnding(PgnEndGameToken ending) throws InvalidGameEndingException {
         switch (ending) {
             case WHITE_WIN:
-                if (!(gameHandler.isGameDone() && gameHandler.isCheckMate(BLACK))) {
+                if (!(gameHandler.isGameEnded() && gameHandler.isCheckMate(BLACK))) {
                     throw new InvalidGameEndingException(WHITE);
                 }
                 break;
             case BLACK_WIN:
-                if (!(gameHandler.isGameDone() && gameHandler.isCheckMate(WHITE))) {
+                if (!(gameHandler.isGameEnded() && gameHandler.isCheckMate(WHITE))) {
                     throw new InvalidGameEndingException(BLACK);
                 }
                 break;

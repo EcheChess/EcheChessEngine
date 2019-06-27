@@ -208,6 +208,26 @@ public abstract class GameBoard implements Serializable {
         return gameBoardData.getWhitePlayerPoint();
     }
 
+    public boolean isAllowOtherToJoin() {
+        return gameBoardData.isAllowOtherToJoin();
+    }
+
+    public void setAllowOtherToJoin(boolean allowOtherToJoin) {
+        gameBoardData.setAllowOtherToJoin(allowOtherToJoin);
+    }
+
+    public boolean isAllowObservers() {
+        return gameBoardData.isAllowObservers();
+    }
+
+    public void setAllowObservers(boolean allowObservers) {
+        gameBoardData.setAllowObservers(allowObservers);
+    }
+
+    public boolean isGamePaused() {
+        return gameBoardData.isGamePaused();
+    }
+
     public GameBoardData getCloneOfCurrentDataState() {
         try {
             return org.apache.commons.lang3.ObjectUtils.cloneIfPossible(gameBoardData);

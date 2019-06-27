@@ -41,7 +41,9 @@ public interface GameHandler {
 
     void setUuid(String uuid);
 
-    boolean isGameDone();
+    boolean isGameEnded();
+
+    boolean isGameStalemate();
 
     PlayerHandler getPlayerHandler();
 
