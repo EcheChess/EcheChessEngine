@@ -87,41 +87,41 @@ public class GameUtils implements BaseUtils {
      * @return
      */
     public static Map<CasePosition, Pieces> getDefaultGame() {
-        final Map<CasePosition, Pieces> GAME = new EnumMap<>(CasePosition.class);
-        GAME.put(A_1, W_ROOK);
-        GAME.put(B_1, W_KNIGHT);
-        GAME.put(C_1, W_BISHOP);
-        GAME.put(D_1, W_QUEEN);
-        GAME.put(E_1, W_KING);
-        GAME.put(F_1, W_BISHOP);
-        GAME.put(G_1, W_KNIGHT);
-        GAME.put(H_1, W_ROOK);
-        GAME.put(A_2, W_PAWN);
-        GAME.put(B_2, W_PAWN);
-        GAME.put(C_2, W_PAWN);
-        GAME.put(D_2, W_PAWN);
-        GAME.put(E_2, W_PAWN);
-        GAME.put(F_2, W_PAWN);
-        GAME.put(G_2, W_PAWN);
-        GAME.put(H_2, W_PAWN);
+        Map<CasePosition, Pieces> gameMap = new EnumMap<>(CasePosition.class);
+        gameMap.put(A_1, W_ROOK);
+        gameMap.put(B_1, W_KNIGHT);
+        gameMap.put(C_1, W_BISHOP);
+        gameMap.put(D_1, W_QUEEN);
+        gameMap.put(E_1, W_KING);
+        gameMap.put(F_1, W_BISHOP);
+        gameMap.put(G_1, W_KNIGHT);
+        gameMap.put(H_1, W_ROOK);
+        gameMap.put(A_2, W_PAWN);
+        gameMap.put(B_2, W_PAWN);
+        gameMap.put(C_2, W_PAWN);
+        gameMap.put(D_2, W_PAWN);
+        gameMap.put(E_2, W_PAWN);
+        gameMap.put(F_2, W_PAWN);
+        gameMap.put(G_2, W_PAWN);
+        gameMap.put(H_2, W_PAWN);
 
-        GAME.put(A_8, B_ROOK);
-        GAME.put(B_8, B_KNIGHT);
-        GAME.put(C_8, B_BISHOP);
-        GAME.put(D_8, B_QUEEN);
-        GAME.put(E_8, B_KING);
-        GAME.put(F_8, B_BISHOP);
-        GAME.put(G_8, B_KNIGHT);
-        GAME.put(H_8, B_ROOK);
-        GAME.put(A_7, B_PAWN);
-        GAME.put(B_7, B_PAWN);
-        GAME.put(C_7, B_PAWN);
-        GAME.put(D_7, B_PAWN);
-        GAME.put(E_7, B_PAWN);
-        GAME.put(F_7, B_PAWN);
-        GAME.put(G_7, B_PAWN);
-        GAME.put(H_7, B_PAWN);
-        return GAME;
+        gameMap.put(A_8, B_ROOK);
+        gameMap.put(B_8, B_KNIGHT);
+        gameMap.put(C_8, B_BISHOP);
+        gameMap.put(D_8, B_QUEEN);
+        gameMap.put(E_8, B_KING);
+        gameMap.put(F_8, B_BISHOP);
+        gameMap.put(G_8, B_KNIGHT);
+        gameMap.put(H_8, B_ROOK);
+        gameMap.put(A_7, B_PAWN);
+        gameMap.put(B_7, B_PAWN);
+        gameMap.put(C_7, B_PAWN);
+        gameMap.put(D_7, B_PAWN);
+        gameMap.put(E_7, B_PAWN);
+        gameMap.put(F_7, B_PAWN);
+        gameMap.put(G_7, B_PAWN);
+        gameMap.put(H_7, B_PAWN);
+        return gameMap;
     }
 
 

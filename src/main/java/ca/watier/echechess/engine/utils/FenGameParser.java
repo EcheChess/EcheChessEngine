@@ -10,7 +10,9 @@ import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,8 +72,7 @@ public final class FenGameParser {
                     throw new FenParserException();
                 }
 
-                Stack<String> endingSectionStack = new Stack<>();
-                endingSectionStack.addAll(Arrays.asList(endingSections));
+                Deque<String> endingSectionStack = new ArrayDeque<>(Arrays.asList(endingSections));
                 String rawCastlingAvailableMoves = endingSectionStack.pop();
 
                 if (StringUtils.isNotBlank(rawCastlingAvailableMoves)) {

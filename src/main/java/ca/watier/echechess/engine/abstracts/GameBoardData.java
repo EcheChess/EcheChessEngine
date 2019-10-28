@@ -72,7 +72,7 @@ public class GameBoardData implements Cloneable, Serializable {
 
     protected List<Pair<CasePosition, CasePosition>> getPawnPromotionBySide(Side playerSide) {
         if (playerSide == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         return BaseUtils.getSafeList(pawnPromotionMap.get(playerSide));
@@ -277,9 +277,9 @@ public class GameBoardData implements Cloneable, Serializable {
             return;
         }
 
-        this.isPawnUsedSpecialMoveMap = new HashMap<>(isPawnUsedSpecialMoveMap);
-        this.turnNumberPieceMap = new HashMap<>(turnNumberPieceMap);
-        this.isPiecesMovedMap = new HashMap<>(isPiecesMovedMap);
+        this.isPawnUsedSpecialMoveMap = new EnumMap<>(isPawnUsedSpecialMoveMap);
+        this.turnNumberPieceMap = new EnumMap<>(turnNumberPieceMap);
+        this.isPiecesMovedMap = new EnumMap<>(isPiecesMovedMap);
     }
 
     /**

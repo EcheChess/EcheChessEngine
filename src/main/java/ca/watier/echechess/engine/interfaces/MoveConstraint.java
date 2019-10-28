@@ -22,10 +22,12 @@ import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.exceptions.NoMoveTypeDefinedException;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 
+import java.io.Serializable;
+
 /**
  * Created by yannick on 4/23/2017.
  */
-public interface MoveConstraint {
+public interface MoveConstraint extends Serializable {
 
     MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData);
 

@@ -27,7 +27,6 @@ import ca.watier.echechess.engine.models.enums.MoveStatus;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +35,7 @@ import java.util.Objects;
  * Created by yannick on 4/26/2017.
  */
 
-public class PieceMoveConstraintDelegate implements MoveConstraint, Serializable {
+public class PieceMoveConstraintDelegate implements MoveConstraint {
 
     private static final long serialVersionUID = -7763545818654487544L;
 

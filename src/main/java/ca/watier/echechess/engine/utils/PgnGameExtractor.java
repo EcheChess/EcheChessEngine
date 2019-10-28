@@ -90,8 +90,8 @@ public class PgnGameExtractor {
     private void parseGame(String rawCurrentGame) throws ChessException {
         this.currentGame = rawCurrentGame;
 
-        String currentGame = getGame(rawCurrentGame);
-        String[] tokens = currentGame.split("\\s+\\d+\\.");
+        String currentGameString = getGame(rawCurrentGame);
+        String[] tokens = currentGameString.split("\\s+\\d+\\.");
 
         if (tokens.length == 0) {
             return;

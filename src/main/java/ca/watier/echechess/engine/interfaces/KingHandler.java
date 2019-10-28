@@ -5,9 +5,10 @@ import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface KingHandler {
+public interface KingHandler extends Serializable {
     boolean isKingCheckAfterMove(CasePosition from, CasePosition to, GameBoardData gameBoardData);
 
     KingStatus getKingStatus(Side playerSide, GameBoardData gameBoardData);

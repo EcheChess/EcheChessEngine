@@ -11,6 +11,8 @@ import java.util.List;
 import static ca.watier.echechess.common.enums.Side.*;
 
 public class PlayerHandlerImpl implements PlayerHandler {
+    private static final long serialVersionUID = -1267409003065720156L;
+
     private final List<Player> observerList = new ArrayList<>();
     private Player playerWhite;
     private Player playerBlack;

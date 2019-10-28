@@ -3,9 +3,10 @@ package ca.watier.echechess.engine.interfaces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.sessions.Player;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface PlayerHandler {
+public interface PlayerHandler extends Serializable {
     void removePlayerFromWhite(Player player);
 
     boolean changePlayerToBlack(Player player);

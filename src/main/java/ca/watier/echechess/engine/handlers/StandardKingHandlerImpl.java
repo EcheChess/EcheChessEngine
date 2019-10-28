@@ -25,6 +25,7 @@ import static ca.watier.echechess.common.enums.Side.getOtherPlayerSide;
 public class StandardKingHandlerImpl implements KingHandler {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(StandardKingHandlerImpl.class);
+    private static final long serialVersionUID = 8732189942954054774L;
 
     private PieceMoveConstraintDelegate moveConstraintDelegate;
 
@@ -69,7 +70,7 @@ public class StandardKingHandlerImpl implements KingHandler {
 
     private List<CasePosition> getPositionKingCanMove(Side playerSide, GameBoardData gameBoardData) {
         if (playerSide == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         CasePosition kingPosition = GameUtils.getSinglePiecePosition(Pieces.getKingBySide(playerSide), gameBoardData.getPiecesLocation());

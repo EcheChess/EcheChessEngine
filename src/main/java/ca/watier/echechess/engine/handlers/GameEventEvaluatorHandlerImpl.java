@@ -6,6 +6,8 @@ import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 
 public class GameEventEvaluatorHandlerImpl implements GameEventEvaluatorHandler {
 
+    private static final long serialVersionUID = -7662914404339428735L;
+
     @Override
     public boolean isPlayerTurn(Side playerSide, GameBoardData gameBoardData) {
         if (playerSide == null) {
