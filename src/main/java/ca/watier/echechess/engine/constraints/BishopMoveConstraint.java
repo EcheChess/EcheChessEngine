@@ -23,6 +23,8 @@ import ca.watier.echechess.common.enums.DirectionPattern;
  * Created by yannick on 4/23/2017.
  */
 public class BishopMoveConstraint extends DirectionalMoveConstraint {
+    private static final long serialVersionUID = 737006191697229780L;
+
     public BishopMoveConstraint() {
         super(DirectionPattern.DIAGONAL);
     }

@@ -42,6 +42,7 @@ import java.util.Set;
  */
 public class KingMoveConstraint implements MoveConstraint {
 
+    private static final long serialVersionUID = -7557608272658055902L;
     private KingHandler kingHandler;
 
     public KingMoveConstraint(KingHandler kingHandler) {

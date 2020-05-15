@@ -22,6 +22,8 @@ import ca.watier.echechess.common.enums.DirectionPattern;
  * Created by yannick on 4/23/2017.
  */
 public class QueenMoveConstraint extends DirectionalMoveConstraint {
+    private static final long serialVersionUID = -37751583442568661L;
+
     public QueenMoveConstraint() {
         super(DirectionPattern.ALL);
     }

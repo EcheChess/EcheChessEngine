@@ -22,6 +22,8 @@ import ca.watier.echechess.common.enums.DirectionPattern;
  * Created by yannick on 4/23/2017.
  */
 public class RookMoveConstraint extends DirectionalMoveConstraint {
+    private static final long serialVersionUID = 8439593234072170944L;
+
     public RookMoveConstraint() {
         super(DirectionPattern.NORMAL);
     }

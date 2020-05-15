@@ -33,6 +33,7 @@ import java.util.*;
  */
 public class DirectionalMoveConstraint implements MoveConstraint {
 
+    private static final long serialVersionUID = 8337007739691270394L;
     private DirectionPattern pattern;
     private List<Direction> directionList;
 

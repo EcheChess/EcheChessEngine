@@ -37,6 +37,7 @@ import java.util.Set;
 public class PawnMoveConstraint implements MoveConstraint {
 
     private static final SetMultimap<Side, Direction> ATTACK_DIRECTION_BY_SIDE;
+    private static final long serialVersionUID = -6750284337757241863L;
 
     static {
         ATTACK_DIRECTION_BY_SIDE = HashMultimap.create(2, 2);
