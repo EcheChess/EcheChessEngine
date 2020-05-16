@@ -15,4 +15,4 @@ addons:
   sonarcloud:
     organization: "doi9t-github"
 script:
-  - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=ca.watier:echechess-engine
+  - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=ca.watier.echechess:echechess-engine
