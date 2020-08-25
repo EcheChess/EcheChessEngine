@@ -21,10 +21,8 @@ import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
-import ca.watier.echechess.engine.handlers.StandardKingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
-import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,11 +32,9 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
-import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.MoveType.CAPTURE;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.Side.WHITE;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 

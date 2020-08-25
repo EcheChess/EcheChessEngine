@@ -18,12 +18,9 @@ package ca.watier.game;
 
 import ca.watier.echechess.common.enums.KingStatus;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.exceptions.FenParserException;
-import ca.watier.echechess.engine.handlers.StandardKingHandlerImpl;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
@@ -38,8 +35,6 @@ import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by yannick on 6/20/2017.

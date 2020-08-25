@@ -19,7 +19,6 @@ package ca.watier.pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
-import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;

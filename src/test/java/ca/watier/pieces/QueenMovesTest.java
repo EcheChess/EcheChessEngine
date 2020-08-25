@@ -18,7 +18,6 @@ package ca.watier.pieces;
 
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
-import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -26,10 +25,8 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
-import static ca.watier.echechess.common.enums.KingStatus.OK;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.Side.WHITE;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
