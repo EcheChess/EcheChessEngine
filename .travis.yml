@@ -8,7 +8,7 @@ matrix:
       install: . ./install-jdk.sh -f 14
 branches:
   only:
-    - develop
+    - master
 git:
   depth: false
 addons:
