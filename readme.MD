@@ -1,5 +1,4 @@
 # EcheChessEngine
-![Build Status](https://travis-ci.org/EcheChess/EcheChessEngine.svg?branch=develop)
 ![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=ca.watier.echechess:echechess-engine&metric=alert_status)
 ![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=ca.watier.echechess:echechess-engine&metric=security_rating)
 ![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=ca.watier.echechess:echechess-engine&metric=reliability_rating)
