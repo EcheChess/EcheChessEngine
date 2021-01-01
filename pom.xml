@@ -10,6 +10,8 @@
 
     <properties>
         <java.version>14</java.version>
+        <sonar.projectKey>echechess_EcheChessEngine</sonar.projectKey>
+        <sonar.organization>echechess</sonar.organization>
     </properties>
 
     <distributionManagement>
