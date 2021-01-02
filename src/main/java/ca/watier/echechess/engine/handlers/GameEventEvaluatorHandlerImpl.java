@@ -4,8 +4,11 @@ import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 
+import java.io.Serial;
+
 public class GameEventEvaluatorHandlerImpl implements GameEventEvaluatorHandler {
 
+    @Serial
     private static final long serialVersionUID = -7662914404339428735L;
 
     @Override

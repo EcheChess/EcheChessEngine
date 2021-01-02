@@ -19,7 +19,6 @@ package ca.watier.echechess.engine.utils;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Direction;
 import ca.watier.echechess.common.enums.Pieces;
-import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.models.DistancePiecePositionModel;
@@ -31,7 +30,7 @@ import java.util.*;
 /**
  * Created by yannick on 4/23/2017.
  */
-public class GameUtils implements BaseUtils {
+public final class GameUtils {
 
     private static final CasePosition A_1 = CasePosition.A1;
     private static final CasePosition B_1 = CasePosition.B1;
@@ -237,7 +236,7 @@ public class GameUtils implements BaseUtils {
             return positions;
         }
 
-        int distanceFromDestination = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to));
+        int distanceFromDestination = MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to);
         Direction directionToDestination = MathUtils.getDirectionFromPosition(from, to);
 
         for (Map.Entry<CasePosition, Pieces> casePositionPiecesEntry : pieces.entrySet()) {
@@ -246,7 +245,7 @@ public class GameUtils implements BaseUtils {
             Pieces piece = casePositionPiecesEntry.getValue();
             if (piece != null && position != from && position != to) {
 
-                int distanceToOther = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, position));
+                int distanceToOther = MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, position);
                 Direction directionToOther = MathUtils.getDirectionFromPosition(from, position);
 
                 if (MathUtils.isPositionInLine(from, to, position) && distanceFromDestination > distanceToOther && directionToOther == directionToDestination) {

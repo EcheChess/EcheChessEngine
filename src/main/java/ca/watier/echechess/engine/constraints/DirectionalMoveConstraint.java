@@ -26,6 +26,7 @@ import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.Serial;
 import java.util.*;
 
 /**
@@ -33,9 +34,11 @@ import java.util.*;
  */
 public class DirectionalMoveConstraint implements MoveConstraint {
 
+    @Serial
     private static final long serialVersionUID = 8337007739691270394L;
-    private DirectionPattern pattern;
-    private List<Direction> directionList;
+
+    private final DirectionPattern pattern;
+    private final List<Direction> directionList;
 
     public DirectionalMoveConstraint(DirectionPattern pattern) {
         this.pattern = pattern;

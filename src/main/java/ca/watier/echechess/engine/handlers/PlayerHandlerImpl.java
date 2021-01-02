@@ -5,12 +5,15 @@ import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 import static ca.watier.echechess.common.enums.Side.*;
 
 public class PlayerHandlerImpl implements PlayerHandler {
+
+    @Serial
     private static final long serialVersionUID = -1267409003065720156L;
 
     private final List<Player> observerList = new ArrayList<>();
@@ -60,24 +63,21 @@ public class PlayerHandlerImpl implements PlayerHandler {
         boolean value;
 
         switch (side) {
-            case BLACK: {
+            case BLACK -> {
                 removePlayerFromWhite(player);
                 value = changePlayerToBlack(player);
                 observerList.remove(player);
-                break;
             }
-            case WHITE: {
+            case WHITE -> {
                 removePlayerFromBlack(player);
                 value = changePlayerToWhite(player);
                 observerList.remove(player);
-                break;
             }
-            default: {
+            default -> {
                 removePlayerFromWhite(player);
                 removePlayerFromBlack(player);
                 observerList.add(player);
                 value = true;
-                break;
             }
         }
 

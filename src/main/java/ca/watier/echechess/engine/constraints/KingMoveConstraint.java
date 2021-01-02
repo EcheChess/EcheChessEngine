@@ -20,7 +20,6 @@ import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.MoveType;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
@@ -32,6 +31,7 @@ import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,8 +42,10 @@ import java.util.Set;
  */
 public class KingMoveConstraint implements MoveConstraint {
 
+    @Serial
     private static final long serialVersionUID = -7557608272658055902L;
-    private KingHandler kingHandler;
+
+    private final KingHandler kingHandler;
 
     public KingMoveConstraint(KingHandler kingHandler) {
         this.kingHandler = kingHandler;
@@ -54,7 +56,7 @@ public class KingMoveConstraint implements MoveConstraint {
         Pieces fromPiece = gameBoardData.getPiece(from);
         Pieces toPiece = gameBoardData.getPiece(to);
 
-        if (BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to)) != 1) {
+        if (MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to) != 1) {
             return MoveStatus.getInvalidMoveStatusBasedOnTarget(toPiece);
         }
 
@@ -131,14 +133,14 @@ public class KingMoveConstraint implements MoveConstraint {
         boolean isKingSideAvail = false;
 
         switch (sideFrom) {
-            case BLACK:
+            case BLACK -> {
                 isKingSideAvail = gameHandler.isBlackKingCastlingAvailable();
                 isQueenSideAvail = gameHandler.isBlackQueenCastlingAvailable();
-                break;
-            case WHITE:
+            }
+            case WHITE -> {
                 isKingSideAvail = gameHandler.isWhiteKingCastlingAvailable();
                 isQueenSideAvail = gameHandler.isWhiteQueenCastlingAvailable();
-                break;
+            }
         }
 
         return (queenSideCastling && !isQueenSideAvail) || (kingSideCastling && !isKingSideAvail);

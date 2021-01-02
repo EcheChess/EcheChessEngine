@@ -13,6 +13,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serial;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -25,9 +26,11 @@ import static ca.watier.echechess.common.enums.Side.getOtherPlayerSide;
 public class StandardKingHandlerImpl implements KingHandler {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(StandardKingHandlerImpl.class);
+
+    @Serial
     private static final long serialVersionUID = 8732189942954054774L;
 
-    private PieceMoveConstraintDelegate moveConstraintDelegate;
+    private final PieceMoveConstraintDelegate moveConstraintDelegate;
 
     public StandardKingHandlerImpl(PieceMoveConstraintDelegate moveConstraintDelegate) {
         this.moveConstraintDelegate = moveConstraintDelegate;

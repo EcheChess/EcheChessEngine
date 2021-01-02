@@ -17,16 +17,15 @@
 package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
-import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 
+import java.io.Serial;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,11 +35,13 @@ import java.util.Set;
  */
 public class PawnMoveConstraint implements MoveConstraint {
 
-    private static final SetMultimap<Side, Direction> ATTACK_DIRECTION_BY_SIDE;
+    private static final HashSetValuedHashMap<Side, Direction> ATTACK_DIRECTION_BY_SIDE;
+
+    @Serial
     private static final long serialVersionUID = -6750284337757241863L;
 
     static {
-        ATTACK_DIRECTION_BY_SIDE = HashMultimap.create(2, 2);
+        ATTACK_DIRECTION_BY_SIDE = new HashSetValuedHashMap<>(2, 2);
         ATTACK_DIRECTION_BY_SIDE.put(Side.BLACK, Direction.SOUTH_WEST);
         ATTACK_DIRECTION_BY_SIDE.put(Side.BLACK, Direction.SOUTH_EAST);
 
@@ -98,7 +99,7 @@ public class PawnMoveConstraint implements MoveConstraint {
             if (pieceTurnEnemyPawn != null) {
                 int nbTotalMove = gameBoardData.getNbTotalMove();
                 boolean isLastMove = (nbTotalMove - pieceTurnEnemyPawn) == 1;
-                boolean isMoveOneCase = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to)) == 1;
+                boolean isMoveOneCase = MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to) == 1;
 
                 isEnPassant = isLastMove && isMoveOneCase && pawnUsedSpecialMove;
             }
@@ -153,7 +154,7 @@ public class PawnMoveConstraint implements MoveConstraint {
         Direction direction = getMovePositionBySide(sideFrom);
         Set<Direction> attackDirection = ATTACK_DIRECTION_BY_SIDE.get(sideFrom);
 
-        int nbCaseBetweenPositions = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to));
+        int nbCaseBetweenPositions = MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to);
         boolean otherPiecesBetweenTarget = GameUtils.isOtherPiecesBetweenTarget(from, to, gameBoardData.getPiecesLocation());
         boolean isNbOfCaseIsOne = nbCaseBetweenPositions == 1;
 
@@ -223,7 +224,7 @@ public class PawnMoveConstraint implements MoveConstraint {
             if (enemyPawnPosition != null) {
                 Pieces enemyPawn = gameBoardData.getPiece(enemyPawnPosition);
 
-                int nbCaseBetweenPositions = BaseUtils.getSafeInteger(MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to));
+                int nbCaseBetweenPositions = MathUtils.getDistanceBetweenPositionsWithCommonDirection(from, to);
 
                 if (isPawnMoveHop(from, pieceFrom, to, gameBoardData, nbCaseBetweenPositions)) {
                     return MoveType.PAWN_HOP;

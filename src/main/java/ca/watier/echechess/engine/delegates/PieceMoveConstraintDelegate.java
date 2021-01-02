@@ -27,6 +27,7 @@ import ca.watier.echechess.engine.models.enums.MoveStatus;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +38,7 @@ import java.util.Objects;
 
 public class PieceMoveConstraintDelegate implements MoveConstraint {
 
+    @Serial
     private static final long serialVersionUID = -7763545818654487544L;
 
     private final MoveConstraint king;
@@ -140,28 +142,14 @@ public class PieceMoveConstraintDelegate implements MoveConstraint {
             return null;
         }
 
-        switch (fromPiece) {
-            case W_KING:
-            case B_KING:
-                return king;
-            case W_QUEEN:
-            case B_QUEEN:
-                return queen;
-            case W_ROOK:
-            case B_ROOK:
-                return rook;
-            case W_BISHOP:
-            case B_BISHOP:
-                return bishop;
-            case W_KNIGHT:
-            case B_KNIGHT:
-                return knight;
-            case W_PAWN:
-            case B_PAWN:
-                return pawn;
-            default:
-                return null;
-        }
+        return switch (fromPiece) {
+            case W_KING, B_KING -> king;
+            case W_QUEEN, B_QUEEN -> queen;
+            case W_ROOK, B_ROOK -> rook;
+            case W_BISHOP, B_BISHOP -> bishop;
+            case W_KNIGHT, B_KNIGHT -> knight;
+            case W_PAWN, B_PAWN -> pawn;
+        };
     }
 
     public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide, GameBoardData cloneOfCurrentDataState) {

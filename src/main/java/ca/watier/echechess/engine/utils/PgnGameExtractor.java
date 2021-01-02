@@ -395,16 +395,13 @@ public class PgnGameExtractor {
 
             String before = getParsedBefore(action);
 
-            switch (before.length()) {
-                case 1: //Row or column
-                    value = getPositionWhenRowOrCol(similarPieceThatHitTarget, before);
-                    break;
-                case 2: //Full position
-                    value = getPositionWhenFullCoordinate(CasePosition.valueOf(before.toUpperCase()), similarPieceThatHitTarget);
-                    break;
-                default:
-                    throw new IllegalStateException("Invalid number of characters!");
-            }
+            value = switch (before.length()) {
+                //Row or column
+                case 1 -> getPositionWhenRowOrCol(similarPieceThatHitTarget, before);
+                //Full position
+                case 2 -> getPositionWhenFullCoordinate(CasePosition.valueOf(before.toUpperCase()), similarPieceThatHitTarget);
+                default -> throw new IllegalStateException("Invalid number of characters!");
+            };
         } else { //Normal move
             value = getPositionWhenNormalMove(action, similarPieceThatHitTarget);
         }

@@ -18,10 +18,14 @@ package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.DirectionPattern;
 
+import java.io.Serial;
+
 /**
  * Created by yannick on 4/23/2017.
  */
 public class RookMoveConstraint extends DirectionalMoveConstraint {
+
+    @Serial
     private static final long serialVersionUID = 8439593234072170944L;
 
     public RookMoveConstraint() {

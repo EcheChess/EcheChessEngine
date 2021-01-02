@@ -13,11 +13,14 @@ import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.CharUtils;
 
+import java.io.Serial;
 import java.util.*;
 
 public class FenPositionGameHandler extends GenericGameHandler {
 
     private static final String NO_PIECES_ON_ROW = "8";
+
+    @Serial
     private static final long serialVersionUID = 9073722042994714192L;
 
     public FenPositionGameHandler(PieceMoveConstraintDelegate pieceDelegate, PlayerHandler playerHandler, GameEventEvaluatorHandler gameEventEvaluatorHandler) {
@@ -42,14 +45,11 @@ public class FenPositionGameHandler extends GenericGameHandler {
 
 
     private Side getSide(char sideToPlay) throws FenParserException {
-        switch (sideToPlay) {
-            case 'W':
-                return Side.WHITE;
-            case 'B':
-                return Side.BLACK;
-            default:
-                throw new FenParserException();
-        }
+        return switch (sideToPlay) {
+            case 'W' -> Side.WHITE;
+            case 'B' -> Side.BLACK;
+            default -> throw new FenParserException();
+        };
     }
 
     public void setPieces(String[] rows) throws FenParserException {

@@ -3,7 +3,7 @@ package ca.watier.echechess.engine.models;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 
-public class DistancePiecePositionModel extends PiecePositionModel implements Comparable {
+public class DistancePiecePositionModel extends PiecePositionModel implements Comparable<DistancePiecePositionModel> {
 
     private final int distance;
 
@@ -17,12 +17,7 @@ public class DistancePiecePositionModel extends PiecePositionModel implements Co
     }
 
     @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof DistancePiecePositionModel)) {
-            throw new UnsupportedOperationException();
-        }
-        DistancePiecePositionModel toCompare = (DistancePiecePositionModel) o;
-
-        return Integer.compare(getDistance(), toCompare.getDistance());
+    public int compareTo(DistancePiecePositionModel distancePiecePositionModel) {
+        return Integer.compare(getDistance(), distancePiecePositionModel.getDistance());
     }
 }

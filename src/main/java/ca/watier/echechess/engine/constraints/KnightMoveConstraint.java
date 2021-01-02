@@ -25,6 +25,7 @@ import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,8 @@ public class KnightMoveConstraint implements MoveConstraint {
 
     public static final float KNIGHT_RADIUS_EQUATION = 2.23606797749979f;
     private static final List<Direction> DEFAULT_RADIUS_FINDER_POSITION = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+
+    @Serial
     private static final long serialVersionUID = 8532461631276349892L;
 
     @Override

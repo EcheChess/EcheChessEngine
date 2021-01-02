@@ -77,18 +77,10 @@ public final class FenGameParser {
                 if (StringUtils.isNotBlank(rawCastlingAvailableMoves)) {
                     for (byte availCastling : rawCastlingAvailableMoves.getBytes()) {
                         switch (availCastling) {
-                            case 'K':
-                                isWhiteKingMoveAvail = true;
-                                break;
-                            case 'Q':
-                                isWhiteQueenMoveAvail = true;
-                                break;
-                            case 'k':
-                                isBlackKingMoveAvail = true;
-                                break;
-                            case 'q':
-                                isBlackQueenMoveAvail = true;
-                                break;
+                            case 'K' -> isWhiteKingMoveAvail = true;
+                            case 'Q' -> isWhiteQueenMoveAvail = true;
+                            case 'k' -> isBlackKingMoveAvail = true;
+                            case 'q' -> isBlackQueenMoveAvail = true;
                         }
                     }
                 }

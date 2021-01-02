@@ -34,6 +34,7 @@ import ca.watier.echechess.engine.interfaces.GameHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 
+import java.io.Serial;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,10 @@ import static ca.watier.echechess.common.enums.Side.*;
  * Created by yannick on 5/5/2017.
  */
 public class GenericGameHandler extends GameBoard implements GameHandler {
+
+    @Serial
     private static final long serialVersionUID = 1139291295474732218L;
+
     public static final KingStatus CHECKMATE = KingStatus.CHECKMATE;
     public static final KingStatus CHECK = KingStatus.CHECK;
     public static final KingStatus STALEMATE = KingStatus.STALEMATE;
@@ -212,21 +216,13 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
 
         if (castlingPositionHelper.isQueenSide()) {
             switch (playerSide) {
-                case BLACK:
-                    setBlackQueenCastlingAvailable(false);
-                    break;
-                case WHITE:
-                    setWhiteQueenCastlingAvailable(false);
-                    break;
+                case BLACK -> setBlackQueenCastlingAvailable(false);
+                case WHITE -> setWhiteQueenCastlingAvailable(false);
             }
         } else {
             switch (playerSide) {
-                case BLACK:
-                    setBlackKingCastlingAvailable(false);
-                    break;
-                case WHITE:
-                    setWhiteKingCastlingAvailable(false);
-                    break;
+                case BLACK -> setBlackKingCastlingAvailable(false);
+                case WHITE -> setWhiteKingCastlingAvailable(false);
             }
         }
 

@@ -19,10 +19,14 @@ package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.DirectionPattern;
 
+import java.io.Serial;
+
 /**
  * Created by yannick on 4/23/2017.
  */
 public class BishopMoveConstraint extends DirectionalMoveConstraint {
+
+    @Serial
     private static final long serialVersionUID = 737006191697229780L;
 
     public BishopMoveConstraint() {

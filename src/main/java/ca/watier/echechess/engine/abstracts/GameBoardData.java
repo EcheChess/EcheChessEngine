@@ -3,14 +3,16 @@ package ca.watier.echechess.engine.abstracts;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.utils.GameUtils;
-import com.google.common.collect.ArrayListMultimap;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang3.BooleanUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
@@ -18,7 +20,9 @@ import static ca.watier.echechess.common.enums.Side.WHITE;
 
 public class GameBoardData implements Cloneable, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -5242416504518941779L;
+
     //The default position of the board
     private final Map<CasePosition, Pieces> defaultPositions;
     //The pieces position on the board
@@ -30,7 +34,7 @@ public class GameBoardData implements Cloneable, Serializable {
     //Used to track the turn that the piece have moved
     private Map<CasePosition, Integer> turnNumberPieceMap;
     //Used to track the pawn promotions
-    private ArrayListMultimap<Side, Pair<CasePosition, CasePosition>> pawnPromotionMap;
+    private MultiValuedMap<Side, Pair<CasePosition, CasePosition>> pawnPromotionMap;
     //Used to track the number of turn of each player
     private int blackTurnNumber;
     private int whiteTurnNumber;
@@ -49,7 +53,7 @@ public class GameBoardData implements Cloneable, Serializable {
     private boolean allowObservers;
 
     public GameBoardData() {
-        pawnPromotionMap = ArrayListMultimap.create();
+        pawnPromotionMap = new ArrayListValuedHashMap<>(); //FIXME: Note that ArrayListValuedHashMap is not synchronized and is not thread-safe
         defaultPositions = GameUtils.getDefaultGame();
         positionPiecesMap = GameUtils.getDefaultGame();
         isPiecesMovedMap = GameUtils.initNewMovedPieceMap(positionPiecesMap);
@@ -70,12 +74,12 @@ public class GameBoardData implements Cloneable, Serializable {
         allowObservers = false;
     }
 
-    protected List<Pair<CasePosition, CasePosition>> getPawnPromotionBySide(Side playerSide) {
+    protected Collection<Pair<CasePosition, CasePosition>> getPawnPromotionBySide(Side playerSide) {
         if (playerSide == null) {
             return new ArrayList<>();
         }
 
-        return BaseUtils.getSafeList(pawnPromotionMap.get(playerSide));
+        return CollectionUtils.emptyIfNull(pawnPromotionMap.get(playerSide));
     }
 
     protected Pieces getPieceFromPosition(CasePosition position) {
@@ -303,7 +307,7 @@ public class GameBoardData implements Cloneable, Serializable {
             return;
         }
 
-        pawnPromotionMap.remove(side, pair);
+        pawnPromotionMap.remove(side);
     }
 
     protected final void setPositionPiecesMap(Map<CasePosition, Pieces> positionPiecesMap) {
@@ -341,7 +345,7 @@ public class GameBoardData implements Cloneable, Serializable {
         cloned.isPiecesMovedMap = new EnumMap<>(this.isPiecesMovedMap);
         cloned.isPawnUsedSpecialMoveMap = new EnumMap<>(this.isPawnUsedSpecialMoveMap);
         cloned.turnNumberPieceMap = new EnumMap<>(this.turnNumberPieceMap);
-        cloned.pawnPromotionMap = ArrayListMultimap.create(this.pawnPromotionMap);
+        cloned.pawnPromotionMap = new ArrayListValuedHashMap<>(this.pawnPromotionMap);
         cloned.totalMove = this.totalMove;
         cloned.blackTurnNumber = this.blackTurnNumber;
         cloned.whiteTurnNumber = this.whiteTurnNumber;

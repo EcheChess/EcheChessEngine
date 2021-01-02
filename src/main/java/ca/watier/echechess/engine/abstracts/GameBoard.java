@@ -19,7 +19,6 @@ package ca.watier.echechess.engine.abstracts;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
-import ca.watier.echechess.common.interfaces.BaseUtils;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.utils.MathUtils;
 import ca.watier.echechess.common.utils.ObjectUtils;
@@ -27,6 +26,7 @@ import ca.watier.echechess.common.utils.Pair;
 import org.apache.commons.lang3.exception.CloneFailedException;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +36,11 @@ import java.util.Map;
  */
 public abstract class GameBoard implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 807194077405321185L;
+
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GameBoard.class);
-    private GameBoardData gameBoardData;
+    private final GameBoardData gameBoardData;
 
     public GameBoard() {
         super();
@@ -93,7 +95,7 @@ public abstract class GameBoard implements Serializable {
      */
     protected void changePawnSpecialMove(Pieces piece, CasePosition from, CasePosition to) {
         if (Pieces.isPawn(piece)) {
-            boolean isValid = BaseUtils.getSafeBoolean(gameBoardData.isPawnUsedSpecialMove(from)) || MathUtils.getDistanceBetweenPositions(from, to) == 2;
+            boolean isValid = gameBoardData.isPawnUsedSpecialMove(from) || MathUtils.getDistanceBetweenPositions(from, to) == 2;
 
             gameBoardData.addPawnUsedSpecialMove(to, isValid);
             gameBoardData.removePawnUsedSpecialMove(from);
