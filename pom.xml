@@ -12,7 +12,7 @@
 
     <groupId>ca.watier.echechess.engine</groupId>
     <artifactId>echechess-engine</artifactId>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>2.2.0</version>
 
     <properties>
         <sonar.projectKey>echechess_EcheChessEngine</sonar.projectKey>
