@@ -18,12 +18,12 @@ package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serial;
 import java.util.Objects;
@@ -52,7 +52,7 @@ public class PawnMoveConstraint implements MoveConstraint {
 
     public static boolean isEnPassant(CasePosition from, CasePosition to, GameBoardData gameBoardData, Side currentSide) {
 
-        if (ObjectUtils.hasNull(from, to, gameBoardData, currentSide)) {
+        if (ObjectUtils.anyNull(from, to, gameBoardData, currentSide)) {
             return false;
         }
 
@@ -74,7 +74,7 @@ public class PawnMoveConstraint implements MoveConstraint {
      * @return
      */
     public static CasePosition getEnemyPawnPositionFromEnPassant(CasePosition enPassantMovePosition, Side otherSide) {
-        if (ObjectUtils.hasNull(enPassantMovePosition, otherSide)) {
+        if (ObjectUtils.anyNull(enPassantMovePosition, otherSide)) {
             return null;
         }
 
@@ -84,7 +84,7 @@ public class PawnMoveConstraint implements MoveConstraint {
     private static boolean isEnPassant(CasePosition from, CasePosition to, GameBoardData gameBoardData, Side currentSide, CasePosition enemyPawnPosition, Pieces enemyPawn) {
 
 
-        if (ObjectUtils.hasNull(from, to, gameBoardData, currentSide, enemyPawnPosition, enemyPawn)) {
+        if (ObjectUtils.anyNull(from, to, gameBoardData, currentSide, enemyPawnPosition, enemyPawn)) {
             return false;
         }
 
@@ -116,7 +116,7 @@ public class PawnMoveConstraint implements MoveConstraint {
      * @return
      */
     public static CasePosition getEnPassantPositionFromEnemyPawn(CasePosition pawnPosition, Side otherSide) {
-        if (ObjectUtils.hasNull(pawnPosition, otherSide)) {
+        if (ObjectUtils.anyNull(pawnPosition, otherSide)) {
             return null;
         }
 
@@ -138,7 +138,7 @@ public class PawnMoveConstraint implements MoveConstraint {
 
     @Override
     public MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
-        if (ObjectUtils.hasNull(from, to, gameBoardData)) {
+        if (ObjectUtils.anyNull(from, to, gameBoardData)) {
             return MoveStatus.getInvalidMoveStatusBasedOnTarget(to);
         }
 
@@ -208,7 +208,7 @@ public class PawnMoveConstraint implements MoveConstraint {
 
     @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
-        if (ObjectUtils.hasNull(from, to, gameBoardData)) {
+        if (ObjectUtils.anyNull(from, to, gameBoardData)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 
@@ -247,7 +247,7 @@ public class PawnMoveConstraint implements MoveConstraint {
     }
 
     private boolean isPawnMoveHop(CasePosition from, Pieces pieceFrom, CasePosition to, GameBoardData gameHandler, int nbCaseBetweenPositions) {
-        if (ObjectUtils.hasNull(from, pieceFrom, to, gameHandler)) {
+        if (ObjectUtils.anyNull(from, pieceFrom, to, gameHandler)) {
             return false;
         }
 

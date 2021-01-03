@@ -18,13 +18,13 @@ package ca.watier.echechess.engine.constraints;
 
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.models.DistancePiecePositionModel;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serial;
 import java.util.*;
@@ -52,7 +52,7 @@ public class DirectionalMoveConstraint implements MoveConstraint {
 
     @Override
     public MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
-        if (ObjectUtils.hasNull(from, to, pattern)) {
+        if (ObjectUtils.anyNull(from, to, pattern)) {
             return MoveStatus.getInvalidMoveStatusBasedOnTarget(from);
         }
 

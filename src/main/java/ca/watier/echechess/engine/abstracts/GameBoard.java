@@ -21,9 +21,9 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.ObjectUtils;
-import ca.watier.echechess.common.utils.Pair;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.exception.CloneFailedException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serial;
@@ -43,16 +43,15 @@ public abstract class GameBoard implements Serializable {
     private final GameBoardData gameBoardData;
 
     public GameBoard() {
-        super();
         gameBoardData = new GameBoardData();
     }
 
     protected final void addPawnPromotion(CasePosition from, CasePosition to, Side side) {
-        if (ObjectUtils.hasNull(side, from, to) || Side.OBSERVER.equals(side)) {
+        if (ObjectUtils.anyNull(side, from, to) || Side.OBSERVER.equals(side)) {
             return;
         }
 
-        gameBoardData.addPawnPromotionToMap(side, new Pair<>(from, to));
+        gameBoardData.addPawnPromotionToMap(side, Pair.of(from, to));
     }
 
     /**
@@ -73,7 +72,7 @@ public abstract class GameBoard implements Serializable {
      * @param piece
      */
     protected final void movePieceTo(CasePosition from, CasePosition to, Pieces piece) {
-        if (ObjectUtils.hasNull(from, to, piece)) {
+        if (ObjectUtils.anyNull(from, to, piece)) {
             return;
         }
 
@@ -123,13 +122,13 @@ public abstract class GameBoard implements Serializable {
 
     public final boolean upgradePiece(CasePosition to, Pieces pieces, Side playerSide) {
 
-        if (ObjectUtils.hasNull(to, pieces, playerSide)) {
+        if (ObjectUtils.anyNull(to, pieces, playerSide)) {
             return false;
         }
 
         Pair<CasePosition, CasePosition> pair = null;
         for (Pair<CasePosition, CasePosition> casePositionCasePositionPair : gameBoardData.getPawnPromotionBySide(playerSide)) {
-            CasePosition toValue = casePositionCasePositionPair.getSecondValue();
+            CasePosition toValue = casePositionCasePositionPair.getValue();
 
             if (to.equals(toValue)) {
                 pair = casePositionCasePositionPair;
@@ -140,7 +139,7 @@ public abstract class GameBoard implements Serializable {
         boolean isPresent = pair != null;
         if (isPresent) {
             gameBoardData.removePawnPromotion(pair, playerSide);
-            CasePosition currentPawnFromPosition = pair.getFirstValue();
+            CasePosition currentPawnFromPosition = pair.getKey();
 
             gameBoardData.removePiece(currentPawnFromPosition); //remove the pawn
             gameBoardData.setPiecePositionWithoutMoveState(pieces, to); // add the wanted piece

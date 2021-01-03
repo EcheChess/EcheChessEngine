@@ -26,11 +26,10 @@ import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.MoveType.*;
@@ -39,13 +38,14 @@ import static ca.watier.echechess.common.enums.Pieces.W_PAWN;
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
  * Created by yannick on 5/8/2017.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PawnMovesTest {
 
     @Spy
@@ -107,41 +107,41 @@ public class PawnMovesTest {
         when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
 
         //Cannot move (blocked in front)
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H2, H4, WHITE)); // 2 cases
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H2, H3, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H7, H5, BLACK)); // 2 cases
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H7, H6, BLACK));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H2, H4, WHITE)); // 2 cases
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H2, H3, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H7, H5, BLACK)); // 2 cases
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(H7, H6, BLACK));
 
         //Can move
-        Assert.assertEquals(PAWN_HOP, gameHandler.movePiece(A2, A4, WHITE)); // 2 cases
-        Assert.assertEquals(NORMAL_MOVE, gameHandler.movePiece(B2, B3, WHITE));
-        Assert.assertEquals(PAWN_HOP, gameHandler.movePiece(A7, A5, BLACK)); // 2 cases
-        Assert.assertEquals(NORMAL_MOVE, gameHandler.movePiece(B7, B6, BLACK));
+        assertEquals(PAWN_HOP, gameHandler.movePiece(A2, A4, WHITE)); // 2 cases
+        assertEquals(NORMAL_MOVE, gameHandler.movePiece(B2, B3, WHITE));
+        assertEquals(PAWN_HOP, gameHandler.movePiece(A7, A5, BLACK)); // 2 cases
+        assertEquals(NORMAL_MOVE, gameHandler.movePiece(B7, B6, BLACK));
 
         //Cannot move by 2 position (not on the starting position)
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(B3, B5, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(B6, B4, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(B3, B5, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(B6, B4, WHITE));
 
         //Can move by one position
-        Assert.assertEquals(NORMAL_MOVE, gameHandler.movePiece(B3, B4, WHITE));
-        Assert.assertEquals(NORMAL_MOVE, gameHandler.movePiece(B6, B5, BLACK));
+        assertEquals(NORMAL_MOVE, gameHandler.movePiece(B3, B4, WHITE));
+        assertEquals(NORMAL_MOVE, gameHandler.movePiece(B6, B5, BLACK));
 
         //cannot move diagonally (without attack)
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, E3, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, G3, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, D4, WHITE)); // 2 cases
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, H4, WHITE)); // 2 cases
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, E6, BLACK));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, G6, BLACK));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, D5, WHITE)); // 2 cases
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, H5, WHITE)); // 2 cases
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, E3, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, G3, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, D4, WHITE)); // 2 cases
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F2, H4, WHITE)); // 2 cases
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, E6, BLACK));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, G6, BLACK));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, D5, WHITE)); // 2 cases
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(F7, H5, WHITE)); // 2 cases
 
         //Kill in all direction
         gameHandler = FenGameParser.parse("8/8/2p3p1/3P1P2/8/3p1p2/2P3P1/8 w KQkq", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
-        Assert.assertEquals(CAPTURE, gameHandler.movePiece(D5, C6, WHITE));
-        Assert.assertEquals(CAPTURE, gameHandler.movePiece(D3, C2, BLACK));
-        Assert.assertEquals(CAPTURE, gameHandler.movePiece(F5, G6, WHITE));
-        Assert.assertEquals(CAPTURE, gameHandler.movePiece(F3, G2, BLACK));
+        assertEquals(CAPTURE, gameHandler.movePiece(D5, C6, WHITE));
+        assertEquals(CAPTURE, gameHandler.movePiece(D3, C2, BLACK));
+        assertEquals(CAPTURE, gameHandler.movePiece(F5, G6, WHITE));
+        assertEquals(CAPTURE, gameHandler.movePiece(F3, G2, BLACK));
     }
 
     @Test
@@ -208,9 +208,9 @@ public class PawnMovesTest {
         gameHandler.movePiece(H4, H5, WHITE);
         gameHandler.movePiece(G7, G5, BLACK); //Move by 2
 
-        Assert.assertEquals(EN_PASSANT, gameHandler.movePiece(H5, G6, WHITE)); // En passant on the black pawn
-        Assert.assertEquals(W_PAWN, gameHandler.getPiece(G6));
-        Assert.assertEquals(new GameScoreResponse((short) 1, (short) 0), gameHandler.getGameScore());
+        assertEquals(EN_PASSANT, gameHandler.movePiece(H5, G6, WHITE)); // En passant on the black pawn
+        assertEquals(W_PAWN, gameHandler.getPiece(G6));
+        assertEquals(new GameScoreResponse((short) 1, (short) 0), gameHandler.getGameScore());
     }
 
     @Test
@@ -221,8 +221,8 @@ public class PawnMovesTest {
         gameHandler.movePiece(G5, G4, BLACK);
         gameHandler.movePiece(H2, H4, WHITE);
 
-        Assert.assertEquals(EN_PASSANT, gameHandler.movePiece(G4, H3, BLACK)); // En passant on the white pawn
-        Assert.assertEquals(B_PAWN, gameHandler.getPiece(H3));
-        Assert.assertEquals(new GameScoreResponse((short) 0, (short) 1), gameHandler.getGameScore());
+        assertEquals(EN_PASSANT, gameHandler.movePiece(G4, H3, BLACK)); // En passant on the white pawn
+        assertEquals(B_PAWN, gameHandler.getPiece(H3));
+        assertEquals(new GameScoreResponse((short) 0, (short) 1), gameHandler.getGameScore());
     }
 }

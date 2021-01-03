@@ -22,7 +22,6 @@ import ca.watier.echechess.common.responses.GameScoreResponse;
 import ca.watier.echechess.common.sessions.Player;
 import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoard;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
@@ -33,6 +32,7 @@ import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.interfaces.GameHandler;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serial;
 import java.util.EnumMap;
@@ -85,7 +85,7 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
      */
     @Override
     public MoveType movePiece(CasePosition from, CasePosition to, Side playerSide) {
-        if (ObjectUtils.hasNull(from, to, playerSide)) {
+        if (ObjectUtils.anyNull(from, to, playerSide)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 
@@ -115,7 +115,7 @@ public class GenericGameHandler extends GameBoard implements GameHandler {
     }
 
     private MoveType movePiece(CasePosition from, CasePosition to, Side playerSide, MoveHistory moveHistory) throws MoveNotAllowedException {
-        if (ObjectUtils.hasNull(from, to, playerSide, moveHistory)) {
+        if (ObjectUtils.anyNull(from, to, playerSide, moveHistory)) {
             throw new MoveNotAllowedException();
         }
 

@@ -24,22 +24,22 @@ import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by yannick on 6/20/2017.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StaleMateTest {
 
     private GenericGameHandler genericGameHandler;
@@ -57,12 +57,12 @@ public class StaleMateTest {
         genericGameHandler = FenGameParser.parse("4k3/2P1r3/8/8/8/8/2p1R3/4K3 w", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
         //Cannot move the rook, the king is check
-        Assert.assertEquals(MOVE_NOT_ALLOWED, genericGameHandler.movePiece(E2, C2, WHITE));
-        Assert.assertEquals(MOVE_NOT_ALLOWED, genericGameHandler.movePiece(E7, C7, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, genericGameHandler.movePiece(E2, C2, WHITE));
+        assertEquals(MOVE_NOT_ALLOWED, genericGameHandler.movePiece(E7, C7, WHITE));
 
         //Make sure that the attacked pawn was reverted (not deleted from the map)
-        Assert.assertEquals(Pieces.B_PAWN, genericGameHandler.getPiece(C2));
-        Assert.assertEquals(Pieces.W_PAWN, genericGameHandler.getPiece(C7));
+        assertEquals(Pieces.B_PAWN, genericGameHandler.getPiece(C2));
+        assertEquals(Pieces.W_PAWN, genericGameHandler.getPiece(C7));
     }
 
 
@@ -87,7 +87,7 @@ public class StaleMateTest {
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, WHITE)).isTrue();
 
-        genericGameHandler = FenGameParser.parse("7k/8/7K/6R1/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);;
+        genericGameHandler = FenGameParser.parse("7k/8/7K/6R1/8/8/8/8 b", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
         assertThat(genericGameHandler.isKing(KingStatus.STALEMATE, BLACK)).isTrue();
 
         /*

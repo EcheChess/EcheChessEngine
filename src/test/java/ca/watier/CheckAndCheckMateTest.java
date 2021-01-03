@@ -23,21 +23,21 @@ import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static ca.watier.echechess.common.enums.KingStatus.*;
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
  * Created by yannick on 5/9/2017.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CheckAndCheckMateTest {
 
     private static final Side WHITE = Side.WHITE;
@@ -77,7 +77,7 @@ public class CheckAndCheckMateTest {
 
 
     @Test
-    @Ignore("CheckAndCheckMateTest.assert_single_pattern - Not really unit tests, only used to test the stability of the engine by running games with a string")
+    @Disabled("CheckAndCheckMateTest.assert_single_pattern - Not really unit tests, only used to test the stability of the engine by running games with a string")
     public void assert_single_pattern() throws FenParserException {
         assertSinglePattern(CHECK, BLACK, "8/8/8/3k4/2K5/8/8/8 w");
     }

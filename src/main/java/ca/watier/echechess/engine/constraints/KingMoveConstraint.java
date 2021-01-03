@@ -22,7 +22,6 @@ import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.utils.CastlingPositionHelper;
 import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.KingHandler;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
@@ -30,6 +29,7 @@ import ca.watier.echechess.engine.models.DistancePiecePositionModel;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serial;
 import java.util.List;
@@ -89,7 +89,7 @@ public class KingMoveConstraint implements MoveConstraint {
     */
     @Override
     public MoveType getMoveType(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
-        if (ObjectUtils.hasNull(from, to, gameBoardData)) {
+        if (ObjectUtils.anyNull(from, to, gameBoardData)) {
             return MoveType.MOVE_NOT_ALLOWED;
         }
 

@@ -20,7 +20,6 @@ import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.pojos.MoveHistory;
 import ca.watier.echechess.common.pojos.PieceDataSection;
 import ca.watier.echechess.common.pojos.PieceSingleMoveSection;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
@@ -32,6 +31,7 @@ import ca.watier.echechess.engine.interfaces.PlayerHandler;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
-
 
 public class PgnGameExtractor {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PgnGameExtractor.class);
@@ -361,7 +360,7 @@ public class PgnGameExtractor {
     public Map<CasePosition, Pieces> getAllPiecesThatCanMoveTo(CasePosition to, Side sideToKeep) {
         Map<CasePosition, Pieces> values = new EnumMap<>(CasePosition.class);
 
-        if (ObjectUtils.hasNull(to, sideToKeep)) {
+        if (ObjectUtils.anyNull(to, sideToKeep)) {
             return values;
         }
 

@@ -20,9 +20,9 @@ import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.Side.BLACK;
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by yannick on 5/8/2017.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class KnightMovesTest {
 
     @Test
@@ -59,7 +59,7 @@ public class KnightMovesTest {
 //        assertThat(gameHandler.isCheck(WHITE)).isTrue();
 //    }
 
-    
+
     @Test
     public void canJumpOverOtherPieces() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("8/8/8/3ppp2/3pNP2/3PPP2/8/8 w");

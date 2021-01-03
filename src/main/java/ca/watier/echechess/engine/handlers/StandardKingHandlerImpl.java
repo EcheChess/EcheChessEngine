@@ -2,7 +2,6 @@ package ca.watier.echechess.engine.handlers;
 
 import ca.watier.echechess.common.enums.*;
 import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.constraints.PawnMoveConstraint;
 import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
@@ -11,6 +10,7 @@ import ca.watier.echechess.engine.models.enums.MoveStatus;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serial;
@@ -106,7 +106,7 @@ public class StandardKingHandlerImpl implements KingHandler {
 
     @Override
     public boolean isKingCheckAfterMove(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
-        if (ObjectUtils.hasNull(from, to)) {
+        if (ObjectUtils.anyNull(from, to)) {
             return false;
         }
 
@@ -344,7 +344,7 @@ public class StandardKingHandlerImpl implements KingHandler {
      * @param column
      */
     private CasePosition getPositionByRankAndColumn(Ranks rank, char column, Side side) {
-        if (ObjectUtils.hasNull(rank, side)) {
+        if (ObjectUtils.anyNull(rank, side)) {
             return null;
         }
 

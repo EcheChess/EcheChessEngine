@@ -20,10 +20,10 @@ import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Direction;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.utils.MathUtils;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.interfaces.MoveConstraint;
 import ca.watier.echechess.engine.models.enums.MoveStatus;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serial;
 import java.util.List;
@@ -43,7 +43,7 @@ public class KnightMoveConstraint implements MoveConstraint {
     @Override
     public MoveStatus getMoveStatus(CasePosition from, CasePosition to, GameBoardData gameBoardData) {
 
-        if (ObjectUtils.hasNull(from, to, gameBoardData) || !isTargetValidPosition(from, to)) {
+        if (ObjectUtils.anyNull(from, to, gameBoardData) || !isTargetValidPosition(from, to)) {
             return MoveStatus.getInvalidMoveStatusBasedOnTarget(to);
         }
 

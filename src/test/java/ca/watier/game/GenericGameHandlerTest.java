@@ -5,18 +5,18 @@ import ca.watier.echechess.engine.delegates.PieceMoveConstraintDelegate;
 import ca.watier.echechess.engine.engines.GenericGameHandler;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
 import static ca.watier.echechess.common.enums.Side.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class GenericGameHandlerTest {
 
     private GenericGameHandler genericGameHandler;
@@ -29,8 +29,7 @@ public class GenericGameHandlerTest {
     @Spy
     private GameEventEvaluatorHandler gameEventEvaluatorHandler;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
         playerOne = new Player(UUID.randomUUID().toString());
         playerTwo = new Player(UUID.randomUUID().toString());

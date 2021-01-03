@@ -4,12 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>ca.watier.echechess.properties</groupId>
+        <artifactId>echechess-properties</artifactId>
+        <version>1.4.0</version>
+    </parent>
+
     <groupId>ca.watier.echechess.engine</groupId>
     <artifactId>echechess-engine</artifactId>
     <version>2.2.0-SNAPSHOT</version>
 
     <properties>
-        <java.version>14</java.version>
         <sonar.projectKey>echechess_EcheChessEngine</sonar.projectKey>
         <sonar.organization>echechess</sonar.organization>
     </properties>
@@ -21,18 +26,6 @@
             <url>https://api.bintray.com/maven/doi9t/EcheChess/EcheChessEngine/;publish=1</url>
         </repository>
     </distributionManagement>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>ca.watier.echechess.properties</groupId>
-                <artifactId>echechess-properties</artifactId>
-                <version>1.3.0</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <repositories>
         <repository>
@@ -78,29 +71,20 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/test/resources</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
     </build>
 
     <dependencies>
         <dependency>
             <groupId>ca.watier.echechess.common</groupId>
             <artifactId>echechess-common</artifactId>
-            <version>1.5.0</version>
+            <version>1.7.0</version>
         </dependency>
 
         <dependency>
@@ -142,8 +126,20 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -20,13 +20,14 @@ import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.Pieces.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by yannick on 4/28/2017.
@@ -46,21 +47,21 @@ public class GameUtilsTest {
     public void isOtherPiecesBetweenTarget() {
 
         Map<CasePosition, Pieces> defaultGame = GameUtils.getDefaultGame();
-        Assert.assertTrue(GameUtils.isOtherPiecesBetweenTarget(H1, H7, defaultGame));
-        Assert.assertFalse(GameUtils.isOtherPiecesBetweenTarget(H2, H7, defaultGame));
-        Assert.assertTrue(GameUtils.isOtherPiecesBetweenTarget(H7, H1, defaultGame));
-        Assert.assertFalse(GameUtils.isOtherPiecesBetweenTarget(H7, H2, defaultGame));
+        assertTrue(GameUtils.isOtherPiecesBetweenTarget(H1, H7, defaultGame));
+        assertFalse(GameUtils.isOtherPiecesBetweenTarget(H2, H7, defaultGame));
+        assertTrue(GameUtils.isOtherPiecesBetweenTarget(H7, H1, defaultGame));
+        assertFalse(GameUtils.isOtherPiecesBetweenTarget(H7, H2, defaultGame));
 
-        Assert.assertTrue(GameUtils.isOtherPiecesBetweenTarget(A1, G7, defaultGame));
-        Assert.assertFalse(GameUtils.isOtherPiecesBetweenTarget(B2, G7, defaultGame));
-        Assert.assertTrue(GameUtils.isOtherPiecesBetweenTarget(G7, A1, defaultGame));
-        Assert.assertFalse(GameUtils.isOtherPiecesBetweenTarget(G7, B2, defaultGame));
+        assertTrue(GameUtils.isOtherPiecesBetweenTarget(A1, G7, defaultGame));
+        assertFalse(GameUtils.isOtherPiecesBetweenTarget(B2, G7, defaultGame));
+        assertTrue(GameUtils.isOtherPiecesBetweenTarget(G7, A1, defaultGame));
+        assertFalse(GameUtils.isOtherPiecesBetweenTarget(G7, B2, defaultGame));
 
-        Assert.assertFalse(GameUtils.isOtherPiecesBetweenTarget(H1, G1, defaultGame));
-        Assert.assertFalse(GameUtils.isOtherPiecesBetweenTarget(G1, H1, defaultGame));
+        assertFalse(GameUtils.isOtherPiecesBetweenTarget(H1, G1, defaultGame));
+        assertFalse(GameUtils.isOtherPiecesBetweenTarget(G1, H1, defaultGame));
 
-        Assert.assertTrue(GameUtils.isOtherPiecesBetweenTarget(H1, F1, defaultGame));
-        Assert.assertTrue(GameUtils.isOtherPiecesBetweenTarget(F1, H1, defaultGame));
+        assertTrue(GameUtils.isOtherPiecesBetweenTarget(H1, F1, defaultGame));
+        assertTrue(GameUtils.isOtherPiecesBetweenTarget(F1, H1, defaultGame));
 
     }
 }

@@ -3,7 +3,7 @@ package ca.watier.echechess.engine.models;
 import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -11,7 +11,6 @@ import java.util.TreeSet;
 public class DistancePiecePositionModelTest {
     @Test
     public void compareTo() {
-
         DistancePiecePositionModel value1 = new DistancePiecePositionModel(1, Pieces.B_BISHOP, CasePosition.A1);
         DistancePiecePositionModel value2 = new DistancePiecePositionModel(3, Pieces.B_BISHOP, CasePosition.A1);
         DistancePiecePositionModel value3 = new DistancePiecePositionModel(4, Pieces.B_BISHOP, CasePosition.A1);

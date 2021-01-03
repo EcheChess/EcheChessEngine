@@ -2,8 +2,8 @@ package ca.watier.echechess.engine.handlers;
 
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.sessions.Player;
-import ca.watier.echechess.common.utils.ObjectUtils;
 import ca.watier.echechess.engine.interfaces.PlayerHandler;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serial;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class PlayerHandlerImpl implements PlayerHandler {
 
     @Override
     public boolean setPlayerToSide(Player player, Side side) {
-        if (ObjectUtils.hasNull(player, side)) {
+        if (ObjectUtils.anyNull(player, side)) {
             return false;
         }
 

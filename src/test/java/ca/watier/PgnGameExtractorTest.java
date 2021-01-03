@@ -20,17 +20,17 @@ import ca.watier.echechess.engine.exceptions.ChessException;
 import ca.watier.echechess.engine.utils.PgnGameExtractor;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PgnGameExtractorTest {
 
 
@@ -38,7 +38,7 @@ public class PgnGameExtractorTest {
 
     static {
         try {
-            gamesAsFile = IOUtils.toString(PgnGameExtractorTest.class.getResourceAsStream("/puzzles.pgn"), Charset.forName("UTF-8"));
+            gamesAsFile = IOUtils.toString(PgnGameExtractorTest.class.getResourceAsStream("/puzzles.pgn"), StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,7 +46,7 @@ public class PgnGameExtractorTest {
 
 
     @Test
-    @Ignore("PgnGameExtractorTest#pgnManualTest - Not really unit tests, only used to test the stability of the engine by running games with a string")
+    @Disabled("PgnGameExtractorTest#pgnManualTest - Not really unit tests, only used to test the stability of the engine by running games with a string")
     public void pgnManualTest() {
         PgnGameExtractor pgnGameExtractor = new PgnGameExtractor();
         try {

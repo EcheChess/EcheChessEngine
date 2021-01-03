@@ -6,14 +6,14 @@ import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.engine.abstracts.GameBoardData;
 import ca.watier.echechess.engine.exceptions.FenParserException;
 import ca.watier.echechess.engine.game.FenPositionGameHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.EnumMap;
 import java.util.Map;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.Pieces.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FenGameParserTest {
 

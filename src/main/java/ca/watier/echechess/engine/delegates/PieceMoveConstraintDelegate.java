@@ -155,7 +155,7 @@ public class PieceMoveConstraintDelegate implements MoveConstraint {
     public List<CasePosition> getAllAvailableMoves(CasePosition from, Side playerSide, GameBoardData cloneOfCurrentDataState) {
         List<CasePosition> positions = new ArrayList<>();
 
-        if (ca.watier.echechess.common.utils.ObjectUtils.hasNull(from, playerSide)) {
+        if (ObjectUtils.anyNull(from, playerSide)) {
             return positions;
         }
 

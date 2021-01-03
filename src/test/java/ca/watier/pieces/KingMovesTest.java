@@ -25,12 +25,10 @@ import ca.watier.echechess.engine.game.FenPositionGameHandler;
 import ca.watier.echechess.engine.handlers.PlayerHandlerImpl;
 import ca.watier.echechess.engine.interfaces.GameEventEvaluatorHandler;
 import ca.watier.echechess.engine.utils.FenGameParser;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static ca.watier.echechess.common.enums.CasePosition.*;
 import static ca.watier.echechess.common.enums.MoveType.CASTLING;
@@ -38,13 +36,14 @@ import static ca.watier.echechess.common.enums.MoveType.MOVE_NOT_ALLOWED;
 import static ca.watier.echechess.common.enums.Side.BLACK;
 import static ca.watier.echechess.common.enums.Side.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
  * Created by yannick on 5/8/2017.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class KingMovesTest {
 
     @Spy
@@ -54,18 +53,14 @@ public class KingMovesTest {
     @Spy
     private GameEventEvaluatorHandler gameEventEvaluatorHandler;
 
-
-    @Before
-    public void setUp() {
-        when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
-    }
-
     @Test
     public void validPathCastlingTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/8/8/8/8/8/8/R3K2R w KQkq", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
+        when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
+
+        assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
+        assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
 
         assertThat(gameHandler.getPiecesLocation()).isNotNull().containsKeys(A8, F8, G8, C1, D1, H1);
     }
@@ -75,10 +70,10 @@ public class KingMovesTest {
     public void attackedBothPathCastlingTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/2R3R1/8/8/8/8/1r3r2/R3K2R w KQkq");
 
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling, blocked
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling, blocked
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side, blocked by C7
+        assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling, blocked
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling, blocked
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side, blocked by C7
     }
 
 
@@ -86,14 +81,17 @@ public class KingMovesTest {
     public void attackedQueenSidePathCastlingTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/1r2pppp/8/8/8/8/1r2PPPP/R3K2R w KQkq", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side, blocked the previous castling by the rook on D1
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
 
-        Assert.assertEquals(Pieces.W_KING, gameHandler.getPiece(C1));
-        Assert.assertEquals(Pieces.W_ROOK, gameHandler.getPiece(D1));
-        Assert.assertEquals(Pieces.B_KING, gameHandler.getPiece(G8));
-        Assert.assertEquals(Pieces.B_ROOK, gameHandler.getPiece(F8));
+        when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
+
+        assertEquals(CASTLING, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side, blocked the previous castling by the rook on D1
+        assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
+
+        assertEquals(Pieces.W_KING, gameHandler.getPiece(C1));
+        assertEquals(Pieces.W_ROOK, gameHandler.getPiece(D1));
+        assertEquals(Pieces.B_KING, gameHandler.getPiece(G8));
+        assertEquals(Pieces.B_ROOK, gameHandler.getPiece(F8));
     }
 
 
@@ -101,10 +99,10 @@ public class KingMovesTest {
     public void checkAtBeginningPositionQueenSidePathCastlingTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/1r3ppp/8/4R3/4r3/8/1r3PPP/R3K2R w KQkq");
 
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
     }
 
 
@@ -112,30 +110,32 @@ public class KingMovesTest {
     public void checkAtEndingPositionQueenSidePathCastlingTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("r3k2r/2R1pppp/8/8/8/8/2r1PPPP/R3K2R w KQkq");
 
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
+        assertEquals(CASTLING, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling
+        assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
 
-        Assert.assertEquals(Pieces.W_KING, gameHandler.getPiece(G1));
-        Assert.assertEquals(Pieces.W_ROOK, gameHandler.getPiece(F1));
-        Assert.assertEquals(Pieces.B_KING, gameHandler.getPiece(G8));
-        Assert.assertEquals(Pieces.B_ROOK, gameHandler.getPiece(F8));
+        assertEquals(Pieces.W_KING, gameHandler.getPiece(G1));
+        assertEquals(Pieces.W_ROOK, gameHandler.getPiece(F1));
+        assertEquals(Pieces.B_KING, gameHandler.getPiece(G8));
+        assertEquals(Pieces.B_ROOK, gameHandler.getPiece(F8));
     }
 
     @Test
     public void blockingPieceQueenSidePathCastlingTest() throws FenParserException {
         FenPositionGameHandler gameHandler = FenGameParser.parse("r2pk2r/4pppp/8/8/8/8/4PPPP/R2PK2R w KQkq", pieceMoveConstraintDelegate, playerHandler, gameEventEvaluatorHandler);
 
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling
-        Assert.assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
+        when(gameEventEvaluatorHandler.isPlayerTurn(any(Side.class), any(GameBoardData.class))).thenReturn(true);
 
-        Assert.assertEquals(Pieces.W_KING, gameHandler.getPiece(G1));
-        Assert.assertEquals(Pieces.W_ROOK, gameHandler.getPiece(F1));
-        Assert.assertEquals(Pieces.B_KING, gameHandler.getPiece(G8));
-        Assert.assertEquals(Pieces.B_ROOK, gameHandler.getPiece(F8));
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
+        assertEquals(CASTLING, gameHandler.movePiece(E1, H1, WHITE)); //Normal castling
+        assertEquals(CASTLING, gameHandler.movePiece(E8, H8, BLACK)); //Normal castling
+
+        assertEquals(Pieces.W_KING, gameHandler.getPiece(G1));
+        assertEquals(Pieces.W_ROOK, gameHandler.getPiece(F1));
+        assertEquals(Pieces.B_KING, gameHandler.getPiece(G8));
+        assertEquals(Pieces.B_ROOK, gameHandler.getPiece(F8));
     }
 
     //FIXME: TO MOCK
@@ -162,7 +162,7 @@ public class KingMovesTest {
         //Move the black rook to the original position
         gameHandler.movePiece(A7, A8, BLACK);
 
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
-        Assert.assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E1, A1, WHITE)); //Queen side
+        assertEquals(MOVE_NOT_ALLOWED, gameHandler.movePiece(E8, A8, BLACK)); //Queen side
     }
 }

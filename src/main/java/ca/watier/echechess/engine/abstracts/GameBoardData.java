@@ -4,13 +4,13 @@ import ca.watier.echechess.common.enums.CasePosition;
 import ca.watier.echechess.common.enums.Pieces;
 import ca.watier.echechess.common.enums.Side;
 import ca.watier.echechess.common.pojos.MoveHistory;
-import ca.watier.echechess.common.utils.ObjectUtils;
-import ca.watier.echechess.common.utils.Pair;
 import ca.watier.echechess.engine.utils.GameUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -164,7 +164,7 @@ public class GameBoardData implements Cloneable, Serializable {
     }
 
     protected void addPawnPromotionToMap(Side side, Pair<CasePosition, CasePosition> casePositionCasePositionPair) {
-        if (ObjectUtils.hasNull(side, casePositionCasePositionPair)) {
+        if (ObjectUtils.anyNull(side, casePositionCasePositionPair)) {
             return;
         }
 
@@ -180,7 +180,7 @@ public class GameBoardData implements Cloneable, Serializable {
     }
 
     public void setPiecePositionWithoutMoveState(Pieces piece, CasePosition to) {
-        if (ObjectUtils.hasNull(piece, to)) {
+        if (ObjectUtils.anyNull(piece, to)) {
             return;
         }
 
@@ -195,7 +195,7 @@ public class GameBoardData implements Cloneable, Serializable {
      * @param to
      */
     protected void changeMovedStateOfPiece(Pieces piece, CasePosition from, CasePosition to) {
-        if (ObjectUtils.hasNull(piece, from, to)) {
+        if (ObjectUtils.anyNull(piece, from, to)) {
             return;
         }
 
@@ -257,7 +257,7 @@ public class GameBoardData implements Cloneable, Serializable {
     }
 
     protected void changePieceTurnNumber(CasePosition from, CasePosition to) {
-        if (ObjectUtils.hasNull(to, from)) {
+        if (ObjectUtils.anyNull(to, from)) {
             return;
         }
 
@@ -303,7 +303,7 @@ public class GameBoardData implements Cloneable, Serializable {
     }
 
     protected void removePawnPromotion(Pair<CasePosition, CasePosition> pair, Side side) {
-        if (ObjectUtils.hasNull(pair, side) || Side.OBSERVER.equals(side)) {
+        if (ObjectUtils.anyNull(pair, side) || Side.OBSERVER.equals(side)) {
             return;
         }
 
