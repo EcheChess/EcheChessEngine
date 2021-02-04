@@ -7,7 +7,7 @@
     <parent>
         <groupId>ca.watier.echechess.properties</groupId>
         <artifactId>echechess-properties</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </parent>
 
     <groupId>ca.watier.echechess.engine</groupId>
@@ -21,20 +21,19 @@
 
     <distributionManagement>
         <repository>
-            <id>bintray-repo-maven</id>
-            <name>doi9t-EcheChess</name>
-            <url>https://api.bintray.com/maven/doi9t/EcheChess/EcheChessEngine/;publish=1</url>
+            <id>gitlab-maven</id>
+            <url>https://gitlab.com/api/v4/projects/6727276/packages/maven</url>
         </repository>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>bintray-doi9t-EcheChess</id>
-            <name>bintray</name>
-            <url>https://dl.bintray.com/doi9t/EcheChess</url>
+            <id>gitlab-maven-EcheChessProperties</id> <!-- https://gitlab.com/echechess/EcheChessProperties -->
+            <url>https://gitlab.com/api/v4/projects/6727485/packages/maven</url>
+        </repository>
+        <repository>
+            <id>gitlab-maven-EcheChessCommon</id> <!-- https://gitlab.com/echechess/EcheChessCommon -->
+            <url>https://gitlab.com/api/v4/projects/6727136/packages/maven</url>
         </repository>
     </repositories>
 
@@ -84,7 +83,7 @@
         <dependency>
             <groupId>ca.watier.echechess.common</groupId>
             <artifactId>echechess-common</artifactId>
-            <version>1.7.0</version>
+            <version>1.8.0</version>
         </dependency>
 
         <dependency>

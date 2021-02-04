@@ -231,7 +231,7 @@ public abstract class GameBoard implements Serializable {
 
     public GameBoardData getCloneOfCurrentDataState() {
         try {
-            return org.apache.commons.lang3.ObjectUtils.cloneIfPossible(gameBoardData);
+            return ObjectUtils.cloneIfPossible(gameBoardData);
         } catch (CloneFailedException ex) {
             LOGGER.error(ex.getMessage(), ex);
             return gameBoardData;
